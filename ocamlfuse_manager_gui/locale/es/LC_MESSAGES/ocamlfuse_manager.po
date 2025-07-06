@@ -1,0 +1,1499 @@
+# Spanish translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-07-04 16:01-0300\n"
+"PO-Revision-Date: 2025-07-02 16:06-0300\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: es <LL@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: account.py:36
+msgid ""
+"La etiqueta no puede estar vacía. Escribe un nombre único para la cuenta."
+msgstr ""
+"La etiqueta no puede estar vacía. Escribe un nombre único para la cuenta."
+
+#: account.py:39
+#, python-brace-format
+msgid "Ya existe una cuenta con la etiqueta '{label}'. Usa otra diferente."
+msgstr "Ya existe una cuenta con la etiqueta '{label}'. Usa otra diferente."
+
+#: account.py:42
+msgid "Client ID y Client Secret son obligatorios"
+msgstr "Client ID y Client Secret son obligatorios"
+
+#: account.py:45
+msgid ""
+"El Client ID debe tener el formato:\n"
+"1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com"
+msgstr ""
+"El Client ID debe tener el formato:\n"
+"1234567890-abcdefghijklmnopqrstuvwxyz.apps.googleusercontent.com"
+
+#: account.py:48
+msgid ""
+"El Client Secret debe ser una cadena alfanumérica de al menos 24 caracteres."
+msgstr ""
+"El Client Secret debe ser una cadena alfanumérica de al menos 24 caracteres."
+
+#: account.py:54
+msgid "Ya existe una cuenta configurada con este Client ID.\n"
+msgstr "Ya existe una cuenta configurada con este Client ID.\n"
+
+#: account.py:55
+msgid "No puedes usar el mismo archivo de credenciales para varias cuentas.\n"
+msgstr "No puedes usar el mismo archivo de credenciales para varias cuentas.\n"
+
+#: account.py:56
+msgid ""
+"Si quieres acceder a diferentes Google Drive, crea credenciales distintas en "
+"Google Cloud Console."
+msgstr ""
+"Si quieres acceder a diferentes Google Drive, crea credenciales distintas en "
+"Google Cloud Console."
+
+#: account.py:63 gui.py:917
+msgid "Configurando cuenta"
+msgstr "Configurando cuenta"
+
+#: account.py:80
+msgid "Autoriza en navegador..."
+msgstr "Autoriza en navegador..."
+
+#: account.py:86 gui.py:786 gui.py:939
+msgid "Cancelar"
+msgstr "Cancelar"
+
+#: account.py:131 account.py:261 account.py:315 account.py:449 account.py:456
+#: gui.py:956 gui.py:1002 gui.py:1074 gui.py:1111
+msgid "Advertencia"
+msgstr "Advertencia"
+
+#: account.py:131
+msgid "Selecciona una cuenta"
+msgstr "Selecciona una cuenta"
+
+#: account.py:136 account.py:157 account.py:171 account.py:338 account.py:397
+#: account.py:566 account.py:647 account.py:649 gui.py:247 gui.py:317
+#: gui.py:536 gui.py:604 gui.py:614 gui.py:880 gui.py:902 gui.py:1020
+#: gui.py:1062 gui.py:1066 gui.py:1068 gui.py:1148 gui.py:1311 mount.py:35
+#: mount.py:38 mount.py:41
+msgid "Error"
+msgstr "Error"
+
+#: account.py:136
+msgid "Cuenta no encontrada"
+msgstr "Cuenta no encontrada"
+
+#: account.py:142
+msgid "Reautorizando..."
+msgstr "Reautorizando..."
+
+#: account.py:151 account.py:536 gui.py:895
+msgid "No se pudo iniciar el servidor OAuth"
+msgstr "No se pudo iniciar el servidor OAuth"
+
+#: account.py:152 account.py:153
+msgid "Reautorización cancelada por el usuario."
+msgstr "Reautorización cancelada por el usuario."
+
+#: account.py:154 account.py:539 gui.py:898
+msgid "No se recibió el código de autorización a tiempo"
+msgstr "No se recibió el código de autorización a tiempo"
+
+#: account.py:155
+msgid "Error al completar la reautorización OAuth"
+msgstr "Error al completar la reautorización OAuth"
+
+#: account.py:157 gui.py:902
+msgid "Error desconocido"
+msgstr "Error desconocido"
+
+#: account.py:169 account.py:415 account.py:645 gui.py:628 gui.py:907
+#: gui.py:1054 gui.py:1105 mount.py:32 mount.py:87
+msgid "Éxito"
+msgstr "Éxito"
+
+#: account.py:169
+#, python-brace-format
+msgid "'La cuenta{lbl}' ha sido reautorizada"
+msgstr "'La cuenta{lbl}' ha sido reautorizada"
+
+#: account.py:171
+msgid "Reautorización falló"
+msgstr "Reautorización falló"
+
+#: account.py:233 gui.py:536 gui.py:1248
+msgid "Pendiente"
+msgstr "Pendiente"
+
+#: account.py:235 gui.py:1250
+msgid "Importada"
+msgstr "Importada"
+
+#: account.py:237 gui.py:1252
+msgid "Configurada"
+msgstr "Configurada"
+
+#: account.py:255
+#, fuzzy
+msgid ""
+"¡Hey! Primero selecciona una cuenta antes de intentar borrarla, no borres el "
+"aire :)."
+msgstr ""
+"¡Hey! Primero selecciona una cuenta antes de intentar borrarla, no borres el "
+"aire :)"
+
+#: account.py:256
+msgid "¿Intentas eliminar el vacío? Selecciona una cuenta real, por favor."
+msgstr "¿Intentas eliminar el vacío? Selecciona una cuenta real, por favor."
+
+#: account.py:257
+msgid ""
+"¡Ups! No hay ninguna cuenta seleccionada para eliminar. ¡Elige una primero!"
+msgstr ""
+"¡Ups! No hay ninguna cuenta seleccionada para eliminar. ¡Elige una primero!"
+
+#: account.py:258
+msgid "Nada seleccionado, nada eliminado. ¡Así de simple!"
+msgstr "Nada seleccionado, nada eliminado. ¡Así de simple!"
+
+#: account.py:259
+msgid ""
+"Selecciona una cuenta antes de hacerla desaparecer como por arte de magia."
+msgstr ""
+"Selecciona una cuenta antes de hacerla desaparecer como por arte de magia."
+
+#: account.py:270 gui.py:579
+msgid "Cuenta Montada"
+msgstr "Cuenta Montada"
+
+#: account.py:271
+#, python-brace-format
+msgid ""
+"La cuenta '{account}' está actualmente montada. Por favor, desmonta la "
+"unidad antes de eliminar la cuenta."
+msgstr ""
+"La cuenta '{account}' está actualmente montada. Por favor, desmonta la "
+"unidad antes de eliminar la cuenta."
+
+#: account.py:301
+#, python-brace-format
+msgid ""
+"¿Seguro que quieres eliminar la cuenta '{account}'? ¡No hay marcha atrás en "
+"la montaña!"
+msgstr ""
+"¿Seguro que quieres eliminar la cuenta '{account}'? ¡No hay marcha atrás en "
+"la montaña!"
+
+#: account.py:302
+#, python-brace-format
+msgid "¿Eliminar '{account}'? ¡Que los dioses de la nube lo aprueban!"
+msgstr "¿Eliminar '{account}'? ¡Que los dioses de la nube lo aprueban!"
+
+#: account.py:303
+#, python-brace-format
+msgid "¿Vas a eliminar '{account}'? ¡Que no te tiemble el pulso!"
+msgstr "¿Vas a eliminar '{account}'? ¡Que no te tiemble el pulso!"
+
+#: account.py:304
+#, python-brace-format
+msgid ""
+"Eliminar '{account}' es como borrar huellas en la nieve... ¿Estás seguro?"
+msgstr ""
+"Eliminar '{account}' es como borrar huellas en la nieve... ¿Estás seguro?"
+
+#: account.py:305
+#, python-brace-format
+msgid "¿Estás listo para decirle adiós a '{account}'? ¡Despedidas en la cima!"
+msgstr "¿Estás listo para decirle adiós a '{account}'? ¡Despedidas en la cima!"
+
+#: account.py:308 gui.py:1090 mount.py:73
+msgid "Confirmar"
+msgstr "Confirmar"
+
+#: account.py:315
+msgid ""
+"No se pudo desmontar la unidad. La carpeta de montaje podría estar en uso. "
+"Se intentará eliminar la carpeta de todas formas si confirmas."
+msgstr ""
+"No se pudo desmontar la unidad. La carpeta de montaje podría estar en uso. "
+"Se intentará eliminar la carpeta de todas formas si confirmas."
+
+#: account.py:325
+msgid "Eliminar del sistema"
+msgstr "Eliminar del sistema"
+
+#: account.py:327
+#, python-brace-format
+msgid ""
+"¿También quieres eliminar la configuración real de la cuenta en:\n"
+"{gdfuse_path}\n"
+"\n"
+"Esto borrará los tokens y configuraciones de google-drive-ocamlfuse para "
+"esta cuenta.\n"
+"\n"
+"¿Eliminar del sistema?"
+msgstr ""
+"¿También quieres eliminar la configuración real de la cuenta en:\n"
+"{gdfuse_path}\n"
+"\n"
+"Esto borrará los tokens y configuraciones de google-drive-ocamlfuse para "
+"esta cuenta.\n"
+"\n"
+"¿Eliminar del sistema?"
+
+#: account.py:338
+#, python-brace-format
+msgid ""
+"No se pudo eliminar la carpeta:\n"
+"{gdfuse_path}\n"
+"\n"
+"{e}"
+msgstr ""
+"No se pudo eliminar la carpeta:\n"
+"{gdfuse_path}\n"
+"\n"
+"{e}"
+
+#: account.py:346
+msgid "Eliminar punto de montaje"
+msgstr "Eliminar punto de montaje"
+
+#: account.py:355
+#, fuzzy, python-brace-format
+msgid ""
+"¿También quieres eliminar la carpeta de montaje local?\n"
+"{mount_point}\n"
+"\n"
+"¡ADVERTENCIA! Esto eliminará la carpeta y TODO su contenido de forma "
+"permanente."
+msgstr ""
+"¿También quieres eliminar la carpeta de montaje local:\n"
+"{mount_point}\n"
+"\n"
+"¡ADVERTENCIA! Esto eliminará la carpeta y TODO su contenido de forma "
+"permanente."
+
+#: account.py:361
+msgid "No volver a preguntar"
+msgstr "No volver a preguntar"
+
+#: account.py:378
+msgid "Sí"
+msgstr "Sí"
+
+#: account.py:379
+msgid "No"
+msgstr "No"
+
+#: account.py:397
+msgid ""
+"No se pudo eliminar la carpeta de montaje:\n"
+"{}\n"
+"\n"
+"{}"
+msgstr ""
+"No se pudo eliminar la carpeta de montaje:\n"
+"{}\n"
+"\n"
+"{}"
+
+#: account.py:409
+#, python-brace-format
+msgid "¡Cuenta '{account}' eliminada! Ahora hay más espacio en la nube"
+msgstr "¡Cuenta '{account}' eliminada! Ahora hay más espacio en la nube"
+
+#: account.py:410
+#, python-brace-format
+msgid ""
+"'{account}' ha sido eliminada. ¡Desapareció como un copo de nieve al sol!"
+msgstr ""
+"'{account}' ha sido eliminada. ¡Desapareció como un copo de nieve al sol!"
+
+#: account.py:411
+#, python-brace-format
+msgid "¡Listo! '{account}' ya no está entre nosotros."
+msgstr "¡Listo! '{account}' ya no está entre nosotros."
+
+#: account.py:412
+#, python-brace-format
+msgid "La cuenta '{account}' fue eliminada con éxito. ¡Hasta la vista, baby!"
+msgstr "La cuenta '{account}' fue eliminada con éxito. ¡Hasta la vista, baby!"
+
+#: account.py:413
+#, python-brace-format
+msgid "¡Puf! '{account}' se ha ido. ¡Así de fácil!"
+msgstr "¡Puf! '{account}' se ha ido. ¡Así de fácil!"
+
+#: account.py:422
+msgid "Restaurar cuenta"
+msgstr "Restaurar cuenta"
+
+#: account.py:422
+msgid "No hay cuentas eliminadas para restaurar."
+msgstr "No hay cuentas eliminadas para restaurar."
+
+#: account.py:426
+msgid "Restaurar Cuenta Eliminada"
+msgstr "Restaurar Cuenta Eliminada"
+
+#: account.py:429
+msgid "Selecciona la cuenta a restaurar:"
+msgstr "Selecciona la cuenta a restaurar:"
+
+#: account.py:437 gui.py:379 gui.py:1539
+msgid "Cuenta"
+msgstr "Cuenta"
+
+#: account.py:449
+msgid "Selecciona una cuenta para restaurar"
+msgstr "Selecciona una cuenta para restaurar"
+
+#: account.py:456
+msgid "Selecciona una cuenta para eliminar"
+msgstr "Selecciona una cuenta para eliminar"
+
+#: account.py:460 account.py:479
+msgid "Eliminar definitivamente"
+msgstr "Eliminar definitivamente"
+
+#: account.py:461
+#, python-brace-format
+msgid ""
+"¿Eliminar '{account}' de la lista de restaurables de forma permanente?\n"
+"\n"
+"Esta acción no se puede deshacer."
+msgstr ""
+"¿Eliminar '{account}' de la lista de restaurables de forma permanente?\n"
+"\n"
+"Esta acción no se puede deshacer."
+
+#: account.py:470
+msgid "Eliminada"
+msgstr "Eliminada"
+
+#: account.py:471
+#, python-brace-format
+msgid "La cuenta '{account}' fue eliminada definitivamente."
+msgstr "La cuenta '{account}' fue eliminada definitivamente."
+
+#: account.py:478
+msgid "Restaurar"
+msgstr "Restaurar"
+
+#: account.py:494
+msgid "Carpeta de configuración no encontrada"
+msgstr "Carpeta de configuración no encontrada"
+
+#: account.py:496
+#, fuzzy, python-brace-format
+msgid ""
+"La carpeta real de configuración para '{account}' no existe en:\n"
+"{gdfuse_path}\n"
+"\n"
+"¿Deseas reconfigurar la cuenta ahora (recomendado)? ahora (recomendado)?\n"
+"Si eliges 'No', solo se restaurará la configuración interna, pero no podrás "
+"montar la cuenta hasta reconfigurarla.\n"
+"Podrás usar el botón 'Reautorizar' para completar la configuración más "
+"adelante."
+msgstr ""
+"La carpeta real de configuración para '{account}' no existe en:\n"
+"{gdfuse_path}\n"
+"\n"
+"¿Deseas reconfigurar la cuenta ahora (recomendado)?\n"
+"Si eliges 'No', solo se restaurará la configuración interna, pero no podrás "
+"montar la cuenta hasta reconfigurarla.\n"
+"Podrás usar el botón 'Reautorizar' para completar la configuración más "
+"adelante."
+
+#: account.py:516
+msgid "Reconfigurar cuenta"
+msgstr "Reconfigurar cuenta"
+
+#: account.py:517
+msgid ""
+"Se han precargado los datos de la cuenta. Completa el flujo de configuración "
+"OAuth para restaurar completamente la cuenta."
+msgstr ""
+"Se han precargado los datos de la cuenta. Completa el flujo de configuración "
+"OAuth para restaurar completamente la cuenta."
+
+#: account.py:530 account.py:586
+msgid "Restaurada"
+msgstr "Restaurada"
+
+#: account.py:530
+#, python-brace-format
+msgid "La cuenta '{account}' ha sido restaurada completamente."
+msgstr "La cuenta '{account}' ha sido restaurada completamente."
+
+#: account.py:537 account.py:538
+msgid "Restauración cancelada por el usuario."
+msgstr "Restauración cancelada por el usuario."
+
+#: account.py:540
+msgid "Error al completar la restauración OAuth"
+msgstr "Error al completar la restauración OAuth"
+
+#: account.py:541 gui.py:900
+#, fuzzy
+msgid "Ya existe una cuenta configurada con el correo '{}'."
+msgstr "Ya existe una cuenta configurada con el correo '{email}'."
+
+#: account.py:541
+#, fuzzy
+msgid "desconocido"
+msgstr "Desconocido"
+
+#: account.py:544
+msgid "Restauración incompleta"
+msgstr "Restauración incompleta"
+
+#: account.py:545
+msgid ""
+"La cuenta no fue reconfigurada completamente. Sigue en la lista de "
+"eliminadas."
+msgstr ""
+"La cuenta no fue reconfigurada completamente. Sigue en la lista de "
+"eliminadas."
+
+#: account.py:554
+msgid "Restauración parcial"
+msgstr "Restauración parcial"
+
+#: account.py:555
+msgid ""
+"La cuenta se restaurará solo en la configuración interna, pero no podrá "
+"montarse hasta que la reautorices.\n"
+"\n"
+"Puedes usar el botón 'Reautorizar' cuando lo desees."
+msgstr ""
+"La cuenta se restaurará solo en la configuración interna, pero no podrá "
+"montarse hasta que la reautorices.\n"
+"\n"
+"Puedes usar el botón 'Reautorizar' cuando lo desees."
+
+#: account.py:568
+#, python-brace-format
+msgid ""
+"Ya existe una cuenta activa con el mismo Client ID.\n"
+"No puedes restaurar '{account}' mientras exista otra cuenta con el mismo "
+"Client ID."
+msgstr ""
+"Ya existe una cuenta activa con el mismo Client ID.\n"
+"No puedes restaurar '{account}' mientras exista otra cuenta con el mismo "
+"Client ID."
+
+#: account.py:587
+#, python-brace-format
+msgid "La cuenta '{account}' ha sido restaurada correctamente."
+msgstr "La cuenta '{account}' ha sido restaurada correctamente."
+
+#: account.py:612
+msgid "Seleccionar archivo de credenciales JSON"
+msgstr "Seleccionar archivo de credenciales JSON"
+
+#: account.py:613
+msgid "Archivos JSON"
+msgstr "Archivos JSON"
+
+#: account.py:645
+msgid "Credenciales cargadas correctamente"
+msgstr "Credenciales cargadas correctamente"
+
+#: account.py:647
+msgid "El archivo JSON no contiene client_id o client_secret válidos."
+msgstr "El archivo JSON no contiene client_id o client_secret válidos."
+
+#: account.py:649
+#, python-brace-format
+msgid ""
+"No se pudo leer el archivo:\n"
+"{e}"
+msgstr ""
+"No se pudo leer el archivo:\n"
+"{e}"
+
+#: account.py:654
+#, python-brace-format
+msgid ""
+"Guía para crear credenciales OAuth 2.0 (Aplicación web o Aplicación de "
+"escritorio):\n"
+"\n"
+"1. Ve a {credentials_url}\n"
+"2. Haz clic en 'Crear credenciales' > 'ID de cliente de OAuth'\n"
+"3. Selecciona 'Aplicación web' o 'Aplicación de escritorio' como tipo de "
+"aplicación.\n"
+"   - Si eliges 'Aplicación de escritorio', Google ya permite usar el flujo "
+"de redirección a localhost.\n"
+"4. Ponle un nombre (ejemplo: EasyOcamlfuse).\n"
+"5. En 'URIs de redireccionamiento autorizados' agrega:\n"
+"    {redirect_uri}\n"
+"6. Haz clic en 'Crear'\n"
+"7. Descarga el archivo JSON y usa el botón 'Cargar credenciales JSON' aquí.\n"
+"8. Si lo prefieres, copia el Client ID y Client Secret manualmente.\n"
+"\n"
+"Más información oficial:\n"
+"{official_docs}"
+msgstr ""
+"Guía para crear credenciales OAuth 2.0 (Aplicación web o Aplicación de "
+"escritorio):\n"
+"\n"
+"1. Ve a {credentials_url}\n"
+"2. Haz clic en 'Crear credenciales' > 'ID de cliente de OAuth'\n"
+"3. Selecciona 'Aplicación web' o 'Aplicación de escritorio' como tipo de "
+"aplicación.\n"
+"   - Si eliges 'Aplicación de escritorio', Google ya permite usar el flujo "
+"de redirección a localhost.\n"
+"4. Ponle un nombre (ejemplo: EasyOcamlfuse).\n"
+"5. En 'URIs de redireccionamiento autorizados' agrega:\n"
+"    {redirect_uri}\n"
+"6. Haz clic en 'Crear'\n"
+"7. Descarga el archivo JSON y usa el botón 'Cargar credenciales JSON' aquí.\n"
+"8. Si lo prefieres, copia el Client ID y Client Secret manualmente.\n"
+"\n"
+"Más información oficial:\n"
+"{official_docs}"
+
+#: account.py:675
+msgid "Guía para crear credenciales OAuth 2.0"
+msgstr "Guía para crear credenciales OAuth 2.0"
+
+#: account.py:692 account.py:730 gui.py:281
+msgid "Texto copiado al portapapeles"
+msgstr "Texto copiado al portapapeles"
+
+#: account.py:696 gui.py:644
+msgid "Copiar"
+msgstr "Copiar"
+
+#: account.py:697 gui.py:649
+msgid "Edición"
+msgstr "Edición"
+
+#: account.py:737
+msgid "Abrir Google Cloud Console"
+msgstr "Abrir Google Cloud Console"
+
+#: config.py:24
+#, python-brace-format
+msgid "Error al cargar configuración: {e}"
+msgstr "Error al cargar configuración: {e}"
+
+#: config.py:32
+#, python-brace-format
+msgid "Error al guardar configuración: {e}"
+msgstr "Error al guardar configuración: {e}"
+
+#: gui.py:36 gui.py:1525 gui.py:1527
+msgid "Easy Ocamlfuse"
+msgstr "Easy Ocamlfuse"
+
+#: gui.py:53
+#, fuzzy
+msgid "No se pudo cargar el icono de ventana: {}"
+msgstr "No se pudo cargar el icono de ventana: {e}"
+
+#: gui.py:248
+msgid ""
+"No se pudo eliminar la línea de autoinicio de ~/.profile:\n"
+"{}"
+msgstr ""
+"No se pudo eliminar la línea de autoinicio de ~/.profile:\n"
+"{}"
+
+#: gui.py:257
+msgid "Autoinicio en Bodhi/Enlightenment"
+msgstr "Autoinicio en Bodhi/Enlightenment"
+
+#: gui.py:263
+msgid ""
+"En Bodhi/Enlightenment el inicio automático estándar puede no funcionar.\n"
+"\n"
+msgstr ""
+"En Bodhi/Enlightenment el inicio automático estándar puede no funcionar.\n"
+"\n"
+
+#: gui.py:264
+msgid ""
+"Para asegurar el autoinicio, añade la siguiente línea al final de tu archivo "
+"~/.profile:\n"
+"\n"
+msgstr ""
+"Para asegurar el autoinicio, añade la siguiente línea al final de tu archivo "
+"~/.profile:\n"
+"\n"
+
+#: gui.py:266
+msgid ""
+"Puedes copiar el texto, editarlo manualmente o pulsar el botón para añadirlo "
+"automáticamente.\n"
+msgstr ""
+"Puedes copiar el texto, editarlo manualmente o pulsar el botón para añadirlo "
+"automáticamente.\n"
+
+#: gui.py:267
+msgid "Luego, reinicia sesión."
+msgstr "Luego, reinicia sesión."
+
+#: gui.py:310
+msgid "Listo"
+msgstr "Listo"
+
+#: gui.py:311
+msgid "Se añadió la línea de autoinicio a tu ~/.profile correctamente.\n"
+msgstr "Se añadió la línea de autoinicio a tu ~/.profile correctamente.\n"
+
+#: gui.py:312
+msgid "Reinicia sesión para que surta efecto."
+msgstr "Reinicia sesión para que surta efecto."
+
+#: gui.py:318
+#, fuzzy
+msgid ""
+"No se pudo modificar ~/.profile:\n"
+"{}"
+msgstr ""
+"No se pudo modificar ~/.profile:\n"
+"{e}"
+
+#: gui.py:322
+msgid "Añadir automáticamente a ~/.profile"
+msgstr "Añadir automáticamente a ~/.profile"
+
+#: gui.py:326
+msgid "Cerrar"
+msgstr "Cerrar"
+
+#: gui.py:341
+msgid "Desmontaje Detectado"
+msgstr "Desmontaje Detectado"
+
+#: gui.py:342
+#, python-brace-format
+msgid "La cuenta '{label}' fue desmontada externamente."
+msgstr "La cuenta '{label}' fue desmontada externamente."
+
+#: gui.py:357 gui.py:1530
+msgid "Gestión Principal"
+msgstr "Gestión Principal"
+
+#: gui.py:360 gui.py:1531
+msgid "Gestión de Cuentas"
+msgstr "Gestión de Cuentas"
+
+#: gui.py:368 gui.py:1534
+msgid "Estado del Sistema"
+msgstr "Estado del Sistema"
+
+#: gui.py:371 gui.py:1535
+msgid "Verificando instalación..."
+msgstr "Verificando instalación..."
+
+#: gui.py:375 gui.py:1536
+msgid "Cuentas Montadas"
+msgstr "Cuentas Montadas"
+
+#: gui.py:379 gui.py:480 gui.py:1539 gui.py:1565
+msgid "Etiqueta"
+msgstr "Etiqueta"
+
+#: gui.py:379 gui.py:1539
+msgid "Punto de Montaje"
+msgstr "Punto de Montaje"
+
+#: gui.py:379 gui.py:480 gui.py:1539 gui.py:1565
+msgid "Estado"
+msgstr "Estado"
+
+#: gui.py:408 gui.py:1543
+msgid "Montar Cuenta"
+msgstr "Montar Cuenta"
+
+#: gui.py:410 gui.py:1544
+msgid "Desmontar Seleccionada"
+msgstr "Desmontar Seleccionada"
+
+#: gui.py:412 gui.py:1545
+msgid "Desmontar Todas"
+msgstr "Desmontar Todas"
+
+#: gui.py:414 gui.py:1546
+msgid "Actualizar"
+msgstr "Actualizar"
+
+#: gui.py:416 gui.py:1547
+msgid "Abrir Carpeta"
+msgstr "Abrir Carpeta"
+
+#: gui.py:423 gui.py:1550
+msgid "Agregar Nueva Cuenta"
+msgstr "Agregar Nueva Cuenta"
+
+#: gui.py:429 gui.py:1551
+msgid "Etiqueta:"
+msgstr "Etiqueta:"
+
+#: gui.py:433
+msgid ""
+"Nombre identificador para tu cuenta (ej: personal, trabajo) NO! dejes este "
+"campo vacio"
+msgstr ""
+"Nombre identificador para tu cuenta (ej: personal, trabajo) NO! dejes este "
+"campo vacio"
+
+#: gui.py:436 gui.py:1552
+msgid "Client ID:"
+msgstr "Client ID:"
+
+#: gui.py:440
+msgid "Client ID de tu proyecto en Google Cloud Console."
+msgstr "Client ID de tu proyecto en Google Cloud Console."
+
+#: gui.py:443 gui.py:1553
+msgid "Client Secret:"
+msgstr "Client Secret:"
+
+#: gui.py:447
+msgid "Client Secret de tu proyecto en Google Cloud Console."
+msgstr "Client Secret de tu proyecto en Google Cloud Console."
+
+#: gui.py:464 gui.py:1557
+msgid "Cargar JSON"
+msgstr "Cargar JSON"
+
+#: gui.py:467 gui.py:1558
+msgid "Configurar Cuenta"
+msgstr "Configurar Cuenta"
+
+#: gui.py:470 gui.py:1559
+msgid "Limpiar"
+msgstr "Limpiar"
+
+#: gui.py:473 gui.py:685 gui.py:1560
+msgid "Ayuda"
+msgstr "Ayuda"
+
+#: gui.py:477 gui.py:1562
+msgid "Cuentas Configuradas"
+msgstr "Cuentas Configuradas"
+
+#: gui.py:480 gui.py:1565
+msgid "Client ID"
+msgstr "Client ID"
+
+#: gui.py:480 gui.py:484 gui.py:1565
+msgid "Montar al iniciar"
+msgstr "Montar al iniciar"
+
+#: gui.py:517 gui.py:1569
+msgid "Eliminar Cuenta"
+msgstr "Eliminar Cuenta"
+
+#: gui.py:520 gui.py:1570
+msgid "Reautorizar"
+msgstr "Reautorizar"
+
+#: gui.py:523 gui.py:1571
+msgid "Actualizar Lista"
+msgstr "Actualizar Lista"
+
+#: gui.py:526 gui.py:1572
+msgid "Restaurar Cuenta"
+msgstr "Restaurar Cuenta"
+
+#: gui.py:579
+#, fuzzy
+msgid ""
+"No puedes cambiar el nombre de '{}' mientras esté montada. Desmóntala "
+"primero."
+msgstr ""
+"No puedes cambiar el nombre de '{old_label}' mientras esté montada. "
+"Desmóntala primero."
+
+#: gui.py:604
+#, fuzzy
+msgid "La etiqueta '{}' ya existe."
+msgstr "La etiqueta '{new_label}' ya existe."
+
+#: gui.py:614
+#, fuzzy
+msgid ""
+"No se pudo renombrar la carpeta de configuración de ocamlfuse:\n"
+"{} a {}\n"
+"\n"
+"Error: {}\n"
+"\n"
+"La etiqueta se ha actualizado en la aplicación, pero es posible que "
+"necesites corregir la carpeta manualmente para evitar problemas."
+msgstr ""
+"No se pudo renombrar la carpeta de configuración de ocamlfuse:\n"
+"{old_gdfuse_path} a {new_gdfuse_path}\n"
+"\n"
+"Error: {e}\n"
+"\n"
+"La etiqueta se ha actualizado en la aplicación, pero es posible que "
+"necesites corregir la carpeta manualmente para evitar problemas."
+
+#: gui.py:628
+#, fuzzy
+msgid "La cuenta '{}' ha sido renombrada a '{}'."
+msgstr "La cuenta '{old_label}' ha sido renombrada a '{new_label}'."
+
+#: gui.py:639 gui.py:1489 tray.py:22 tray.py:58
+msgid "Salir"
+msgstr "Salir"
+
+#: gui.py:640
+msgid "Archivo"
+msgstr "Archivo"
+
+#: gui.py:645
+msgid "Pegar"
+msgstr "Pegar"
+
+#: gui.py:646
+msgid "Cortar"
+msgstr "Cortar"
+
+#: gui.py:648
+msgid "Limpiar campos"
+msgstr "Limpiar campos"
+
+#: gui.py:654
+msgid "Iniciar con el sistema"
+msgstr "Iniciar con el sistema"
+
+#: gui.py:659 gui.py:1134
+msgid "Restaurar configuración"
+msgstr "Restaurar configuración"
+
+#: gui.py:666
+msgid "Español"
+msgstr "Español"
+
+#: gui.py:672
+msgid "English"
+msgstr "English"
+
+#: gui.py:677
+msgid "Idioma"
+msgstr "Idioma"
+
+#: gui.py:679
+msgid "Preferencias"
+msgstr "Preferencias"
+
+#: gui.py:684
+msgid "Acerca de..."
+msgstr "Acerca de..."
+
+#: gui.py:739
+msgid "Instalar ocamlfuse"
+msgstr "Instalar ocamlfuse"
+
+#: gui.py:740
+msgid ""
+"google-drive-ocamlfuse no está instalado.\n"
+"\n"
+"¿Deseas instalarlo automáticamente ahora?\n"
+"\n"
+"Se requerirá tu contraseña de administrador."
+msgstr ""
+"google-drive-ocamlfuse no está instalado.\n"
+"\n"
+"¿Deseas instalarlo automáticamente ahora?\n"
+"\n"
+"Se requerirá tu contraseña de administrador."
+
+#: gui.py:750
+msgid "Instalación manual"
+msgstr "Instalación manual"
+
+#: gui.py:751
+msgid ""
+"Puedes instalar google-drive-ocamlfuse manualmente:\n"
+"\n"
+"1. Abre una terminal\n"
+"2. Sigue las instrucciones en:\n"
+"   https://github.com/astrada/google-drive-ocamlfuse\n"
+"\n"
+"Después de instalar, reinicia esta aplicación."
+msgstr ""
+"Puedes instalar google-drive-ocamlfuse manualmente:\n"
+"\n"
+"1. Abre una terminal\n"
+"2. Sigue las instrucciones en:\n"
+"   https://github.com/astrada/google-drive-ocamlfuse\n"
+"\n"
+"Después de instalar, reinicia esta aplicación."
+
+#: gui.py:767
+msgid "Seleccionar una versión de PPA"
+msgstr "Seleccionar una versión de PPA"
+
+#: gui.py:772
+msgid "¿Qué versión deseas instalar?"
+msgstr "¿Qué versión deseas instalar?"
+
+#: gui.py:777
+msgid "Estable (ppa:alessandro-strada/ppa)"
+msgstr "Estable (ppa:alessandro-strada/ppa)"
+
+#: gui.py:778
+msgid "Beta (ppa:alessandro-strada/google-drive-ocamlfuse-beta)"
+msgstr "Beta (ppa:alessandro-strada/google-drive-ocamlfuse-beta)"
+
+#: gui.py:785
+msgid "Continuar"
+msgstr "Continuar"
+
+#: gui.py:797
+msgid "Distribución no soportada"
+msgstr "Distribución no soportada"
+
+#: gui.py:798
+msgid ""
+"No se pudo determinar tu distribución o no es soportada para instalación "
+"automática.\n"
+"\n"
+msgstr ""
+"No se pudo determinar tu distribución o no es soportada para instalación "
+"automática.\n"
+"\n"
+
+#: gui.py:799
+msgid "Por favor instala google-drive-ocamlfuse manualmente."
+msgstr "Por favor instala google-drive-ocamlfuse manualmente."
+
+#: gui.py:806
+msgid "Proceso de instalación"
+msgstr "Proceso de instalación"
+
+#: gui.py:815
+msgid "Instalando google-drive-ocamlfuse..."
+msgstr "Instalando google-drive-ocamlfuse..."
+
+#: gui.py:817
+msgid "Preparando instalación..."
+msgstr "Preparando instalación..."
+
+#: gui.py:834
+msgid "Ejecutando comandos de instalación...\n"
+msgstr "Ejecutando comandos de instalación...\n"
+
+#: gui.py:847
+msgid "Instalación completada con éxito!"
+msgstr "Instalación completada con éxito!"
+
+#: gui.py:850
+msgid "Instalación exitosa"
+msgstr "Instalación exitosa"
+
+#: gui.py:851
+msgid ""
+"google-drive-ocamlfuse se instaló correctamente.\n"
+"\n"
+"Reinicia la aplicación para continuar."
+msgstr ""
+"google-drive-ocamlfuse se instaló correctamente.\n"
+"\n"
+"Reinicia la aplicación para continuar."
+
+#: gui.py:857
+msgid "Error en la instalación"
+msgstr "Error en la instalación"
+
+#: gui.py:860
+msgid "Error de instalación"
+msgstr "Error de instalación"
+
+#: gui.py:861
+msgid ""
+"Ocurrió un error durante la instalación.\n"
+"\n"
+"Consulta la salida para más detalles."
+msgstr ""
+"Ocurrió un error durante la instalación.\n"
+"\n"
+"Consulta la salida para más detalles."
+
+#: gui.py:885
+msgid "Esperando autorización..."
+msgstr "Esperando autorización..."
+
+#: gui.py:896
+msgid ""
+"Has cancelado la autorización en Google. Espera unos segundos y vuelve a "
+"intentarlo."
+msgstr ""
+"Has cancelado la autorización en Google. Espera unos segundos y vuelve a "
+"intentarlo."
+
+#: gui.py:897
+msgid "Configuración cancelada por el usuario."
+msgstr "Configuración cancelada por el usuario."
+
+#: gui.py:899
+msgid "Error al completar la configuración OAuth"
+msgstr "Error al completar la configuración OAuth"
+
+#: gui.py:907
+#, python-brace-format
+msgid "Cuenta '{label}' configurada correctamente"
+msgstr "Cuenta '{label}' configurada correctamente"
+
+#: gui.py:913
+msgid "Error inesperado"
+msgstr "Error inesperado"
+
+#: gui.py:931
+msgid "Autoriza la aplicación en tu navegador..."
+msgstr "Autoriza la aplicación en tu navegador..."
+
+#: gui.py:956
+msgid "No hay cuentas configuradas"
+msgstr "No hay cuentas configuradas"
+
+#: gui.py:960
+msgid "Seleccionar Cuenta a Montar"
+msgstr "Seleccionar Cuenta a Montar"
+
+#: gui.py:963
+msgid "Selecciona la cuenta que deseas montar:"
+msgstr "Selecciona la cuenta que deseas montar:"
+
+#: gui.py:994
+msgid "Abrir carpeta al montar"
+msgstr "Abrir carpeta al montar"
+
+#: gui.py:1002
+msgid "Selecciona una cuenta para montar"
+msgstr "Selecciona una cuenta para montar"
+
+#: gui.py:1007
+msgid "Montar"
+msgstr "Montar"
+
+#: gui.py:1021
+#, python-brace-format
+msgid "La cuenta '{account}' no está configurada correctamente."
+msgstr "La cuenta '{account}' no está configurada correctamente."
+
+#: gui.py:1027
+msgid "Información"
+msgstr "Información"
+
+#: gui.py:1028
+#, python-brace-format
+msgid "La cuenta '{account}' ya está montada en {mount_point}"
+msgstr "La cuenta '{account}' ya está montada en {mount_point}"
+
+#: gui.py:1055
+#, python-brace-format
+msgid "Cuenta '{account}' montada en {mount_point}"
+msgstr "Cuenta '{account}' montada en {mount_point}"
+
+#: gui.py:1063
+#, python-brace-format
+msgid ""
+"Error al montar:\n"
+"{stderr}"
+msgstr ""
+"Error al montar:\n"
+"{stderr}"
+
+#: gui.py:1066 mount.py:38
+msgid "Timeout al montar la cuenta"
+msgstr "Timeout al montar la cuenta"
+
+#: gui.py:1068
+#, fuzzy
+msgid "Error inesperado: {}"
+msgstr "Error inesperado"
+
+#: gui.py:1074
+msgid "Selecciona una cuenta para desmontar"
+msgstr "Selecciona una cuenta para desmontar"
+
+#: gui.py:1087 mount.py:70
+msgid "Info"
+msgstr "Info"
+
+#: gui.py:1087 mount.py:70
+msgid "No hay cuentas montadas"
+msgstr "No hay cuentas montadas"
+
+#: gui.py:1090 mount.py:73
+msgid "¿Desmontar todas las cuentas?"
+msgstr "¿Desmontar todas las cuentas?"
+
+#: gui.py:1100 mount.py:82
+msgid "Algunas cuentas no se desmontaron"
+msgstr "Algunas cuentas no se desmontaron"
+
+#: gui.py:1101
+#, python-brace-format
+msgid ""
+"No se pudieron desmontar las siguientes cuentas:\n"
+"{errores_str}\n"
+"Verifica que no estén en uso."
+msgstr ""
+"No se pudieron desmontar las siguientes cuentas:\n"
+"{errores_str}\n"
+"Verifica que no estén en uso."
+
+#: gui.py:1105 mount.py:87
+msgid "Todas las cuentas fueron desmontadas correctamente."
+msgstr "Todas las cuentas fueron desmontadas correctamente."
+
+#: gui.py:1111
+msgid "Selecciona una cuenta montada"
+msgstr "Selecciona una cuenta montada"
+
+#: gui.py:1124
+#, fuzzy
+msgid "Error al abrir la carpeta {}: {}"
+msgstr "Error al abrir la carpeta {path}: {e}"
+
+#: gui.py:1135
+msgid ""
+"¿Seguro que quieres restaurar la configuración?\n"
+"Se perderán todas las cuentas y preferencias guardadas."
+msgstr ""
+"¿Seguro que quieres restaurar la configuración?\n"
+"Se perderán todas las cuentas y preferencias guardadas."
+
+#: gui.py:1146
+msgid "Restaurado"
+msgstr "Restaurado"
+
+#: gui.py:1146
+msgid ""
+"Configuración restaurada. Reinicia la aplicación para aplicar los cambios."
+msgstr ""
+"Configuración restaurada. Reinicia la aplicación para aplicar los cambios."
+
+#: gui.py:1148
+#, fuzzy
+msgid ""
+"No se pudo restaurar la configuración:\n"
+"{}"
+msgstr ""
+"No se pudo restaurar la configuración:\n"
+"{e}"
+
+#: gui.py:1295 gui.py:1300 mount.py:106
+msgid "Desconocido"
+msgstr "Desconocido"
+
+#: gui.py:1311
+msgid "Montado"
+msgstr "Montado"
+
+#: gui.py:1381
+#, fuzzy
+msgid ""
+"No se monta '{}' porque el token OAuth no es válido o ha caducado. Por "
+"favor, reautoriza la cuenta."
+msgstr ""
+"No se monta '{label}' porque el token OAuth no es válido o ha caducado. Por "
+"favor, reautoriza la cuenta."
+
+#: gui.py:1383 gui.py:1385
+#, fuzzy
+msgid "Error al montar '{}': {}"
+msgstr "Error al montar '{label}': {e}"
+
+#: gui.py:1390
+msgid "Acerca de Easy Ocamlfuse"
+msgstr "Acerca de Easy Ocamlfuse"
+
+#: gui.py:1402
+msgid "Acerca de"
+msgstr "Acerca de"
+
+#: gui.py:1418
+msgid "Gestor gráfico para Google Drive Ocamlfuse"
+msgstr "Gestor gráfico para Google Drive Ocamlfuse"
+
+#: gui.py:1419
+msgid "Versión: 1.0"
+msgstr "Versión: 1.0"
+
+#: gui.py:1420
+msgid "Repositorio y descargas en:"
+msgstr "Repositorio y descargas en:"
+
+#: gui.py:1427
+msgid "Basado en el software original:"
+msgstr "Basado en el software original:"
+
+#: gui.py:1436
+msgid "Créditos"
+msgstr "Créditos"
+
+#: gui.py:1438
+msgid "Autor: ayalarol"
+msgstr "Autor: ayalarol"
+
+#: gui.py:1439
+msgid "¡Gracias por usar Easy Ocamlfuse!"
+msgstr "¡Gracias por usar Easy Ocamlfuse!"
+
+#: gui.py:1444
+msgid "¿Te gusta el proyecto? ¡Dame energías con un café en PayPal! :D"
+msgstr "¿Te gusta el proyecto? ¡Dame energías con un café en PayPal! :D"
+
+#: gui.py:1452
+msgid "Licencia"
+msgstr "Licencia"
+
+#: gui.py:1489
+msgid "¿Deseas cerrar la aplicación?"
+msgstr "¿Deseas cerrar la aplicación?"
+
+#: gui.py:1518
+msgid "Idioma cambiado"
+msgstr "Idioma cambiado"
+
+#: gui.py:1519
+msgid ""
+"El idioma se ha cambiado. Reinicia la aplicación para aplicar todos los "
+"cambios."
+msgstr ""
+"El idioma se ha cambiado. Reinicia la aplicación para aplicar todos los "
+"cambios."
+
+#: mount.py:32
+#, python-brace-format
+msgid "Cuenta '{label}' montada en {mount_point}"
+msgstr "Cuenta '{label}' montada en {mount_point}"
+
+#: mount.py:35
+#, python-brace-format
+msgid ""
+"Error al montar:\n"
+"{result.stderr}"
+msgstr ""
+"Error al montar:\n"
+"{result.stderr}"
+
+#: mount.py:41
+msgid "Error inesperado: {str(e)}"
+msgstr "Error inesperado: {str(e)}"
+
+#: mount.py:52 mount.py:61
+msgid "Error al desmontar"
+msgstr "Error al desmontar"
+
+#: mount.py:53
+#, python-brace-format
+msgid ""
+"No se pudo desmontar '{account}' en '{mount_point}':\n"
+"Asegúrate de que ningún archivo, terminal o ventana esté usando la carpeta "
+"de montaje.\n"
+"\n"
+msgstr ""
+"No se pudo desmontar '{account}' en '{mount_point}':\n"
+"Asegúrate de que ningún archivo, terminal o ventana esté usando la carpeta "
+"de montaje.\n"
+"\n"
+
+#: mount.py:57 mount.py:64
+#, python-brace-format
+msgid "Error al desmontar {account} en {mount_point}: {e}"
+msgstr "Error al desmontar {account} en {mount_point}: {e}"
+
+#: mount.py:62
+#, python-brace-format
+msgid ""
+"Error inesperado al desmontar '{account}' en '{mount_point}':\n"
+"{e}"
+msgstr ""
+"Error inesperado al desmontar '{account}' en '{mount_point}':\n"
+"{e}"
+
+#: mount.py:83
+msgid ""
+"No se pudieron desmontar las siguientes cuentas:\n"
+"{', '.join(errores)}\n"
+"Verifica que no estén en uso."
+msgstr ""
+"No se pudieron desmontar las siguientes cuentas:\n"
+"{', '.join(errores)}\n"
+"Verifica que no estén en uso."
+
+#: mount.py:114
+#, python-brace-format
+msgid "Error al refrescar montajes: {e}"
+msgstr "Error al refrescar montajes: {e}"
+
+#: mount.py:123
+#, python-brace-format
+msgid "Error comprobando punto de montaje {mount_point}: {e}"
+msgstr "Error comprobando punto de montaje {mount_point}: {e}"
+
+#: mount.py:151
+#, python-brace-format
+msgid "Error al montar '{label}': {result.stderr}"
+msgstr "Error al montar '{label}': {result.stderr}"
+
+#: mount.py:153
+#, python-brace-format
+msgid "Error al montar '{label}': {e}"
+msgstr "Error al montar '{label}': {e}"
+
+#: mount.py:171
+#, python-brace-format
+msgid "Error obteniendo etiqueta: {e}"
+msgstr "Error obteniendo etiqueta: {e}"
+
+#: mount.py:202
+#, python-brace-format
+msgid "Error in mount monitor while checking '{label}': {e}"
+msgstr "Error in mount monitor while checking '{label}': {e}"
+
+#: oauth.py:78
+msgid "No se encontró el código de autorización"
+msgstr "No se encontró el código de autorización"
+
+#: oauth.py:80
+msgid "Página no encontrada"
+msgstr "Página no encontrada"
+
+#: oauth.py:105
+#, python-brace-format
+msgid "Servidor OAuth iniciado en http://localhost:{self.port}"
+msgstr "Servidor OAuth iniciado en http://localhost:{self.port}"
+
+#: oauth.py:108
+#, python-brace-format
+msgid "Error al iniciar servidor OAuth: {e}"
+msgstr "Error al iniciar servidor OAuth: {e}"
+
+#: oauth.py:117
+msgid "Servidor OAuth detenido"
+msgstr "Servidor OAuth detenido"
+
+#: oauth.py:121
+msgid "Código OAuth capturado: {code[:10]}..."
+msgstr "Código OAuth capturado: {code[:10]}..."
+
+#: oauth.py:125
+msgid "Autorización cancelada por el usuario."
+msgstr "Autorización cancelada por el usuario."
+
+#: tray.py:19
+msgid "Mostrar"
+msgstr "Mostrar"
+
+#: tray.py:20
+msgid "Desmontar Todo"
+msgstr "Desmontar Todo"
+
+#: tray.py:24
+msgid "Google Drive Manager"
+msgstr "Google Drive Manager"
+
+#: tray.py:27
+#, python-brace-format
+msgid "No se pudo crear bandeja: {e}"
+msgstr "No se pudo crear bandeja: {e}"
+
+#: tray.py:43
+msgid "Desea salir"
+msgstr "Desea salir"
+
+#: tray.py:43 tray.py:58
+msgid "¿Está seguro de que desea salir?"
+msgstr "¿Está seguro de que desea salir?"
+
+#: utils.py:76
+msgid "✓ google-drive-ocamlfuse instalado correctamente"
+msgstr "✓ google-drive-ocamlfuse instalado correctamente"
+
+#: utils.py:78
+msgid "✗ Error al verificar google-drive-ocamlfuse"
+msgstr "✗ Error al verificar google-drive-ocamlfuse"
+
+#: utils.py:80
+msgid "✗ google-drive-ocamlfuse no está instalado"
+msgstr "✗ google-drive-ocamlfuse no está instalado"
+
+#: utils.py:82
+msgid "✗ Timeout al verificar instalación"
+msgstr "✗ Timeout al verificar instalación"
+
+#: utils.py:128
+msgid "Solicitando permisos..."
+msgstr "Solicitando permisos..."
+
+#: utils.py:130
+msgid "> Solicitando permisos de administrador...\n"
+msgstr "> Solicitando permisos de administrador...\n"
+
+#: utils.py:141
+msgid "Instalando..."
+msgstr "Instalando..."
+
+#: utils.py:143
+msgid "> Ejecutando: "
+msgstr "> Ejecutando: "
+
+#: utils.py:157
+msgid ""
+"\n"
+"✗ Error inesperado: "
+msgstr ""
+"\n"
+"✗ Error inesperado: "
+
+#, python-brace-format
+#~ msgid "Ya existe una cuenta configurada con el correo '{email}'."
+#~ msgstr "Ya existe una cuenta configurada con el correo '{email}'."
+
+#, fuzzy
+#~ msgid "No se pudo renombrar la carpeta de configuración de ocamlfuse:"
+#~ msgstr ""
+#~ "No se pudo restaurar la configuración:\n"
+#~ "{e}"
+
+#, python-brace-format
+#~ msgid "Error al montar '{label}': {error_msg}"
+#~ msgstr "Error al montar '{label}': {error_msg}"
+
+#, python-brace-format
+#~ msgid "No se pudo cargar la licencia: {e}"
+#~ msgstr "No se pudo cargar la licencia: {e}"
+
+#~ msgid "Autorización Cancelada"
+#~ msgstr "Autorización Cancelada"
+
+#~ msgid ""
+#~ "Cancelaste el acceso en Google. Puedes cerrar esta ventana y volver a la "
+#~ "aplicación."
+#~ msgstr ""
+#~ "Cancelaste el acceso en Google. Puedes cerrar esta ventana y volver a la "
+#~ "aplicación."
+
+#~ msgid "Autorización Completada"
+#~ msgstr "Autorización Completada"
+
+#~ msgid "El código de autorización ha sido capturado correctamente."
+#~ msgstr "El código de autorización ha sido capturado correctamente."
+
+#~ msgid "Puedes cerrar esta ventana y volver a la aplicación."
+#~ msgstr "Puedes cerrar esta ventana y volver a la aplicación."
