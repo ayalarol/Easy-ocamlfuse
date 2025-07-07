@@ -6,12 +6,12 @@
 </p>
 
 <p align="center">
-  <img src="ocamlfuse_manager_gui/assets/capturas/EOFGEST1.png" alt="Gestión cuentas" width="600">
+  <img src="ocamlfuse_manager_gui/assets/capturas/EOFGEST2.png" alt="Gestión cuentas" width="600">
   <br><em>Gestión cuentas</em>
 </p>
 
 <p align="center">
-  <img src="ocamlfuse_manager_gui/assets/capturas/EOFGEST1.png" alt="Guía de credenciales" width="600">
+  <img src="ocamlfuse_manager_gui/assets/capturas/EOFGEST3.png" alt="Guía de credenciales" width="600">
   <br><em>Guía de credenciales</em>
 </p>
 **Easy Ocamlfuse** es una aplicación de escritorio con interfaz gráfica (GUI) para gestionar `google-drive-ocamlfuse`, facilitando el montaje y la administración de tus cuentas de Google Drive en sistemas Linux.
