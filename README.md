@@ -1,8 +1,8 @@
 # Easy Ocamlfuse - Gestor Gráfico para Google Drive
 
-![Gestión principal](assets/capturas/EOFGEST1.png)
-![Gestión cuentas](assets/capturas/EOFGEST1.png)
-![Guia de credenciales](assets/capturas/EOFGEST1.png)
+![Gestión principal](ocamlfuse_manager_gui/assets/capturas/EOFGEST1.png)
+![Gestión cuentas](ocamlfuse_manager_gui/assets/capturas/EOFGEST1.png)
+![Guia de credenciales](ocamlfuse_manager_gui/assets/capturas/EOFGEST1.png)
 **Easy Ocamlfuse** es una aplicación de escritorio con interfaz gráfica (GUI) para gestionar `google-drive-ocamlfuse`, facilitando el montaje y la administración de tus cuentas de Google Drive en sistemas Linux.
 
 La aplicación está desarrollada en Python con Tkinter y es compatible con múltiples idiomas (español e inglés por defecto).
