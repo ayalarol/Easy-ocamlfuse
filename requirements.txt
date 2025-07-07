@@ -1,0 +1,4 @@
+notify2
+Pillow
+pystray
+requests

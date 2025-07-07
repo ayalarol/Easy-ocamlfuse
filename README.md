@@ -1,7 +1,8 @@
 # Easy Ocamlfuse - Gestor Gráfico para Google Drive
 
-![Easy Ocamlfuse](https://imgur.com/gallery/easy-ocamlfuse-Yx3A1ax)
-
+![Gestión principal](assets/capturas/EOFGEST1.png)
+![Gestión cuentas](assets/capturas/EOFGEST1.png)
+![Guia de credenciales](assets/capturas/EOFGEST1.png)
 **Easy Ocamlfuse** es una aplicación de escritorio con interfaz gráfica (GUI) para gestionar `google-drive-ocamlfuse`, facilitando el montaje y la administración de tus cuentas de Google Drive en sistemas Linux.
 
 La aplicación está desarrollada en Python con Tkinter y es compatible con múltiples idiomas (español e inglés por defecto).
@@ -39,7 +40,21 @@ sudo apt install python3-tk gettext fuse
 ```
 
 ### Dependencias de Python
-Puedes instalarlas usando `pip`:
+
+**Se recomienda el uso de un entorno virtual para evitar conflictos con otras dependencias del sistema.**
+
+#### Crear y activar un entorno virtual:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+#### Instalar las dependencias usando pip:
+```bash
+pip install -r requirements.txt
+```
+
+O bien, si prefieres instalarlas manualmente:
 ```bash
 pip install notify2 Pillow pystray requests
 ```
@@ -50,26 +65,26 @@ pip install notify2 Pillow pystray requests
 
 1.  **Clona el repositorio:**
     ```bash
-    git clone https://github.com/tu-usuario/Easy-ocamlfuse.git
+    git clone https://github.com/ayalarol/Easy-ocamlfuse.git
     cd Easy-ocamlfuse
     ```
 
-2.  **Instala las dependencias de Python:**
+2.  **(Opcional pero recomendado) Crea y activa un entorno virtual:**
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Instala las dependencias de Python:**
     ```bash
     pip install -r requirements.txt
     ```
-    *(Nota: Asegúrate de crear un archivo `requirements.txt` con el contenido mencionado arriba).*
 
-3.  **Ejecuta la aplicación:**
+4.  **Ejecuta la aplicación:**
     Desde el directorio raíz del proyecto:
     ```bash
     python3 main.py
     ```
-    o como módulo:
-    ```bash
-    python3 -m ocamlfuse_manager_gui.main
-    ```
-
 ---
 
 ## 📖 Uso Básico

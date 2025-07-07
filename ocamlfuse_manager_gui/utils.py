@@ -2,8 +2,34 @@ import tkinter as tk
 import subprocess
 import os
 import threading
+import requests
+from ocamlfuse_manager_gui.constants import APP_VERSION
 from .i18n import i18n_instance
 _ = i18n_instance.gettext
+
+def check_for_updates():
+    """
+    Checks for a new release of the application on GitHub.
+
+    Returns:
+        A dictionary with update information if a new version is available, otherwise None.
+    """
+    try:
+        response = requests.get("https://api.github.com/repos/ayalarol/Easy-ocamlfuse/releases/latest")
+        response.raise_for_status()
+        latest_release = response.json()
+        latest_version = latest_release.get("tag_name")
+
+        # Simple version comparison
+        if latest_version and latest_version.lstrip('v') > APP_VERSION:
+            return {
+                "version": latest_version,
+                "url": latest_release.get("html_url"),
+                "notes": latest_release.get("body")
+            }
+    except requests.RequestException as e:
+        print(f"Error checking for updates: {e}")
+    return None
 
 class ToolTip:
     def __init__(self, widget, text):

@@ -9,8 +9,8 @@ from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import shutil
 
-from .constants import LOGO_FILE, GDFUSE_DIR, CONFIG_FILE
-from .utils import ToolTip,centrar_ventana,verificar_ocamlfuse, detectar_distro_id, obtener_comando_instalacion_ocamlfuse, instalar_ocamlfuse_async
+from .constants import LOGO_FILE, GDFUSE_DIR, CONFIG_FILE, APP_VERSION
+from .utils import ToolTip,centrar_ventana,verificar_ocamlfuse, detectar_distro_id, obtener_comando_instalacion_ocamlfuse, instalar_ocamlfuse_async, check_for_updates
 from .config    import ConfigManager
 from .mount     import MountManager
 from .account   import AccountManager
@@ -115,6 +115,8 @@ class GoogleDriveManager:
             target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
             daemon=True
         ).start()
+        
+        self.check_for_updates_on_startup()
 
     def _cargar_datos_pesados(self):
         self.refresh_accounts()
@@ -197,7 +199,7 @@ class GoogleDriveManager:
         exec_path = sys.executable
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../main.py"))
         icon_path = os.path.abspath(LOGO_FILE)
-        desktop_entry = f"""[Desktop Entry]\nType=Application\nName=EasyOcamlfuse\nExec={exec_path} {script_path} --minimized\nIcon={icon_path}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n"""
+        desktop_entry = f'''[Desktop Entry]\nType=Application\nName=EasyOcamlfuse\nExec={exec_path} {script_path} --minimized\nIcon={icon_path}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n'''
         autostart_line = (
             f'\n# Autoinicio EasyOcamlfuse\n'
             f'if ! pgrep -f "gdrive_manager.py" > /dev/null; then\n'
@@ -608,12 +610,7 @@ class GoogleDriveManager:
                 try:
                     shutil.move(old_gdfuse_path, new_gdfuse_path)
                 except Exception as e:
-                    messagebox.showerror(_("Error"), _("""No se pudo renombrar la carpeta de configuración de ocamlfuse:
-{} a {}
-
-Error: {}
-
-La etiqueta se ha actualizado en la aplicación, pero es posible que necesites corregir la carpeta manualmente para evitar problemas.""").format(old_gdfuse_path, new_gdfuse_path, e))
+                    messagebox.showerror(_("Error"), _('''No se pudo renombrar la carpeta de configuración de ocamlfuse:\n{} a {}\n\nError: {}\n\nLa etiqueta se ha actualizado en la aplicación, pero es posible que necesites corregir la carpeta manualmente para evitar problemas.''').format(old_gdfuse_path, new_gdfuse_path, e))
                     return
 
             self.accounts[new_label] = self.accounts.pop(old_label)
@@ -745,7 +742,7 @@ La etiqueta se ha actualizado en la aplicación, pero es posible que necesites c
             else:
                 messagebox.showinfo(
                     _("Instalación manual"),
-                    _("Puedes instalar google-drive-ocamlfuse manualmente:\n\n"
+                    _("Puedes instalar google-drive-ocamlfuse manually:\n\n"
                       "1. Abre una terminal\n"
                       "2. Sigue las instrucciones en:\n"
                       "   https://github.com/astrada/google-drive-ocamlfuse\n\n"
@@ -1146,8 +1143,7 @@ La etiqueta se ha actualizado en la aplicación, pero es posible que necesites c
                 self._save_state()
                 messagebox.showinfo(_("Restaurado"), _("Configuración restaurada. Reinicia la aplicación para aplicar los cambios."))
             except Exception as e:
-                messagebox.showerror(_("Error"), _("""No se pudo restaurar la configuración:
-{}""").format(e))
+                messagebox.showerror(_("Error"), _('''No se pudo restaurar la configuración:\n{}''').format(e))
 
     def restore_account(self):
         self.account_mgr.restore_account()
@@ -1389,7 +1385,7 @@ La etiqueta se ha actualizado en la aplicación, pero es posible que necesites c
         """Mostrar información de la aplicación y enlaces en pestañas."""
         top = tk.Toplevel(self.root)
         top.title(_("Acerca de Easy Ocamlfuse"))
-        top.geometry("500x350")
+        top.geometry("500x400")
         top.resizable(False, False)
         top.withdraw()
         centrar_ventana(top, self.root)
@@ -1402,35 +1398,44 @@ La etiqueta se ha actualizado en la aplicación, pero es posible que necesites c
         about_frame = ttk.Frame(notebook)
         notebook.add(about_frame, text=_("Acerca de"))
 
-        icon_frame = tk.Frame(about_frame)
-        icon_frame.pack(side=tk.LEFT, fill=tk.Y, anchor="n")
+        # Frame para el contenido principal (todo menos el botón de actualizar)
+        main_content_frame = ttk.Frame(about_frame)
+        main_content_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Frame para el icono a la izquierda
+        icon_frame = tk.Frame(main_content_frame)
+        icon_frame.pack(side=tk.LEFT, fill=tk.Y, anchor="n", padx=(10,0), pady=(10,0))
 
         icon_img = self._load_icon("assets/icons/gdrive_logo.png", size=(64, 64))
         if icon_img:
-            icon_label = tk.Label(about_frame, image=icon_img)
+            icon_label = tk.Label(icon_frame, image=icon_img)
             icon_label.image = icon_img  # Mantener referencia
-            icon_label.pack(side=tk.TOP, anchor="center", padx=(18, 0), pady=(18, 0))
+            icon_label.pack()
 
-        # Contenido principal alineado a la derecha del icono
-        content_frame = tk.Frame(about_frame)
-        content_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # Frame para el texto a la derecha del icono
+        text_frame = tk.Frame(main_content_frame)
+        text_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
 
-        tk.Label(content_frame, text="Easy Ocamlfuse", font=("Arial", 16, "bold")).pack(pady=(18, 4), anchor="center")
-        tk.Label(content_frame, text=_("Gestor gráfico para Google Drive Ocamlfuse"), font=("Arial", 11)).pack(pady=(0, 10), anchor="center")
-        tk.Label(content_frame, text=_("Versión: 1.0"), font=("Arial", 10)).pack(pady=(0, 10), anchor="center")
-        tk.Label(content_frame, text=_("Repositorio y descargas en:"), font=("Arial", 10)).pack(anchor="center")
+        tk.Label(text_frame, text="Easy Ocamlfuse", font=("Arial", 16, "bold")).pack(pady=(10, 4), anchor="center")
+        tk.Label(text_frame, text=_("Gestor gráfico para Google Drive Ocamlfuse"), font=("Arial", 11)).pack(pady=(0, 10), anchor="center")
+        tk.Label(text_frame, text=_("Versión: {}").format(APP_VERSION), font=("Arial", 10)).pack(pady=(0, 10), anchor="center")
+        tk.Label(text_frame, text=_("Repositorio y descargas en:"), font=("Arial", 10)).pack(anchor="center")
         
-        enlace1 = tk.Label(content_frame, text="https://github.com/ayalarol/Easy-ocamlfuse", 
+        enlace1 = tk.Label(text_frame, text="https://github.com/ayalarol/Easy-ocamlfuse", 
                           fg="blue", cursor="hand2", font=("Arial", 10, "underline"))
         enlace1.pack(anchor="center")
         enlace1.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/ayalarol/Easy-ocamlfuse"))
         
-        tk.Label(content_frame, text=_("Basado en el software original:"), font=("Arial", 10)).pack(pady=(14, 0), anchor="center")
+        tk.Label(text_frame, text=_("Basado en el software original:"), font=("Arial", 10)).pack(pady=(14, 0), anchor="center")
         
-        enlace2 = tk.Label(content_frame, text="https://github.com/astrada/google-drive-ocamlfuse", 
+        enlace2 = tk.Label(text_frame, text="https://github.com/astrada/google-drive-ocamlfuse", 
                           fg="blue", cursor="hand2", font=("Arial", 10, "underline"))
         enlace2.pack(anchor="center")
         enlace2.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/astrada/google-drive-ocamlfuse"))
+        
+        # Botón de Actualizar, empaquetado en la parte inferior del about_frame
+        update_button = ttk.Button(about_frame, text=_("Buscar actualizaciones"), command=self.check_for_updates_manual)
+        update_button.pack(side=tk.BOTTOM, pady=19)
         
         # --- Pestaña "Créditos" ---
         credits_frame = ttk.Frame(notebook)
@@ -1475,9 +1480,37 @@ La etiqueta se ha actualizado en la aplicación, pero es posible que necesites c
         license_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         license_label.config(yscrollcommand=license_scrollbar.set)
 
-        
+    def check_for_updates_manual(self):
+        update_info = check_for_updates()
+        if update_info:
+            if messagebox.askyesno(_("Actualización disponible"), 
+                                f"{_('Hay una nueva versión disponible:')} {update_info['version']}\n\n{update_info['notes']}\n\n{_('¿Desea ir a la página de descarga?')}"):
+                webbrowser.open(update_info['url'])
+        else:
+            messagebox.showinfo(_("Sin actualizaciones"), _("Tu versión está actualizada."))
 
+    def check_for_updates_on_startup(self):
+        threading.Thread(target=self._check_for_updates_background, daemon=True).start()
+
+    def _check_for_updates_background(self):
+        update_info = check_for_updates()
+        if update_info:
+            self.show_update_notification(update_info)
+
+    def show_update_notification(self, update_info):
+        message = f"{_('Nueva versión disponible:')} {update_info['version']}. {_('Haz clic en Ayuda -> Acerca de para más detalles.')}"
+        self.show_notification_banner(message)
+
+    def show_notification_banner(self, message):
+        banner = tk.Label(self.root, text=message, bg="yellow", fg="black", font=("Helvetica", 10, "bold"), cursor="hand2")
+        banner.pack(fill=tk.X, side=tk.BOTTOM)
         
+        def open_about_and_hide():
+            self.show_about_dialog()
+            banner.pack_forget()
+
+        banner.bind("<Button-1>", lambda e: open_about_and_hide())
+        self.root.after(15000, lambda: banner.pack_forget() if banner.winfo_exists() else None)
 
     def quit_application(self, icon=None, item=None):
         """Salir de la aplicación"""
@@ -1582,4 +1615,3 @@ La etiqueta se ha actualizado en la aplicación, pero es posible que necesites c
         self.refresh_mounts()
     def run(self):
         self.root.mainloop()
-

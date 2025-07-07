@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-07-04 15:57-0300\n"
-"PO-Revision-Date: 2025-07-02 14:56-0300\n"
+"POT-Creation-Date: 2025-07-04 16:01-0300\n"
+"PO-Revision-Date: 2025-07-05 00:38-0300\n"
 "Last-Translator: Tecnico <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
 "Language: en\n"
@@ -16,6 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.4.2\n"
 
 #: account.py:36
 msgid ""
@@ -442,6 +443,11 @@ msgstr "Error completing OAuth restoration"
 #: account.py:541 gui.py:900
 msgid "Ya existe una cuenta configurada con el correo '{}'."
 msgstr "An account is already configured with the email '{email}'."
+
+#: account.py:541
+#, fuzzy
+msgid "desconocido"
+msgstr "Unknown"
 
 #: account.py:544
 msgid "Restauración incompleta"
@@ -1428,37 +1434,32 @@ msgstr ""
 "✗ Unexpected error: "
 
 #, python-brace-format
-#~ msgid "Ya existe una cuenta configurada con el correo '{email}'."
-#~ msgstr "An account is already configured with the email '{email}'."
-
-#~ msgid "No se pudo renombrar la carpeta de configuración de ocamlfuse:"
-#~ msgstr ""
-#~ "Could not restore configuration:\n"
-#~ "{e}"
+msgid "No se pudo renombrar la carpeta de configuración de ocamlfuse:"
+msgstr "Could not restore configuration:"
 
 #, python-brace-format
-#~ msgid "Error al montar '{label}': {error_msg}"
-#~ msgstr "Error mounting '{label}': {error_msg}"
+msgid "Error al montar '{label}': {error_msg}"
+msgstr "Error mounting '{label}': {error_msg}"
 
 #, python-brace-format
-#~ msgid "No se pudo cargar la licencia: {e}"
-#~ msgstr "Could not load license: {e}"
+msgid "No se pudo cargar la licencia: {e}"
+msgstr "Could not load license: {e}"
 
-#~ msgid "Autorización Cancelada"
-#~ msgstr "Authorization Canceled"
+msgid "Autorización Cancelada"
+msgstr "Authorization Canceled"
 
-#~ msgid ""
-#~ "Cancelaste el acceso en Google. Puedes cerrar esta ventana y volver a la "
-#~ "aplicación."
-#~ msgstr ""
-#~ "You canceled access in Google. You can close this window and return to "
-#~ "the application."
+msgid ""
+"Cancelaste el acceso en Google. Puedes cerrar esta ventana y volver a la "
+"aplicación."
+msgstr ""
+"You canceled access in Google. You can close this window and return to the "
+"application."
 
-#~ msgid "Autorización Completada"
-#~ msgstr "Authorization Complete"
+msgid "Autorización Completada"
+msgstr "Authorization Complete"
 
-#~ msgid "El código de autorización ha sido capturado correctamente."
-#~ msgstr "The authorization code has been captured successfully."
+msgid "El código de autorización ha sido capturado correctamente."
+msgstr "The authorization code has been captured successfully."
 
-#~ msgid "Puedes cerrar esta ventana y volver a la aplicación."
-#~ msgstr "You can close this window and return to the application."
+msgid "Puedes cerrar esta ventana y volver a la aplicación."
+msgstr "You can close this window and return to the application."

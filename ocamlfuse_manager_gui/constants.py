@@ -1,5 +1,9 @@
 import os
 
+APP_VERSION = "1.0.0"
+GITHUB_URL = "https://github.com/ayalarol/Easy-ocamlfuse"
+LICENSE_URL = f"{GITHUB_URL}/blob/main/LICENSE"
+
 SCRIPT_DIR = os.path.dirname(__file__)
 ASSETS_DIR = os.path.join(SCRIPT_DIR, "assets")
 ICONS_DIR  = os.path.join(ASSETS_DIR, "icons")
