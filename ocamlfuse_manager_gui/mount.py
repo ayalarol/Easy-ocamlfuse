@@ -16,6 +16,16 @@ class MountManager:
         """Montar una cuenta específica"""
         os.makedirs(mount_point, exist_ok=True)
         try:
+            # --- Obtener client_secret desencriptado si es necesario ---
+            if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
+                account_data = self.main_app.accounts.get(label)
+                if account_data:
+                    from .encryption import EncryptionManager
+                    enc_mgr = EncryptionManager()
+                    try:
+                        client_secret = enc_mgr.decrypt(account_data['client_secret'])
+                    except Exception:
+                        client_secret = account_data['client_secret']
             mount_cmd = ["google-drive-ocamlfuse", "-label", label, mount_point]
             result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
 
@@ -42,7 +52,7 @@ class MountManager:
             return False
 
     def unmount_account(self, account, mount_point):
-        """Desmontar una cuenta específica con manejo de errores claro"""
+        """Desmontar una cuenta específica"""
         try:
             unmount_cmd = ["fusermount", "-u", mount_point]
             subprocess.check_call(unmount_cmd)
@@ -131,18 +141,23 @@ class MountManager:
         return self.mounted_accounts
 
     def automount_accounts(self, accounts):
-        """Montar automáticamente las cuentas marcadas como 'automount' al iniciar la app."""
+        """Montar automáticamente las cuentas marcadas como 'automount' al iniciar"""
+        from .encryption import EncryptionManager
+        enc_mgr = EncryptionManager()
         for label, data in accounts.items():
             if data.get("automount", False):
-                # Verifica si ya está montada
                 mount_point = data.get('mount_point')
                 if not mount_point:
                     mount_point = os.path.expanduser(f"~/{label}")
                     os.makedirs(mount_point, exist_ok=True)
                     data['mount_point'] = mount_point
-                
                 if label not in self.mounted_accounts or not os.path.ismount(mount_point):
                     try:
+                        # Desencriptar client_secret si es necesario (por si se usa en el futuro)
+                        try:
+                            client_secret = enc_mgr.decrypt(data['client_secret'])
+                        except Exception:
+                            client_secret = data['client_secret']
                         mount_cmd = ["google-drive-ocamlfuse", "-label", label, mount_point]
                         result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
                         if result.returncode == 0:
@@ -175,16 +190,39 @@ class MountManager:
         """
         Inicia un hilo que monitorea los puntos de montaje. Si detecta un desmontaje,
         llama al callback y termina su ciclo para que la GUI actualice el estado.
+        Además, si detecta cuentas con client_secret sin encriptar, las encripta una sola vez.
         """
         if hasattr(self, '_monitoring') and self._monitoring:
             return
 
         self._monitoring = True
+        self._already_encrypted = set()  # Para evitar encriptar varias veces el mismo client_id
 
         def monitor():
+            from .encryption import EncryptionManager
+            enc_mgr = EncryptionManager()
             while self._monitoring:
                 time.sleep(interval)
-                
+
+                # --- Encriptar client_secret si es necesario ---
+                if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
+                    for label, data in self.main_app.accounts.items():
+                        client_id = data.get('client_id')
+                        if not client_id or client_id in self._already_encrypted:
+                            continue
+                        client_secret = data.get('client_secret')
+                        # Intentar desencriptar, si falla, significa que no está encriptado
+                        try:
+                            enc_mgr.decrypt(client_secret)
+                            self._already_encrypted.add(client_id)
+                        except Exception:
+                            # No está encriptado, así que lo encriptamos y guardamos
+                            encrypted = enc_mgr.encrypt(client_secret)
+                            data['client_secret'] = encrypted
+                            self._already_encrypted.add(client_id)
+                            if hasattr(self.main_app, '_save_state'):
+                                self.main_app._save_state()
+
                 if not self.mounted_accounts:
                     continue
 
@@ -198,11 +236,9 @@ class MountManager:
                                     on_unmount_callback(label, mount_point)
                                 break
                     except Exception as e:
-                        # En una aplicación real, esto debería ir a un archivo de log
                         print(_(f"Error in mount monitor while checking '{label}': {e}"))
         
         threading.Thread(target=monitor, daemon=True).start()
 
     def stop_mount_monitor(self):
-        """Detiene el hilo de monitoreo."""
         self._monitoring = False

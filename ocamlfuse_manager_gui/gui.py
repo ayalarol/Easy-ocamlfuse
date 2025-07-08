@@ -16,6 +16,7 @@ from .mount     import MountManager
 from .account   import AccountManager
 from .tray      import TrayIconManager
 from .i18n      import _, i18n_instance
+from .encryption import EncryptionManager
 ICON_SIZE = (24, 24)
 
 class GoogleDriveManager:
@@ -51,9 +52,26 @@ class GoogleDriveManager:
 
         # Config Manager
         self.config_mgr = ConfigManager(CONFIG_FILE)
+        self.encryption_manager = EncryptionManager()
 
         # Cargar configuración
         config_data = self.config_mgr.load_config()
+        # asegurar que todos los client_secret estén cifrados al cargar
+        sanitized_accounts = {}
+        for label, acc_data in config_data.get("accounts", {}).items():
+            if "client_secret" in acc_data:
+                secret = acc_data["client_secret"]
+                # Comprobar si el secreto ya está cifrado
+                if not secret.startswith("gAAAAAB"):
+                    try:
+                        encrypted_secret = self.encryption_manager.encrypt(secret)
+                        acc_data["client_secret"] = encrypted_secret
+                        print(f"DEBUG: [GoogleDriveManager.__init__] Secret de '{label}' cifrado durante la carga.")
+                    except Exception as e:
+                        print(f"ERROR: [GoogleDriveManager.__init__] No se pudo cifrar el secret de '{label}': {e}")
+            sanitized_accounts[label] = acc_data
+        config_data["accounts"] = sanitized_accounts
+
         self.accounts = config_data.get("accounts", {})
         self.mounted_accounts = config_data.get("mounted_accounts", {})
         self.deleted_accounts = config_data.get("deleted_accounts", {})
@@ -107,10 +125,10 @@ class GoogleDriveManager:
         self.closing = False
         self._update_main_tab_button_states()
         self._update_accounts_tab_button_states()
-        self.root.update_idletasks()  # Fuerza el render de la UI
-        # Cargar cuentas y montajes en segundo plano
+        self.root.update_idletasks() 
+
         threading.Thread(target=self._cargar_datos_pesados, daemon=True).start()
-        # bandeja
+       
         threading.Thread(
             target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
             daemon=True
@@ -127,14 +145,12 @@ class GoogleDriveManager:
             full_path = os.path.join(os.path.dirname(__file__), path)
             image = Image.open(full_path)
             
-            # Forzar conversión a RGBA si no tiene canal alpha
             if image.mode != 'RGBA':
                 image = image.convert('RGBA')
             
             # Redimensionar manteniendo transparencia
             image = image.resize(size, Image.Resampling.LANCZOS)
             
-            # Si se especificó color de fondo, compuesto con fondo
             if bg_color:
                 background = Image.new("RGBA", image.size, bg_color)
                 image = Image.alpha_composite(background, image)
@@ -142,7 +158,6 @@ class GoogleDriveManager:
             # Crear PhotoImage manteniendo referencia
             photo_image = ImageTk.PhotoImage(image)
             
-            # Tkinter requiere mantener referencia a la imagen
             if not hasattr(self, '_icon_references'):
                 self._icon_references = []
             self._icon_references.append(photo_image)
@@ -170,7 +185,6 @@ class GoogleDriveManager:
     def refresh_accounts(self):
          self.account_mgr.refresh_accounts()
 
-    #funciones de inicio con el sistema de la aplicacion
     def on_closing(self):
         """Maneja el evento de cierre de la ventana principal"""
         self.closing = True
@@ -302,7 +316,7 @@ class GoogleDriveManager:
                                 f.write(line)
                             if skip and line.strip() == "fi":
                                 skip = False
-                # Añadir la línea actualizada con el nombre actual del script
+                # Añadir la línea actualizada con el nombre actual
                 with open(profile_path, "a") as f:
                     f.write("\n" + autostart_line)
                 messagebox.showinfo(
@@ -421,7 +435,6 @@ class GoogleDriveManager:
       
         self.new_account_frame = tk.LabelFrame(self.accounts_frame, text=_("Agregar Nueva Cuenta"))
         self.new_account_frame.pack(fill=tk.X, padx=5, pady=5)
-        # Configurar la rejilla para que la columna 1 (entradas) se expanda
         self.new_account_frame.columnconfigure(1, weight=1)
 
      
@@ -653,7 +666,7 @@ class GoogleDriveManager:
         preferences_menu.add_command(label=_("Restaurar configuración"), command=self.restore_config)
 
         # Submenú de Idioma
-        self.language_var = tk.StringVar(value=i18n_instance.lang)  # Añade esto al inicio del método o en __init__
+        self.language_var = tk.StringVar(value=i18n_instance.lang)
 
         language_menu = tk.Menu(preferences_menu, tearoff=0)
         language_menu.add_radiobutton(
@@ -901,11 +914,12 @@ class GoogleDriveManager:
                 return
 
             if success:
-                self.refresh_accounts()
-                messagebox.showinfo(_("Éxito"), _("Cuenta '{label}' configurada correctamente").format(label=label))
+                messagebox.showinfo(_("Éxito"), _( "Cuenta '{label}' configurada correctamente").format(label=label))
                 # Limpiar y resetear el formulario para la siguiente cuenta
                 self.label_entry.delete(0, tk.END)
                 self._update_credential_fields_state(locked=False)
+                self.account_mgr.refresh_accounts()
+                self.refresh_accounts()  
 
         except Exception as e:
             messagebox.showerror(_("Error inesperado"), str(e))
@@ -1127,7 +1141,7 @@ class GoogleDriveManager:
 
     def restore_config(self):
         """Restablece la configuración a valores de fábrica"""
-        config_path = os.path.expanduser("~/.gdrive_manager_config.json")
+        config_path = os.path.expanduser("~/.gdrivemanagerconfig/config.json")
         if messagebox.askyesno(
             _("Restaurar configuración"),
             _("¿Seguro que quieres restaurar la configuración?\nSe perderán todas las cuentas y preferencias guardadas.")
@@ -1182,80 +1196,22 @@ class GoogleDriveManager:
             return False
 
     def refresh_accounts(self):
-        _ = i18n_instance.gettext  # Asegura función de traducción
-        """Actualizar lista de cuentas, incluyendo las detectadas externamente en ~/.gdfuse, sin duplicados"""
-        # Limpiar el treeview
+        """Actualiza la lista de cuentas en la UI llamando al AccountManager."""
+        self.account_mgr.refresh_accounts()
+        # Limpiar y reconstruir el Treeview de cuentas
         for item in self.accounts_tree.get_children():
             self.accounts_tree.delete(item)
 
-        # Detectar cuentas externas en ~/.gdfuse
-        gdfuse_path = os.path.expanduser(GDFUSE_DIR)
-        cuentas_externas = {}
-        combinaciones = set()  # Para evitar duplicados (label, client_id
-        
-        if os.path.isdir(gdfuse_path):
-            for label in os.listdir(gdfuse_path):
-                config_file = os.path.join(gdfuse_path, label, "config")
-                if os.path.isfile(config_file):
-                    client_id = ""
-                    client_secret = ""
-                    try:
-                        with open(config_file, "r") as f:
-                            for line in f:
-                                if line.startswith("client_id="):
-                                    client_id = line.split("=", 1)[1].strip()
-                                elif line.startswith("client_secret="):
-                                    client_secret = line.split("=", 1)[1].strip()
-                        
-                      
-                        if client_id and (label, client_id) not in combinaciones:
-                            cuentas_externas[label] = {
-                                "client_id": client_id,
-                                "client_secret": client_secret,
-                                "configured": True,
-                                "externally_detected": True
-                            }
-                            combinaciones.add((label, client_id))
-                    except Exception as e:
-                        print(f"Error leyendo config de {label}: {e}")
-
-            # Eliminar de cuentas_externas las que estén en la blacklist
-        for label in list(cuentas_externas.keys()):
-            if label in self.deleted_accounts and self.deleted_accounts[label].get("blacklist"):
-                del cuentas_externas[label]
-
-        cuentas_finales = dict(self.accounts)  
-        for label, data in cuentas_externas.items():
-            if label in cuentas_finales:
-                if not cuentas_finales[label].get("configured", False):
-                    continue
-                data = dict(data)  
-                for key in ["automount", "mount_point"]:
-                    if key in cuentas_finales[label]:
-                        data[key] = cuentas_finales[label][key]
-            cuentas_finales[label] = data
-
-       
-        for item in self.accounts_tree.get_children():
-            self.accounts_tree.delete(item)
-
-        # Mostrar en el treeview
-        for label, data in cuentas_finales.items():
+        for lbl, data in self.accounts.items():
             if not data.get("configured", False):
-                status = _("Pendiente")
-            elif data.get("externally_detected", False) and label not in self.accounts:
-                status = _("Importada")
+                st = _("Pendiente")
+            elif data.get("externally_detected", False):
+                st = _("Importada")
             else:
-                status = _("Configurada")
-
-            client_id_short = data.get("client_id", "")[:20] + "..." if len(data.get("client_id", "")) > 20 else data.get("client_id", "")
-            automount = data.get('automount', False)
-            check = "✓" if automount else "□"
-            self.accounts_tree.insert("", tk.END, values=(label, client_id_short, status, check))
-
-        # Actualizar self.accounts y guardar
-        self.accounts = cuentas_finales
-        self._save_state()
+                st = _("Configurada")
+            cid_s = data.get("client_id", "")[:20] + ("..." if len(data.get("client_id", "")) > 20 else "")
+            chk = "✓" if data.get("automount", False) else "□"
+            self.accounts_tree.insert("", tk.END, values=(lbl, cid_s, st, chk))
         self._update_accounts_tab_button_states()
 
     def refresh_mounts(self):
@@ -1398,7 +1354,7 @@ class GoogleDriveManager:
         about_frame = ttk.Frame(notebook)
         notebook.add(about_frame, text=_("Acerca de"))
 
-        # Frame para el contenido principal (todo menos el botón de actualizar)
+        # Frame para el contenido principal
         main_content_frame = ttk.Frame(about_frame)
         main_content_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -1409,10 +1365,9 @@ class GoogleDriveManager:
         icon_img = self._load_icon("assets/icons/gdrive_logo.png", size=(64, 64))
         if icon_img:
             icon_label = tk.Label(icon_frame, image=icon_img)
-            icon_label.image = icon_img  # Mantener referencia
+            icon_label.image = icon_img
             icon_label.pack()
 
-        # Frame para el texto a la derecha del icono
         text_frame = tk.Frame(main_content_frame)
         text_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10)
 
@@ -1433,7 +1388,7 @@ class GoogleDriveManager:
         enlace2.pack(anchor="center")
         enlace2.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/astrada/google-drive-ocamlfuse"))
         
-        # Botón de Actualizar, empaquetado en la parte inferior del about_frame
+        # Botón de Actualizar
         update_button = ttk.Button(about_frame, text=_("Buscar actualizaciones"), command=self.check_for_updates_manual)
         update_button.pack(side=tk.BOTTOM, pady=19)
         
@@ -1468,7 +1423,7 @@ class GoogleDriveManager:
         except Exception as e:
             license_text = f"Error al cargar la licencia: {e}"
 
-        # Widget Text con Scrollbar, sin traducción, más vistoso
+        # Widget Text
         text_frame = tk.Frame(license_text_frame, bg="#f7f7f7")
         text_frame.pack(fill=tk.BOTH, expand=True)
         license_label = tk.Text(text_frame, wrap="word", font=("Consolas", 10), height=12, bg="#f7f7f7", relief=tk.FLAT, borderwidth=0)
@@ -1521,7 +1476,7 @@ class GoogleDriveManager:
             self.root.focus_force()
             
             if not messagebox.askyesno(_("Salir"), _("¿Deseas cerrar la aplicación?")):
-                self.root.withdraw()  # Ocultar ventana si cancela
+                self.root.withdraw() 
                 return
         
         if self.tray_mgr.tray_icon:
@@ -1533,7 +1488,6 @@ class GoogleDriveManager:
         self.root.quit()
         self.root.destroy()
         
-        # Forzar salida del proceso si es necesario
         try:
             import sys
             sys.exit(0)
@@ -1545,7 +1499,7 @@ class GoogleDriveManager:
         i18n_instance.translation = i18n_instance._setup_translation()
         global _
         _ = i18n_instance.gettext
-        self.language_var.set(lang)  # <-- Añade esto
+        self.language_var.set(lang)
         self._save_state()
         self.refresh_ui_texts() 
         messagebox.showinfo(
@@ -1555,21 +1509,17 @@ class GoogleDriveManager:
 
     def refresh_ui_texts(self):
         """Actualiza los textos de los widgets de la UI."""
-        # Actualizar título de la ventana principal
         self.root.title(_("Easy Ocamlfuse"))
-        # Actualizar título de la ventana principal
-        self.root.title(_("Easy Ocamlfuse"))
+        
 
-        # Actualizar textos de las pestañas del Notebook
+        # Actualizar textos de varias secciones
         self.notebook.tab(0, text=_("Gestión Principal"))
         self.notebook.tab(1, text=_("Gestión de Cuentas"))
 
-        # Actualizar textos en la pestaña principal
         self.status_frame.config(text=_("Estado del Sistema"))
         self.status_label.config(text=_("Verificando instalación..."))
         self.mounted_frame.config(text=_("Cuentas Montadas"))
         
-        # Actualizar encabezados del Treeview de montajes
         columns = (_("Cuenta"), _( "Etiqueta"), _( "Punto de Montaje"), _( "Estado"))
         for i, col_text in enumerate(columns):
             self.mounted_tree.heading(self.mounted_tree["columns"][i], text=col_text)
@@ -1580,14 +1530,11 @@ class GoogleDriveManager:
         self.btn_refresh_mounts.config(text=_("Actualizar"))
         self.btn_open_folder.config(text=_("Abrir Carpeta"))
 
-        # Actualizar textos en la pestaña de cuentas
         self.new_account_frame.config(text=_("Agregar Nueva Cuenta"))
         self.label_label.config(text=_("Etiqueta:"))
         self.client_id_label.config(text=_("Client ID:"))
         self.client_secret_label.config(text=_("Client Secret:"))
         
-        # Actualizar ToolTips (requiere recrearlos o actualizar su texto si la clase ToolTip lo permite)
-        # Por simplicidad, aquí solo se actualizan los textos de los botones
         self.btn_cargar_json.config(text=_("Cargar JSON"))
         self.btn_config_cuenta.config(text=_("Configurar Cuenta"))
         self.btn_limpiar_credenciales.config(text=_("Limpiar"))
@@ -1605,7 +1552,6 @@ class GoogleDriveManager:
         self.btn_update_list.config(text=_("Actualizar Lista"))
         self.btn_restore_account.config(text=_("Restaurar Cuenta"))
 
-     
         self.create_menu() 
 
         self.check_installation()

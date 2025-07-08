@@ -9,10 +9,7 @@ _ = i18n_instance.gettext
 
 def check_for_updates():
     """
-    Checks for a new release of the application on GitHub.
-
-    Returns:
-        A dictionary with update information if a new version is available, otherwise None.
+    Función para avisar al usuario si hay una nueva versión del binario lanzado en releases de la pagina de github
     """
     try:
         response = requests.get("https://api.github.com/repos/ayalarol/Easy-ocamlfuse/releases/latest")
@@ -60,17 +57,13 @@ class ToolTip:
             tw.destroy()
 
 def centrar_ventana(ventana, respecto_a=None):
-    # Asegurarse de que la ventana esté completamente dibujada y sus dimensiones sean finales
     ventana.update_idletasks()
-    # Establecer una posición temporal para forzar al gestor de ventanas a "realizar" la ventana
-    # Esto es crucial para obtener dimensiones correctas, especialmente en Linux/GTK
     ventana.geometry("+0+0")
-    ventana.update_idletasks() # Forzar otra actualización después de la posición temporal
+    ventana.update_idletasks() 
 
     if respecto_a:
         ventana.transient(respecto_a)
-        ventana.update_idletasks() # Forzar actualización después de transient
-
+        ventana.update_idletasks() 
     ancho = ventana.winfo_width()
     alto = ventana.winfo_height()
 
@@ -94,7 +87,7 @@ def centrar_ventana(ventana, respecto_a=None):
     ventana.geometry(f"+{x}+{y}")
 
 def verificar_ocamlfuse():
-    """Devuelve (estado, mensaje, color) según la instalación de google-drive-ocamlfuse."""
+    #Devuelve (estado, mensaje, color)
     try:
         result = subprocess.run(['google-drive-ocamlfuse', "-version"],
                                 capture_output=True, text=True, timeout=10)
@@ -108,7 +101,7 @@ def verificar_ocamlfuse():
         return False, _("✗ Timeout al verificar instalación"), "red"
 
 def detectar_distro_id():
-    """Detecta la distribución de Linux."""
+    #Detecta la distribución de Linux.
     try:
         with open("/etc/os-release") as f:
             for line in f:
@@ -119,7 +112,7 @@ def detectar_distro_id():
     return "unknown"
 
 def obtener_comando_instalacion_ocamlfuse(distro_id, ppa_choice="normal"):
-    """Devuelve el comando de instalación adecuado para la distro."""
+    #Devuelve el comando de instalación adecuado para la distro.
     if distro_id in ["ubuntu", "debian", "linuxmint", "pop"]:
         if ppa_choice == "normal":
             ppa = "ppa:alessandro-strada/ppa"
@@ -143,9 +136,7 @@ def obtener_comando_instalacion_ocamlfuse(distro_id, ppa_choice="normal"):
 
 def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_callback=None):
     """
-    Ejecuta el comando de instalación de ocamlfuse con permisos de administrador.
-    Llama a output_callback(line) por cada línea de salida.
-    Llama a status_callback(text) para actualizar el estado.
+    Ejecuta el comando de instalación de ocamlfuse
     Devuelve el código de retorno del proceso.
     """
     try:
@@ -184,12 +175,9 @@ def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_cal
         return -1
 
 def instalar_ocamlfuse_async(install_cmd, output_callback=None, status_callback=None, finish_callback=None):
-    """
-    Ejecuta la instalación de ocamlfuse en un hilo aparte.
-    - output_callback(line): recibe cada línea de salida del proceso.
-    - status_callback(text): recibe mensajes de estado.
-    - finish_callback(returncode): se llama al terminar, con el código de retorno (0=ok).
-    """
+    
+    #Ejecuta la instalación de ocamlfuse en un hilo aparte.
+    
     def worker():
         returncode = ejecutar_instalacion_ocamlfuse(install_cmd, output_callback, status_callback)
         if finish_callback:

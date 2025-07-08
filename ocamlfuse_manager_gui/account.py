@@ -1,7 +1,6 @@
 import os
 import re
 import json
-import time
 import threading
 import subprocess
 import webbrowser
@@ -14,6 +13,7 @@ from .utils import centrar_ventana
 from .oauth import OAuthServer
 from .constants import GDFUSE_DIR, OAUTH_PORT
 from .i18n import i18n_instance
+from .encryption import EncryptionManager
 _ = i18n_instance.gettext
 
 
@@ -26,6 +26,7 @@ class AccountManager:
         self.save_config = save_cb
         self.refresh_accounts_ui = refresh_cb
         self.ask_before_delete = ask_before_delete
+        self.encryption_manager = EncryptionManager()
 
     def validate_account_data(self, label, client_id, client_secret):
         label = label.strip()
@@ -92,9 +93,14 @@ class AccountManager:
 
     def complete_oauth_setup(self, label, client_id, client_secret, redirect_url, auth_code):
         try:
+            # Asegurarse de que el client_secret esté descifrado antes de usarlo
+            try:
+                client_secret_plain = self.encryption_manager.decrypt(client_secret)
+            except Exception:
+                client_secret_plain = client_secret
             cmd = [
                 "google-drive-ocamlfuse", "-headless",
-                "-id", client_id, "-secret", client_secret,
+                "-id", client_id, "-secret", client_secret_plain,
                 "-label", label, "-redirect_uri", redirect_url
             ]
             proc = subprocess.Popen(
@@ -105,26 +111,21 @@ class AccountManager:
                 text=True
             )
             out, err = proc.communicate(input=auth_code + "\n", timeout=30)
-            
             if proc.returncode != 0:
                 print(f"Error OAuth: {err}")
                 return False, None
-
-            # Leer el token de acceso generado
             tokens_path = os.path.expanduser(f"~/.gdfuse/{label}/tokens.json")
             access_token = ""
-            
             if os.path.isfile(tokens_path):
                 with open(tokens_path, "r") as f:
                     tokens = json.load(f)
                     access_token = tokens.get("access_token", "")
-            
             email = self.get_email_from_token(access_token) if access_token else None
             return True, email
         except Exception as e:
             print(f"Error OAuth: {e}")
             return False, None
-        
+
     def reauthorize_account(self):
         sel = self.main_app.accounts_tree.selection()
         if not sel:
@@ -137,12 +138,18 @@ class AccountManager:
             return
 
         try:
+            client_secret = self.encryption_manager.decrypt(self._ensure_encrypted(data['client_secret']))
+        except Exception as e:
+            messagebox.showerror(_("Error de Cifrado"), _("No se pudo descifrar el client_secret. La clave de cifrado puede haber cambiado o el archivo estar corrupto."))
+            return
+
+        try:
             from . import oauth
             cancel_evt = threading.Event()
             dlg = self.show_progress_dialog(_("Reautorizando..."), cancel_evt)
             
             auth_code, error = oauth.authenticate(
-                data['client_id'], data['client_secret'], OAUTH_PORT, cancel_evt, timeout=120
+                data['client_id'], client_secret, OAUTH_PORT, cancel_evt, timeout=120
             )
             dlg.destroy()
 
@@ -159,13 +166,15 @@ class AccountManager:
 
             redirect_url = f"http://localhost:{OAUTH_PORT}"
             ok, email = self.complete_oauth_setup(
-                lbl, data['client_id'], data['client_secret'], redirect_url, auth_code
+                lbl, data['client_id'], client_secret, redirect_url, auth_code
             )
             if ok:
-                self.accounts[lbl]['configured'] = True
+                self.accounts[lbl] = self._account_to_dict(
+                    lbl, data['client_id'], client_secret, configured=True, externally_detected=data.get('externally_detected', False), email=email
+                )
                 self.save_config()
                 self.refresh_accounts_ui()
-                self.main_app.root.update_idletasks() # Forzar actualización de la UI
+                self.main_app.root.update_idletasks()
                 messagebox.showinfo(_("Éxito"), _("'La cuenta{lbl}' ha sido reautorizada").format(lbl=lbl))
             else:
                 messagebox.showerror(_("Error"), _("Reautorización falló"))
@@ -191,12 +200,10 @@ class AccountManager:
                                 elif line.startswith("client_secret="):
                                     client_secret = line.split("=", 1)[1].strip()
                         if client_id and (lbl, client_id) not in combinaciones:
-                            ext[lbl] = {
-                                "client_id": client_id,
-                                "client_secret": client_secret,
-                                "configured": True,
-                                "externally_detected": True
-                            }
+                            # Solo marcar como importada si no existe ya como interna
+                            ext[lbl] = self._account_to_dict(
+                                lbl, client_id, client_secret, configured=True, externally_detected=True
+                            )
                             combinaciones.add((lbl, client_id))
                     except Exception as e:
                         print(f"Error leyendo config de {lbl}: {e}")
@@ -212,40 +219,25 @@ class AccountManager:
             if lbl in self.deleted_accounts and self.deleted_accounts[lbl].get("blacklist"):
                 continue  # No agregar cuentas en blacklist
             if lbl in merged:
-                if not merged[lbl].get("configured", False):
-                    continue
-                data = dict(data)
-                for k in ("automount", "mount_point"):
-                    if k in merged[lbl]:
-                        data[k] = merged[lbl][k]
+                # Si la cuenta ya existe internamente no cambiar a externally
+                data["externally_detected"] = merged[lbl].get("externally_detected", data.get("externally_detected", True))
+                data["configured"] = merged[lbl].get("configured", data.get("configured", True))
+                if merged[lbl].get("automount"):
+                    data["automount"] = merged[lbl].get("automount")
+                if merged[lbl].get("mount_point"):
+                    data["mount_point"] = merged[lbl].get("mount_point")
             merged[lbl] = data
 
-        # Eliminar del merged cualquier cuenta en blacklist (por si acaso)
+       
         for lbl in list(merged):
             if lbl in self.deleted_accounts and self.deleted_accounts[lbl].get("blacklist"):
                 del merged[lbl]
 
-        # Actualizar Treeview
-        for i in self.main_app.accounts_tree.get_children():
-            self.main_app.accounts_tree.delete(i)
-        for lbl, data in merged.items():
-            if not data.get("configured", False):
-                st = _("Pendiente")
-            elif data.get("externally_detected", False):
-                st = _("Importada")
-            else:
-                st = _("Configurada")
-            cid_s = data.get("client_id", "")[:20] + ("..." if len(data.get("client_id", "")) > 20 else "")
-            chk = "✓" if data.get("automount", False) else "□"
-            self.main_app.accounts_tree.insert("", tk.END, values=(lbl, cid_s, st, chk))
-
-        # Sincronizar y guardar
-        self.refresh_accounts_ui()
         self.accounts = merged
-        self.save_config()
-        self.main_app.root.update_idletasks()
         self.main_app.accounts = self.accounts
         self.main_app.deleted_accounts = self.deleted_accounts
+        self.save_config()
+        self.main_app.root.update_idletasks()
 
     def delete_account(self):
         """Eliminar cuenta seleccionada, guardando el punto de montaje para asegurar su posible eliminación."""
@@ -277,7 +269,7 @@ class AccountManager:
 
        
         if not mount_point_to_delete:
-            # 1. Intentar encontrarlo si está actualmente montado
+            #Intentar encontrarlo si está actualmente montado
             try:
                 result = subprocess.run(['mount'], capture_output=True, text=True, check=True)
                 for line in result.stdout.splitlines():
@@ -293,7 +285,7 @@ class AccountManager:
         # 2. Si aún no se encontró, usar la ubicación por defecto (~/label) si existe la carpeta
         if not mount_point_to_delete:
             default_mount_path = os.path.expanduser(f"~/{account}")
-            if os.path.isdir(default_mount_path): # Solo sugerir si la carpeta por defecto realmente existe
+            if os.path.isdir(default_mount_path):
                 mount_point_to_delete = default_mount_path
                 print(f"Punto de montaje por defecto encontrado: {mount_point_to_delete}")
 
@@ -306,7 +298,7 @@ class AccountManager:
         ]
 
         if messagebox.askyesno(_("Confirmar"), random.choice(mensajes_confirm)):
-            # Desmontar si está montada. Si falla, no abortar la eliminación de la carpeta.
+            
             if account in self.main_app.mounted_accounts:
                
                 active_mount_point = self.main_app.mounted_accounts[account]
@@ -511,7 +503,12 @@ class AccountManager:
                 self.main_app.client_secret_entry.delete(0, tk.END)
                 self.main_app.label_entry.insert(0, account)
                 self.main_app.client_id_entry.insert(0, cuenta.get("client_id", ""))
-                self.main_app.client_secret_entry.insert(0, cuenta.get("client_secret", ""))
+                try:
+                    decrypted_secret = self.encryption_manager.decrypt(self._ensure_encrypted(cuenta.get("client_secret", "")))
+                    self.main_app.client_secret_entry.insert(0, decrypted_secret)
+                except Exception as e:
+                    messagebox.showerror(_("Error de Cifrado"), _("No se pudo descifrar el client_secret para la restauración."))
+                    self.main_app.client_secret_entry.insert(0, "")
                 messagebox.showinfo(
                     _( "Reconfigurar cuenta"),
                     _( "Se han precargado los datos de la cuenta. Completa el flujo de configuración OAuth para restaurar completamente la cuenta."),
@@ -574,7 +571,16 @@ class AccountManager:
                 )
                 return
         
-        self.accounts[account] = self.deleted_accounts[account]
+        # Eliminar claves conflictivas para evitar TypeError
+        extra = {k: v for k, v in self.deleted_accounts[account].items() if k not in ["client_id", "client_secret", "blacklist", "configured", "externally_detected"]}
+        self.accounts[account] = self._account_to_dict(
+            account,
+            self.deleted_accounts[account].get("client_id", ""),
+            self.deleted_accounts[account].get("client_secret", ""),
+            **extra,
+            externally_detected=False, 
+            configured=False
+        )
         if "blacklist" in self.accounts[account]:
             del self.accounts[account]["blacklist"]
         del self.deleted_accounts[account]
@@ -620,7 +626,6 @@ class AccountManager:
         
                 return
         except subprocess.CalledProcessError:
-            # Cancelación de zenity, no hacer nada
             return
 
         if not file_path:
@@ -758,29 +763,48 @@ class AccountManager:
 
     def setup_account_logic(self, label, client_id, client_secret, cancel_event, timeout=120):
         from . import oauth
-        
-        auth_code, error = oauth.authenticate(client_id, client_secret, OAUTH_PORT, cancel_event, timeout)
-
+        # nos aseguramos de que el client_secret esté descifrado antes de usarlo
+        try:
+            client_secret_plain = self.encryption_manager.decrypt(client_secret)
+        except Exception:
+            client_secret_plain = client_secret
+        auth_code, error = oauth.authenticate(client_id, client_secret_plain, OAUTH_PORT, cancel_event, timeout)
         if error:
             return False, None, error
-
         redirect_url = f"http://localhost:{OAUTH_PORT}"
-        success, email = self.complete_oauth_setup(label, client_id, client_secret, redirect_url, auth_code)
-        
+        success, email = self.complete_oauth_setup(label, client_id, client_secret_plain, redirect_url, auth_code)
         if not success:
             return False, None, "oauth_error"
-
         for acc in self.accounts.values():
             if acc.get("email") == email and email:
                 return False, email, "duplicate_email"
-
-        self.accounts[label] = {
-            "client_id": client_id,
-            "client_secret": client_secret,
-            "redirect_url": redirect_url,
-            "configured": True,
-            "externally_detected": False,
-            "email": email
-        }
+        self.accounts[label] = self._account_to_dict(
+            label, client_id, client_secret, redirect_url=redirect_url, configured=True, externally_detected=False, email=email
+        )
         self.save_config()
         return True, email, None
+
+    def _ensure_encrypted(self, client_secret):
+        """Asegura que el client_secret esté cifrado. Si ya lo está, lo retorna tal cual."""
+        try:
+            # Si descifrar no lanza excepción, ya está cifrado
+            self.encryption_manager.decrypt(client_secret)
+            return client_secret
+        except Exception:
+            # Si falla, significa que no está cifrado, así que lo ciframos
+            return self.encryption_manager.encrypt(client_secret)
+
+    def _account_to_dict(self, label, client_id, client_secret, **kwargs):
+        """Devuelve el dict de cuenta, cifrando el client_secret si es necesario."""
+        return {
+            "client_id": client_id,
+            "client_secret": self._ensure_encrypted(client_secret),
+            **kwargs
+        }
+
+    def _dict_to_account(self, data):
+        """Devuelve los datos de cuenta con el client_secret descifrado solo en memoria."""
+        return {
+            **data,
+            "client_secret": self.encryption_manager.decrypt(data["client_secret"])
+        }

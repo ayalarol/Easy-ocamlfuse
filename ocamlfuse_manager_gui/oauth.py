@@ -18,7 +18,6 @@ class OAuthHandler(http.server.BaseHTTPRequestHandler):
         parsed_url = urllib.parse.urlparse(self.path)
         params = urllib.parse.parse_qs(parsed_url.query)
 
-        # Estilo común para las páginas de respuesta
         common_style = """
         <style>
             body {
@@ -42,7 +41,6 @@ class OAuthHandler(http.server.BaseHTTPRequestHandler):
             # Llamar al callback de la ventana si existe (para cerrar y setear evento)
             if hasattr(self.oauth_manager, 'on_cancel') and self.oauth_manager.on_cancel:
                 try:
-                    # Ejecutar en el hilo principal si es posible
                     import tkinter
                     def safe_close():
                         try:
@@ -120,7 +118,7 @@ class OAuthServer:
         self.server_thread = None
         self.running = False
         self.stopped = False
-        self.cancelled = False  # Nuevo flag
+        self.cancelled = False
     
     def start_server(self):
         try:

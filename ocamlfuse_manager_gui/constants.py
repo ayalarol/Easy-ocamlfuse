@@ -11,6 +11,6 @@ ICONS_DIR  = os.path.join(ASSETS_DIR, "icons")
 LOGO_FILE  = os.path.join(ICONS_DIR, "gdrive_logo.png")
 
 # resto de constantes…
-CONFIG_FILE = "~/.gdrive_manager_config.json"
+CONFIG_FILE = os.path.expanduser("~/.gdrivemanagerconfig/config.json")
 GDFUSE_DIR   = "~/.gdfuse"
 OAUTH_PORT   = 8080
