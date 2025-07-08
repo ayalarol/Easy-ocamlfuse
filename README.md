@@ -72,7 +72,7 @@ pip install -r requirements.txt
 O bien, si prefieres instalarlas manualmente:
 
 ```bash
-pip install notify2 Pillow pystray requests
+pip install notify2 Pillow pystray requests cryptography
 ```
 
 ---
