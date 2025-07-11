@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from cryptography.fernet import Fernet
 import os
 import stat

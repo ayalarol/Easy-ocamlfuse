@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
 import subprocess
@@ -35,9 +36,9 @@ class GoogleDriveManager:
         _ = i18n_instance.gettext
 
         self.root.title(_("Easy Ocamlfuse"))
-        self.root.geometry("930x600")
+        self.root.geometry("930x620")
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.root.minsize(930, 600) # Establece el tamaño mínimo de la ventana 
+        self.root.minsize(930, 620) # Establece el tamaño mínimo de la ventana 
         centrar_ventana(self.root)
       
         if not minimized:
@@ -66,7 +67,6 @@ class GoogleDriveManager:
                     try:
                         encrypted_secret = self.encryption_manager.encrypt(secret)
                         acc_data["client_secret"] = encrypted_secret
-                        print(f"DEBUG: [GoogleDriveManager.__init__] Secret de '{label}' cifrado durante la carga.")
                     except Exception as e:
                         print(f"ERROR: [GoogleDriveManager.__init__] No se pudo cifrar el secret de '{label}': {e}")
             sanitized_accounts[label] = acc_data
@@ -405,11 +405,7 @@ class GoogleDriveManager:
         
         buttons_frame = tk.Frame(self.main_frame)
         buttons_frame.pack(fill=tk.X, padx=5, pady=5)
-        
-        
-        center_frame = tk.Frame(buttons_frame)
-        center_frame.pack(anchor="center")
-        
+
         # Cargar iconos
         self.mount_icon = self._load_icon("assets/icons/gestionMontajes/Mount.png")
         self.unmount_selected_icon = self._load_icon("assets/icons/gestionMontajes/unmount.png")
@@ -417,16 +413,24 @@ class GoogleDriveManager:
         self.refresh_icon = self._load_icon("assets/icons/gestionMontajes/update.png")
         self.open_folder_icon = self._load_icon("assets/icons/gestionMontajes/open_folder.png")
 
-        # Botones de acción
-        self.btn_mount_account = tk.Button(center_frame, text=_("Montar Cuenta"), image=self.mount_icon, compound=tk.LEFT, command=self.mount_account)
+        # Fila superior de botones
+        top_buttons = tk.Frame(buttons_frame)
+        top_buttons.pack()
+
+        self.btn_mount_account = tk.Button(top_buttons, text=_("Montar Cuenta"), image=self.mount_icon, compound=tk.LEFT, command=self.mount_account)
         self.btn_mount_account.pack(side=tk.LEFT, padx=8, pady=2)
-        self.btn_unmount_selected = tk.Button(center_frame, text=_("Desmontar Seleccionada"), image=self.unmount_selected_icon, compound=tk.LEFT, command=self.unmount_selected)
+        self.btn_unmount_selected = tk.Button(top_buttons, text=_("Desmontar Seleccionada"), image=self.unmount_selected_icon, compound=tk.LEFT, command=self.unmount_selected)
         self.btn_unmount_selected.pack(side=tk.LEFT, padx=8, pady=2)
-        self.btn_unmount_all = tk.Button(center_frame, text=_("Desmontar Todas"), image=self.unmount_all_icon, compound=tk.LEFT, command=self.unmount_all)
+        self.btn_unmount_all = tk.Button(top_buttons, text=_("Desmontar Todas"), image=self.unmount_all_icon, compound=tk.LEFT, command=self.unmount_all)
         self.btn_unmount_all.pack(side=tk.LEFT, padx=8, pady=2)
-        self.btn_refresh_mounts = tk.Button(center_frame, text=_("Actualizar"), image=self.refresh_icon, compound=tk.LEFT, command=self.refresh_mounts)
+
+        # Fila inferior de botones
+        bottom_buttons = tk.Frame(buttons_frame)
+        bottom_buttons.pack()
+
+        self.btn_refresh_mounts = tk.Button(bottom_buttons, text=_("Actualizar"), image=self.refresh_icon, compound=tk.LEFT, command=self.refresh_mounts)
         self.btn_refresh_mounts.pack(side=tk.LEFT, padx=8, pady=2)
-        self.btn_open_folder = tk.Button(center_frame, text=_("Abrir Carpeta"), image=self.open_folder_icon, compound=tk.LEFT, command=self.open_mount_folder)
+        self.btn_open_folder = tk.Button(bottom_buttons, text=_("Abrir Carpeta"), image=self.open_folder_icon, compound=tk.LEFT, command=self.open_mount_folder)
         self.btn_open_folder.pack(side=tk.LEFT, padx=8, pady=2)
 
     def create_accounts_tab(self):
@@ -765,10 +769,10 @@ class GoogleDriveManager:
                 return False
 
     def instalar_ocamlfuse(self):
-        distro_id = detectar_distro_id()
+        distro_id, version_id = detectar_distro_id()
         install_cmd = ""
         ppa_choice = "normal"
-        if distro_id in ["ubuntu", "debian", "linuxmint", "pop"]:
+        if distro_id in ["ubuntu", "linuxmint", "pop"]:
             # Diálogo para elegir PPA
             ppa_dialog = tk.Toplevel(self.root)
             ppa_dialog.title(_("Seleccionar una versión de PPA"))
@@ -796,9 +800,9 @@ class GoogleDriveManager:
             self.root.wait_window(ppa_dialog)
             if not ppa_choice:
                 return False
-            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, ppa_choice)
+            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id, ppa_choice)
         else:
-            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id)
+            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id)
             if not install_cmd:
                 messagebox.showerror(
                     _("Distribución no soportada"),
@@ -850,19 +854,28 @@ class GoogleDriveManager:
             status_label.config(text=text)
 
         def finish_callback(returncode):
+            progress.stop()
+            print(f"Código de retorno de la instalación: {returncode}")
+
             if returncode == 0:
-                status_label.config(text=_("Instalación completada con éxito!"))
-                output_text.insert('end', "\n✓ Instalación exitosa!\n")
+                status_label.config(text=_("¡Instalación completada con éxito!"))
+                output_text.insert('end', "\n✓ ¡Instalación exitosa!\n")
                 messagebox.showinfo(
                     _("Instalación exitosa"),
                     _("google-drive-ocamlfuse se instaló correctamente.\n\n"
                       "Reinicia la aplicación para continuar."),
                     parent=dialog
                 )
-                self.root.destroy()  # Forzar reinicio
+                dialog.destroy()
+                self.root.destroy()
             else:
                 status_label.config(text=_("Error en la instalación"))
                 output_text.insert('end', f"\n✗ Error en instalación (código {returncode})\n")
+                
+                # Añadir botón para cerrar manualmente
+                close_button = ttk.Button(dialog, text=_("Cerrar"), command=dialog.destroy)
+                close_button.pack(pady=10)
+                
                 messagebox.showerror(
                     _("Error de instalación"),
                     _("Ocurrió un error durante la instalación.\n\n"

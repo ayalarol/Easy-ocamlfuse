@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import tkinter as tk
 import subprocess
 import os
@@ -101,19 +102,36 @@ def verificar_ocamlfuse():
         return False, _("✗ Timeout al verificar instalación"), "red"
 
 def detectar_distro_id():
-    #Detecta la distribución de Linux.
+    #Detecta la distribución de Linux y su versión.
+    distro_id = "unknown"
+    version_id = "0"
     try:
         with open("/etc/os-release") as f:
             for line in f:
                 if line.startswith("ID="):
-                    return line.split("=")[1].strip().replace('"', '')
+                    distro_id = line.split("=")[1].strip().replace('"', '')
+                elif line.startswith("VERSION_ID="):
+                    version_id = line.split("=")[1].strip().replace('"', '')
     except Exception:
         pass
-    return "unknown"
+    return distro_id, version_id
 
-def obtener_comando_instalacion_ocamlfuse(distro_id, ppa_choice="normal"):
+def obtener_comando_instalacion_ocamlfuse(distro_id, version_id, ppa_choice="normal"):
     #Devuelve el comando de instalación adecuado para la distro.
-    if distro_id in ["ubuntu", "debian", "linuxmint", "pop"]:
+    if distro_id == 'debian':
+        command = (
+            'apt update && '
+            'apt install -y software-properties-common dirmngr && '
+            'echo "deb http://ppa.launchpad.net/alessandro-strada/ppa/ubuntu bionic main" >> /etc/apt/sources.list.d/alessandro-strada-ubuntu-ppa-bionic.list && '
+            'echo "deb-src http://ppa.launchpad.net/alessandro-strada/ppa/ubuntu bionic main" >> /etc/apt/sources.list.d/alessandro-strada-ubuntu-ppa-bionic.list && '
+            'apt-key adv --keyserver keyserver.ubuntu.com --recv-keys AD5F235DF639B041 && '
+            'apt-get update && '
+            'groupadd -f fuse && '
+            'adduser $(whoami) fuse && '
+            'apt-get install -y google-drive-ocamlfuse'
+        )
+        return command
+    elif distro_id in ["ubuntu", "linuxmint", "pop"]:
         if ppa_choice == "normal":
             ppa = "ppa:alessandro-strada/ppa"
         else:
@@ -133,6 +151,7 @@ def obtener_comando_instalacion_ocamlfuse(distro_id, ppa_choice="normal"):
         return "zypper install -y google-drive-ocamlfuse"
     else:
         return None
+
 
 def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_callback=None):
     """

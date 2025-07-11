@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pystray
 from PIL import Image
 from tkinter import messagebox

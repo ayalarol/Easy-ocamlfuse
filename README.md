@@ -14,14 +14,12 @@
   <img src="ocamlfuse_manager_gui/assets/capturas/EOFGEST3.png" alt="Guía de credenciales" width="600">
   <br><em>Guía de credenciales</em>
 </p>
+
 **Easy Ocamlfuse** es una aplicación de escritorio con interfaz gráfica (GUI) para gestionar `google-drive-ocamlfuse`, facilitando el montaje y la administración de tus cuentas de Google Drive en sistemas Linux.
 
 La aplicación está desarrollada en Python con Tkinter y es compatible con múltiples idiomas (español e inglés por defecto).
 
 ---
-## 📥 Descargar
-
-[![Download](https://img.shields.io/badge/Download%20Latest%20Release-blue?style=for-the-badge&logo=github)](https://github.com/ayalarol/Easy-ocamlfuse/releases/latest)
 
 ## ✨ Características Principales
 
@@ -42,18 +40,24 @@ Asegúrate de tener las siguientes dependencias instaladas en tu sistema.
 
 ### Dependencias del Sistema
 
-- **Python 3.x**
+- **Python 3.7** o superior
 - **Tkinter**: Generalmente se instala con `python3-tk`
 - **gettext**: Para la internacionalización
+- **Librerías D-Bus**: Necesarias para la comunicación del sistema (ej. `libdbus-1-0`, `libdbus-glib-1-2`)
+- **ImageMagick**: Para la correcta visualización de iconos (paquete `imagemagick`)
 
 En distribuciones basadas en Debian/Ubuntu, puedes instalar la mayoría con:
 
 ```bash
 sudo apt update
-sudo apt install python3-tk gettext python3-pil.imagetk
+sudo apt install python3-tk gettext python3-pil.imagetk imagemagick python3-dbus libdbus-1-0 libdbus-glib-1-2
 ```
 
-> **Nota**: En algunas distribuciones de Ubuntu, es necesario instalar el paquete adicional `python3-pil.imagetk` para evitar errores al cargar los iconos.
+> **Nota para Debian 10 (Buster) y similares:**
+> Algunas dependencias como `python3-pystray` y `python3-notify2` podrían no estar disponibles en los repositorios oficiales o tener nombres diferentes. Si usas los paquetes `.deb` específicos para Buster, es posible que necesites instalar estas librerías manualmente con `pip` después de la instalación del `.deb` para que la funcionalidad de la bandeja del sistema y las notificaciones funcionen:
+> ```bash
+> pip3 install pystray notify2
+> ```
 
 ### Dependencias de Python
 
@@ -75,40 +79,85 @@ pip install -r requirements.txt
 O bien, si prefieres instalarlas manualmente:
 
 ```bash
-pip install notify2 Pillow pystray requests cryptography
+pip install notify2 pillow pystray requests cryptography
 ```
 
 ---
 
-## 🚀 Instalación y Ejecución
+## 🚀 Instalación
 
-1. **Clona el repositorio:**
+Puedes instalar Easy Ocamlfuse de varias maneras:
 
-   ```bash
-   git clone https://github.com/ayalarol/Easy-ocamlfuse.git
-   cd Easy-ocamlfuse
-   ```
+### Desde paquetes .deb (Recomendado)
 
-2. **(Opcional pero recomendado) Crea y activa un entorno virtual:**
+He preparado paquetes `.deb` para facilitar la instalación en sistemas Debian/Ubuntu.
 
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
+1.  **Descarga el paquete adecuado** desde la sección de "Releases" de este repositorio de GitHub.
+    *   **`easy-ocamlfuse-buster.deb`**: Para Debian 10 (Buster) y distribuciones antiguas similares.
+    *   **`easy-ocamlfuse-latest.deb`**: Para Debian 11+ (Bullseye, Bookworm) y Ubuntu 20.04+ (Focal Fossa, Jammy Jellyfish, etc.).
 
-3. **Instala las dependencias de Python:**
+2.  **Instala el paquete descargado:**
 
-   ```bash
-   pip install -r requirements.txt
-   ```
+    *   **Para distribuciones recientes (usando `easy-ocamlfuse-latest.deb`):**
+        ```bash
+        sudo gdebi easy-ocamlfuse-latest.deb
+        # O si gdebi no está instalado:
+        # sudo apt install ./easy-ocamlfuse-latest.deb
+        ```
 
-4. **Ejecuta la aplicación:**
-   
-   Desde el directorio raíz del proyecto:
+    *   **Para Debian 10 (Buster) y similares (usando `easy-ocamlfuse-buster.deb`):**
+        Debido a las particularidades de las dependencias en Debian 10, `gdebi` podría cerrarse o no funcionar correctamente. En ese caso, usa `dpkg` y luego `apt` para resolver dependencias:
+        ```bash
+        sudo dpkg -i easy-ocamlfuse-buster.deb
+        sudo apt --fix-broken install
+        ```
+        > **Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` con `pip`.
 
-   ```bash
-   python3 main.py
-   ```
+### Desde el código fuente
+
+1.  **Clona el repositorio:**
+
+    ```bash
+    git clone https://github.com/ayalarol/Easy-ocamlfuse.git
+    cd Easy-ocamlfuse
+    ```
+
+2.  **(Opcional pero recomendado) Crea y activa un entorno virtual:**
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Instala las dependencias de Python:**
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4.  **Ejecuta la aplicación:**
+
+    Desde el directorio raíz del proyecto:
+
+    ```bash
+    python3 main.py
+    ```
+
+### Instalación del Binario (para Releases)
+
+Si has descargado un binario precompilado (por ejemplo, desde la sección de "Releases" de GitHub) 
+y deseas instalarlo directamente en tu sistema sin usar los paquetes `.deb` o el código fuente, puedes usar el script `install_binary.sh`.
+
+1.  **Descarga el binario** (ej. `OcamlfuseManager`) y el script `install_binary.sh` en el mismo directorio.
+2.  **Dale permisos de ejecución** al script:
+    ```bash
+    chmod +x install_binary.sh
+    ```
+3.  **Ejecuta el script con `sudo`**:
+    ```bash
+    sudo ./install_binary.sh
+    ```
+    Este script moverá el binario a `/usr/local/bin`, creará un archivo `.desktop` para el menú de aplicaciones y gestionará los iconos.
 
 ---
 
@@ -116,18 +165,18 @@ pip install notify2 Pillow pystray requests cryptography
 
 ### 1. Añadir una Cuenta
 
-1. Ve a la pestaña **"Gestión de Cuentas"**
-2. Para obtener tus credenciales de Google, haz clic en el botón **"Ayuda"**, que te guiará en el proceso de creación de un ID de Cliente y Secreto de Cliente en Google Cloud Console
-3. Puedes cargar las credenciales desde el archivo `client_secrets.json` descargado usando el botón **"Cargar JSON"** o pegarlas manualmente
-4. Asigna una **Etiqueta** única a tu cuenta (ej. "Personal", "Trabajo")
-5. Haz clic en **"Configurar Cuenta"**. Se abrirá una ventana en tu navegador para que autorices el acceso a tu cuenta de Google
+1.  Ve a la pestaña **"Gestión de Cuentas"**
+2.  Para obtener tus credenciales de Google, haz clic en el botón **"Ayuda"**, que te guiará en el proceso de creación de un ID de Cliente y Secreto de Cliente en Google Cloud Console
+3.  Puedes cargar las credenciales desde el archivo `client_secrets.json` descargado usando el botón **"Cargar JSON"** o pegarlas manualmente
+4.  Asigna una **Etiqueta** única a tu cuenta (ej. "Personal", "Trabajo")
+5.  Haz clic en **"Configurar Cuenta"**. Se abrirá una ventana en tu navegador para que autorices el acceso a tu cuenta de Google
 
 ### 2. Montar una Cuenta
 
-1. Ve a la pestaña **"Gestión Principal"**
-2. Haz clic en **"Montar Cuenta"**
-3. Selecciona la cuenta que deseas montar de la lista
-4. La unidad se montará en tu directorio HOME en una carpeta con el mismo nombre que la etiqueta
+1.  Ve a la pestaña **"Gestión Principal"**
+2.  Haz clic en **"Montar Cuenta"**
+3.  Selecciona la cuenta que deseas montar de la lista
+4.  La unidad se montará en tu directorio HOME en una carpeta con el mismo nombre que la etiqueta
 
 ### 3. Gestión desde la Bandeja del Sistema
 
@@ -135,9 +184,9 @@ La aplicación se minimizará a la bandeja del sistema al cerrar la ventana.
 
 Desde el icono de la bandeja, puedes:
 
-- Mostrar la ventana principal
-- Desmontar todas las unidades
-- Salir de la aplicación
+-   Mostrar la ventana principal
+-   Desmontar todas las unidades
+-   Salir de la aplicación
 
 ---
 
@@ -147,30 +196,30 @@ El proyecto utiliza `gettext` para las traducciones. Los archivos de idioma se e
 
 ### Para actualizar o añadir un nuevo idioma:
 
-1. **Genera el archivo .pot (plantilla):**
+1.  **Genera el archivo .pot (plantilla):**
 
-   ```bash
-   cd ocamlfuse_manager_gui
-   xgettext --from-code=UTF-8 --language=Python --keyword=_ --output=locale/ocamlfuse_manager.pot --files-from=locale/POTFILES.in
-   ```
+    ```bash
+    cd ocamlfuse_manager_gui
+    xgettext --from-code=UTF-8 --language=Python --keyword=_ --output=locale/ocamlfuse_manager.pot --files-from=locale/POTFILES.in
+    ```
 
-2. **Crea o actualiza el archivo .po para tu idioma** (ej. `fr` para francés):
+2.  **Crea o actualiza el archivo .po para tu idioma** (ej. `fr` para francés):
 
-   ```bash
-   # Para crear uno nuevo:
-   msginit -l fr -o locale/fr/LC_MESSAGES/ocamlfuse_manager.po -i locale/ocamlfuse_manager.pot
-   
-   # Para actualizar uno existente:
-   msgmerge -U locale/fr/LC_MESSAGES/ocamlfuse_manager.po locale/ocamlfuse_manager.pot
-   ```
+    ```bash
+    # Para crear uno nuevo:
+    msginit -l fr -o locale/fr/LC_MESSAGES/ocamlfuse_manager.po -i locale/ocamlfuse_manager.pot
 
-3. **Traduce los textos** en el archivo `.po`
+    # Para actualizar uno existente:
+    msgmerge -U locale/fr/LC_MESSAGES/ocamlfuse_manager.po locale/ocamlfuse_manager.pot
+    ```
 
-4. **Compila el archivo .mo:**
+3.  **Traduce los textos** en el archivo `.po`
 
-   ```bash
-   msgfmt locale/fr/LC_MESSAGES/ocamlfuse_manager.po -o locale/fr/LC_MESSAGES/ocamlfuse_manager.mo
-   ```
+4.  **Compila el archivo .mo:**
+
+    ```bash
+    msgfmt locale/fr/LC_MESSAGES/ocamlfuse_manager.po -o locale/fr/LC_MESSAGES/ocamlfuse_manager.mo
+    ```
 
 ---
 
@@ -178,9 +227,9 @@ El proyecto utiliza `gettext` para las traducciones. Los archivos de idioma se e
 
 ¡Las contribuciones son bienvenidas! Si tienes ideas para mejoras, encuentras errores o quieres añadir nuevas funcionalidades, no dudes en:
 
-- Abrir un **issue** para reportar problemas o sugerir mejoras
-- Hacer un **fork** del proyecto y enviar un **pull request**
-- Ayudar con las traducciones a otros idiomas
+-   Abrir un **issue** para reportar problemas o sugerir mejoras
+-   Hacer un **fork** del proyecto y enviar un **pull request**
+-   Ayudar con las traducciones a otros idiomas
 
 ---
 
@@ -197,9 +246,8 @@ Si este proyecto te ha sido útil, considera apoyar su desarrollo:
 [![GitHub stars](https://img.shields.io/github/stars/ayalarol/Easy-ocamlfuse?style=social)](https://github.com/ayalarol/Easy-ocamlfuse/stargazers)
 [![PayPal](https://img.shields.io/badge/PayPal-Donate-blue.svg)](https://www.paypal.com/donate/?hosted_button_id=N2M3P5A24QKF4)
 
-- ⭐ **Dale una estrella** al proyecto en GitHub
-- 💰 **Apoya con una donación** a través de PayPal
-
+-   ⭐ **Dale una estrella** al proyecto en GitHub
+-   💰 **Apoya con una donación** a través de PayPal
 
 ---
 

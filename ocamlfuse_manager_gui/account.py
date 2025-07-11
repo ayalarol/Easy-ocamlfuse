@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import re
 import json
@@ -237,7 +238,7 @@ class AccountManager:
         self.main_app.accounts = self.accounts
         self.main_app.deleted_accounts = self.deleted_accounts
         self.save_config()
-        self.main_app.root.update_idletasks()
+        self.main_app.root.update_idletasks()  
 
     def delete_account(self):
         """Eliminar cuenta seleccionada, guardando el punto de montaje para asegurar su posible eliminación."""
@@ -282,7 +283,7 @@ class AccountManager:
             except Exception as e:
                 print(f"No se pudo verificar los montajes del sistema: {e}")
 
-        # 2. Si aún no se encontró, usar la ubicación por defecto (~/label) si existe la carpeta
+        # Si aún no se encontró, usar la ubicación por defecto (~/label) si existe la carpeta
         if not mount_point_to_delete:
             default_mount_path = os.path.expanduser(f"~/{account}")
             if os.path.isdir(default_mount_path):
@@ -331,7 +332,6 @@ class AccountManager:
                         return
 
             # Eliminar carpeta de montaje
-            print(f"DEBUG: mount_point_to_delete={mount_point_to_delete}")
             if mount_point_to_delete and os.path.isdir(mount_point_to_delete):
                 if self.main_app.ask_before_delete:
                     dialog = tk.Toplevel(self.root)
