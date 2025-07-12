@@ -1,4 +1,4 @@
-# Easy Ocamlfuse - Gestor Gráfico para Google Drive
+# Easy Ocamlfuse - Gestor Gráfico para google-drive-ocamlfuse
 
 <p align="center">
   <img src="ocamlfuse_manager_gui/assets/capturas/EOFGEST1.png" alt="Gestión principal" width="600">
@@ -17,7 +17,7 @@
 
 **Easy Ocamlfuse** es una aplicación de escritorio con interfaz gráfica (GUI) para gestionar `google-drive-ocamlfuse`, facilitando el montaje y la administración de tus cuentas de Google Drive en sistemas Linux.
 
-La aplicación está desarrollada en Python con Tkinter y es compatible con múltiples idiomas (español e inglés por defecto).
+La aplicación está desarrollada en Python con Tkinter y es compatible para agregar multiples idiomas (español e inglés por defecto).
 
 ---
 
@@ -44,20 +44,14 @@ Asegúrate de tener las siguientes dependencias instaladas en tu sistema.
 - **Tkinter**: Generalmente se instala con `python3-tk`
 - **gettext**: Para la internacionalización
 - **Librerías D-Bus**: Necesarias para la comunicación del sistema (ej. `libdbus-1-0`, `libdbus-glib-1-2`)
-- **ImageMagick**: Para la correcta visualización de iconos (paquete `imagemagick`)
+
 
 En distribuciones basadas en Debian/Ubuntu, puedes instalar la mayoría con:
 
 ```bash
 sudo apt update
-sudo apt install python3-tk gettext python3-pil.imagetk imagemagick python3-dbus libdbus-1-0 libdbus-glib-1-2
+sudo apt install python3-tk gettext python3-pil.imagetkpython3-dbus libdbus-1-0 libdbus-glib-1-2
 ```
-
-> **Nota para Debian 10 (Buster) y similares:**
-> Algunas dependencias como `python3-pystray` y `python3-notify2` podrían no estar disponibles en los repositorios oficiales o tener nombres diferentes. Si usas los paquetes `.deb` específicos para Buster, es posible que necesites instalar estas librerías manualmente con `pip` después de la instalación del `.deb` para que la funcionalidad de la bandeja del sistema y las notificaciones funcionen:
-> ```bash
-> pip3 install pystray notify2
-> ```
 
 ### Dependencias de Python
 
@@ -88,30 +82,14 @@ pip install notify2 pillow pystray requests cryptography
 
 Puedes instalar Easy Ocamlfuse de varias maneras:
 
-### Desde paquetes .deb (Recomendado)
+### Desde paquete .deb (Recomendado)
 
-He preparado paquetes `.deb` para facilitar la instalación en sistemas Debian/Ubuntu.
-
-1.  **Descarga el paquete adecuado** desde la sección de "Releases" de este repositorio de GitHub.
-    *   **`easy-ocamlfuse-buster.deb`**: Para Debian 10 (Buster) y distribuciones antiguas similares.
-    *   **`easy-ocamlfuse-latest.deb`**: Para Debian 11+ (Bullseye, Bookworm) y Ubuntu 20.04+ (Focal Fossa, Jammy Jellyfish, etc.).
-
-2.  **Instala el paquete descargado:**
-
-    *   **Para distribuciones recientes (usando `easy-ocamlfuse-latest.deb`):**
-        ```bash
-        sudo gdebi easy-ocamlfuse-latest.deb
-        # O si gdebi no está instalado:
-        # sudo apt install ./easy-ocamlfuse-latest.deb
-        ```
-
-    *   **Para Debian 10 (Buster) y similares (usando `easy-ocamlfuse-buster.deb`):**
-        Debido a las particularidades de las dependencias en Debian 10, `gdebi` podría cerrarse o no funcionar correctamente. En ese caso, usa `dpkg` y luego `apt` para resolver dependencias:
-        ```bash
-        sudo dpkg -i easy-ocamlfuse-buster.deb
-        sudo apt --fix-broken install
-        ```
-        > **Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` con `pip`.
+  **Instala el paquete .deb:**
+    ```bash
+    sudo apt install ./easy-ocamlfuse-latest.deb
+ 
+    ```
+    > **Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` con `pip` si no se instalaron automáticamente.
 
 ### Desde el código fuente
 
@@ -148,7 +126,7 @@ He preparado paquetes `.deb` para facilitar la instalación en sistemas Debian/U
 Si has descargado un binario precompilado (por ejemplo, desde la sección de "Releases" de GitHub) 
 y deseas instalarlo directamente en tu sistema sin usar los paquetes `.deb` o el código fuente, puedes usar el script `install_binary.sh`.
 
-1.  **Descarga el binario** (ej. `OcamlfuseManager`) y el script `install_binary.sh` en el mismo directorio.
+1.  **Descarga el binario** (ej. `easy-ocamlfuse_1.0.1`) y el script `install_binary.sh` en el mismo directorio.
 2.  **Dale permisos de ejecución** al script:
     ```bash
     chmod +x install_binary.sh

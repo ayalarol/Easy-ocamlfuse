@@ -237,7 +237,7 @@ class AccountManager:
         self.accounts = merged
         self.main_app.accounts = self.accounts
         self.main_app.deleted_accounts = self.deleted_accounts
-        self.save_config()
+        self.root.after(0, self.save_config)
         self.main_app.root.update_idletasks()  
 
     def delete_account(self):

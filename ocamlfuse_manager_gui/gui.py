@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import socket
 import subprocess
 import notify2
 import webbrowser
@@ -21,11 +22,9 @@ from .encryption import EncryptionManager
 ICON_SIZE = (24, 24)
 
 class GoogleDriveManager:
-    def __init__(self):
-        minimized = "--minimized" in sys.argv
-        self.root = tk.Tk(className="EasyOcamlfuse")
-        self.root.withdraw()
-        # --- Configuración de idioma antes de widgets ---
+    def __init__(self, main_loop=None): # Aceptar main_loop como argumento
+        self.main_loop = main_loop # Guardar la referencia al main_loop
+        # --- Configuración de idioma ANTES de cualquier UI ---
         self.config_mgr = ConfigManager(CONFIG_FILE)
         config_data = self.config_mgr.load_config()
         lang = config_data.get("language", "es")
@@ -35,6 +34,12 @@ class GoogleDriveManager:
         global _
         _ = i18n_instance.gettext
 
+        
+
+        minimized = "--minimized" in sys.argv
+        self.root = tk.Tk(className="EasyOcamlfuse")
+        self.root.withdraw()
+        
         self.root.title(_("Easy Ocamlfuse"))
         self.root.geometry("930x620")
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -126,8 +131,9 @@ class GoogleDriveManager:
         self._update_main_tab_button_states()
         self._update_accounts_tab_button_states()
         self.root.update_idletasks() 
+        self.is_quitting = False # Nueva bandera de estado
 
-        threading.Thread(target=self._cargar_datos_pesados, daemon=True).start()
+        
        
         threading.Thread(
             target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
@@ -135,6 +141,9 @@ class GoogleDriveManager:
         ).start()
         
         self.check_for_updates_on_startup()
+
+    def start_background_tasks(self):
+        self._cargar_datos_pesados()
 
     def _cargar_datos_pesados(self):
         self.refresh_accounts()
@@ -149,7 +158,7 @@ class GoogleDriveManager:
                 image = image.convert('RGBA')
             
             # Redimensionar manteniendo transparencia
-            image = image.resize(size, Image.Resampling.LANCZOS)
+            image = image.resize(size, Image.Resampling.NEAREST)
             
             if bg_color:
                 background = Image.new("RGBA", image.size, bg_color)
@@ -187,10 +196,9 @@ class GoogleDriveManager:
 
     def on_closing(self):
         """Maneja el evento de cierre de la ventana principal"""
-        self.closing = True
-        # Guardar configuración al cerrar
-        self._save_state()
-        self.tray_mgr.on_closing()
+        if self.is_quitting: # Evitar doble procesamiento si ya estamos cerrando
+            return
+        self.root.withdraw() # Ocultar la ventana en lugar de salir
 
     def get_autostart_path(self):
         autostart_dir = os.path.expanduser("~/.config/autostart")
@@ -1482,30 +1490,40 @@ class GoogleDriveManager:
 
     def quit_application(self, icon=None, item=None):
         """Salir de la aplicación"""
-        if icon:  # Si se llama desde la bandeja del sistema
-            # Mostrar ventana temporalmente para el diálogo
-            self.root.deiconify()
+        if self.is_quitting: # Evitar procesamiento si ya estamos cerrando
+            return
+        self.is_quitting = True
+
+        # Si se llama desde la bandeja del sistema, confirmar el cierre
+        if icon:  
+            self.root.deiconify() # Mostrar ventana para el diálogo
             self.root.lift()
             self.root.focus_force()
-            
             if not messagebox.askyesno(_("Salir"), _("¿Deseas cerrar la aplicación?")):
                 self.root.withdraw() 
+                self.is_quitting = False # Cancelar el cierre
                 return
         
+        # Guardar configuración antes de salir
+        self._save_state()
+
+        # Detener el icono de la bandeja
         if self.tray_mgr.tray_icon:
             try:
                 self.tray_mgr.tray_icon.stop()
             except Exception as e:
                 print(f"Error al detener la bandeja del sistema: {e}")
         
-        self.root.quit()
-        self.root.destroy()
-        
-        try:
-            import sys
-            sys.exit(0)
-        except:
-            pass
+        # Destruir la ventana de Tkinter de forma segura
+        if self.root.winfo_exists():
+            self.root.after(100, self.root.destroy) # Destruir después de un breve retraso
+
+        # Detener el bucle principal de GLib
+        if self.main_loop:
+            self.main_loop.quit()
+
+        # Salir del proceso
+        sys.exit(0)
 
     def change_language(self, lang):
         i18n_instance.lang = lang
@@ -1572,5 +1590,21 @@ class GoogleDriveManager:
         # Actualizar las listas de cuentas y montajes
         self.refresh_accounts()
         self.refresh_mounts()
+    def show_window(self):
+        """Muestra la ventana principal de la aplicación y la trae al frente."""
+        self.root.after(0, self._do_show_window)
+
+    def _do_show_window(self):
+        """Realiza las acciones de UI para mostrar y enfocar la ventana."""
+        try:
+            if self.root.state() == 'iconic':
+                self.root.deiconify()
+            self.root.lift()
+            self.root.focus_force()
+        except tk.TclError:
+            # La ventana puede haber sido destruida
+            pass
+
     def run(self):
-        self.root.mainloop()
+        # El bucle principal de GLib se encarga de ejecutar la aplicación
+        pass
