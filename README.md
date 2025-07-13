@@ -85,11 +85,10 @@ Puedes instalar Easy Ocamlfuse de varias maneras:
 ### Desde paquete .deb (Recomendado)
 
   **Instala el paquete .deb:**
-    ```bash
-    sudo apt install ./easy-ocamlfuse-latest.deb
- 
-    ```
-    > **Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` con `pip` si no se instalaron automáticamente.
+     ``` bash
+     sudo apt install ./easy-ocamlfuse-latest.deb
+     ```
+**Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` con `pip` si no se instalaron automáticamente.
 
 ### Desde el código fuente
 
@@ -126,7 +125,7 @@ Puedes instalar Easy Ocamlfuse de varias maneras:
 Si has descargado un binario precompilado (por ejemplo, desde la sección de "Releases" de GitHub) 
 y deseas instalarlo directamente en tu sistema sin usar los paquetes `.deb` o el código fuente, puedes usar el script `install_binary.sh`.
 
-1.  **Descarga el binario** (ej. `easy-ocamlfuse_1.0.1`) y el script `install_binary.sh` en el mismo directorio.
+1.  **Descarga el binario** (ej. `easy-ocamlfuse_1.0.0`) y el script `install_binary.sh`(viene incluido en el comprimido) en el mismo directorio.
 2.  **Dale permisos de ejecución** al script:
     ```bash
     chmod +x install_binary.sh
