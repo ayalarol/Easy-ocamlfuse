@@ -66,9 +66,10 @@ class GoogleDriveManager:
             self.root.deiconify()
         #carga de icono 
         try:
-            icon_image = tk.PhotoImage(file=LOGO_FILE)
-            self.root.iconphoto(True, icon_image)
-            self.window_icon = icon_image
+            icon_image = self._load_icon(LOGO_FILE, size=(64, 64))
+            if icon_image:
+                self.root.iconphoto(True, icon_image)
+                self.window_icon = icon_image
         except Exception as e:
             print(_("No se pudo cargar el icono de ventana: {}").format(e))
 
@@ -174,7 +175,7 @@ class GoogleDriveManager:
                 image = image.convert('RGBA')
             
             # Redimensionar manteniendo transparencia
-            image = image.resize(size, Image.Resampling.NEAREST)
+            image = image.resize(size, Image.Resampling.LANCZOS)
             
             if bg_color:
                 background = Image.new("RGBA", image.size, bg_color)
