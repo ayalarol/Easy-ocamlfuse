@@ -1,4 +1,18 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+# Copyright (c) 2025 ayalarol
+#
+# Este programa es software libre: puedes redistribuirlo y/o modificarlo
+# bajo los términos de la Licencia Pública General GNU tal como ha sido
+# publicada por la Free Software Foundation
+# Este programa se distribuye con la esperanza de que sea útil, pero
+# SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
+# MERCANTIL o de APTITUD PARA UN PROPÓSITO PARTICULAR.
+# Consulta los detalles de la Licencia Pública General GNU para más información ve a /assets/resources/LICENSE.txt
+# Debes haber recibido una copia de la Licencia Pública General GNU
+# junto a este programa. En caso contrario, consulta <http://www.gnu.org/licenses/>.
+
 import os
 import sys
 import subprocess
@@ -21,7 +35,7 @@ from .account   import AccountManager
 from .tray      import TrayIconManager
 from .i18n      import _, i18n_instance
 from .encryption import EncryptionManager
-ICON_SIZE = (24, 24)
+ICON_SIZE = (28, 28)
 
 class GoogleDriveManager:
     def __init__(self, main_loop=None):
