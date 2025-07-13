@@ -228,16 +228,24 @@ class MountManager:
                     continue
 
                 accounts_snapshot = list(self.mounted_accounts.items())
+                unmounted_labels = []
 
                 for label, mount_point in accounts_snapshot:
                     try:
                         if not os.path.ismount(mount_point):
-                            if label in self.mounted_accounts:
-                                if on_unmount_callback:
-                                    on_unmount_callback(label, mount_point)
-                                break
+                            unmounted_labels.append((label, mount_point))
                     except Exception as e:
                         print(_(f"Error in mount monitor while checking '{label}': {e}"))
+
+                if unmounted_labels:
+                    for label, mount_point in unmounted_labels:
+                        # Eliminar la cuenta de la lista de monitoreo para evitar notificaciones repetidas.
+                        # La GUI se encargará de la actualización final del estado.
+                        if label in self.mounted_accounts:
+                            del self.mounted_accounts[label]
+                        
+                        if on_unmount_callback:
+                            on_unmount_callback(label, mount_point)
         
         threading.Thread(target=monitor, daemon=True).start()
 

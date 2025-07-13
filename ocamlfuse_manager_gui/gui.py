@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
-import socket
 import subprocess
 import notify2
 import webbrowser
@@ -10,6 +9,9 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
 import shutil
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import GLib
 
 from .constants import LOGO_FILE, GDFUSE_DIR, CONFIG_FILE, APP_VERSION
 from .utils import ToolTip,centrar_ventana,verificar_ocamlfuse, detectar_distro_id, obtener_comando_instalacion_ocamlfuse, instalar_ocamlfuse_async, check_for_updates
@@ -22,8 +24,8 @@ from .encryption import EncryptionManager
 ICON_SIZE = (24, 24)
 
 class GoogleDriveManager:
-    def __init__(self, main_loop=None): # Aceptar main_loop como argumento
-        self.main_loop = main_loop # Guardar la referencia al main_loop
+    def __init__(self, main_loop=None):
+        self.main_loop = main_loop 
         # --- Configuración de idioma ANTES de cualquier UI ---
         self.config_mgr = ConfigManager(CONFIG_FILE)
         config_data = self.config_mgr.load_config()
@@ -43,7 +45,7 @@ class GoogleDriveManager:
         self.root.title(_("Easy Ocamlfuse"))
         self.root.geometry("930x620")
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.root.minsize(930, 620) # Establece el tamaño mínimo de la ventana 
+        self.root.minsize(930, 620) 
         centrar_ventana(self.root)
       
         if not minimized:
@@ -221,7 +223,8 @@ class GoogleDriveManager:
         exec_path = sys.executable
         script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../main.py"))
         icon_path = os.path.abspath(LOGO_FILE)
-        desktop_entry = f'''[Desktop Entry]\nType=Application\nName=EasyOcamlfuse\nExec={exec_path} {script_path} --minimized\nIcon={icon_path}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n'''
+        desktop_entry = f'''[Desktop Entry]\nType=Application\nName=EasyOcamlfuse\nExec={exec_path} {script_path}
+          --minimized\nIcon={icon_path}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n'''
         autostart_line = (
             f'\n# Autoinicio EasyOcamlfuse\n'
             f'if ! pgrep -f "gdrive_manager.py" > /dev/null; then\n'
@@ -311,7 +314,6 @@ class GoogleDriveManager:
 
         def agregar_a_profile():
             try:
-                # Eliminar cualquier línea antigua de autoinicio EasyOcamlfuse
                 if os.path.exists(profile_path):
                     with open(profile_path, "r") as f:
                         lines = f.readlines()
@@ -351,9 +353,10 @@ class GoogleDriveManager:
 
     def on_external_unmount(self, label, mount_point):
         """Callback cuando se detecta un desmontaje externo"""
-        # Programar la actualización en el hilo principal de Tkinter
-        self.root.after(0, self.refresh_mounts)
-        
+        GLib.idle_add(self.handle_unmount_notification, label, mount_point)
+
+    def handle_unmount_notification(self, label, mount_point):
+        self.refresh_mounts()
         try:
             if not hasattr(self, '_notify_inited'):
                 notify2.init("EasyOcamlfuse")
@@ -367,10 +370,10 @@ class GoogleDriveManager:
             n.show()
         except Exception as e:
             print(f"Error al mostrar la notificación: {e}")
+        return False
 
     #creacion de los widgets de la interfaz
     def create_widgets(self):
-        """Crear los widgets de la interface"""
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
@@ -880,7 +883,7 @@ class GoogleDriveManager:
                 status_label.config(text=_("Error en la instalación"))
                 output_text.insert('end', f"\n✗ Error en instalación (código {returncode})\n")
                 
-                # Añadir botón para cerrar manualmente
+               
                 close_button = ttk.Button(dialog, text=_("Cerrar"), command=dialog.destroy)
                 close_button.pack(pady=10)
                 
@@ -1504,7 +1507,7 @@ class GoogleDriveManager:
                 self.is_quitting = False # Cancelar el cierre
                 return
         
-        # Guardar configuración antes de salir
+        
         self._save_state()
 
         # Detener el icono de la bandeja

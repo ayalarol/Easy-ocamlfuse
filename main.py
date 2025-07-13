@@ -1,8 +1,7 @@
 import sys
 import os
-import dbus
-import dbus.service
-import dbus.mainloop.glib
+import socket
+import tkinter as tk
 from gi.repository import GLib
 
 # Añadir el directorio 'vendor' a la ruta de búsqueda de Python
@@ -12,63 +11,56 @@ if vendor_dir not in sys.path:
 
 from ocamlfuse_manager_gui.gui import GoogleDriveManager
 
-# Constantes para D-Bus
-DBUS_SERVICE_NAME = 'org.easyocamlfuse.Manager'
-DBUS_OBJECT_PATH = '/org/easyocamlfuse/Manager'
-DBUS_INTERFACE_NAME = 'org.easyocamlfuse.ManagerInterface'
+# Variable global para mantener el socket de bloqueo
+lock_socket = None
 
-class EasyOcamlfuseDBusService(dbus.service.Object):
-    def __init__(self, app_instance):
-        super().__init__(dbus.SessionBus(), DBUS_OBJECT_PATH)
-        self.app = app_instance
-
-    @dbus.service.method(dbus_interface=DBUS_INTERFACE_NAME,
-                         in_signature='', out_signature='')
-    def ShowWindow(self):
-        self.app.show_window()
+def is_another_instance_running():
+    """
+    Verifica si ya hay otra instancia de la aplicación en ejecución
+    utilizando un socket de dominio Unix.
+    """
+    global lock_socket
+    socket_name = "\0easy_ocamlfuse_lock"
+    
+    try:
+        # Crear un socket de dominio Unix
+        lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        # Intentar enlazar el socket al nombre abstracto
+        lock_socket.bind(socket_name)
+        return False
+    except socket.error:
+        # Si el enlace falla, es probable que otra instancia ya esté en ejecución.
+        return True
 
 def main():
-    dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+    # Verificar si ya hay una instancia en ejecución
+    if is_another_instance_running():
+        print("Easy Ocamlfuse ya se está ejecutando. Saliendo.")
+        sys.exit(0)
+
     main_loop = GLib.MainLoop()
 
     try:
-        # Intentar adquirir el nombre del servicio D-Bus
-        bus = dbus.SessionBus()
-        name = dbus.service.BusName(DBUS_SERVICE_NAME, bus)
-        
-        # Si se adquiere el nombre, esta es la primera instancia
-        app = GoogleDriveManager(main_loop=main_loop) # Pasa el main_loop a la aplicación
-        service = EasyOcamlfuseDBusService(app)
+        # Esta es la primera instancia, iniciar la aplicación
+        app = GoogleDriveManager(main_loop=main_loop)
         app.root.after(0, app.start_background_tasks)
         
         # Función para actualizar Tkinter dentro del bucle de GLib
         def tkinter_update():
-            if not app.is_quitting and app.root.winfo_exists(): # Solo actualizar si la app no está cerrando y la ventana existe
+            if not app.is_quitting and app.root.winfo_exists():
                 try:
                     app.root.update_idletasks()
                     app.root.update()
-                except tk.TclError: # Manejar el error si la ventana ya ha sido destruida
-                    return False # Detener el callback
-            elif app.is_quitting: # Si la app está cerrando, detener el bucle de GLib
+                except tk.TclError:
+                    return False
+            elif app.is_quitting:
                 main_loop.quit()
                 return False
-            return True # Continuar el callback
+            return True
 
-        # Ejecutar la actualización de Tkinter periódicamente
         GLib.idle_add(tkinter_update)
-
-        # Iniciar el bucle principal de GLib
         main_loop.run()
 
-    except dbus.exceptions.NameExistsException:
-        print("La aplicación ya se está ejecutando. Enviando señal para mostrar la ventana.")
-        try:
-            bus = dbus.SessionBus()
-            remote_object = bus.get_object(DBUS_SERVICE_NAME, DBUS_OBJECT_PATH)
-            remote_object.ShowWindow(dbus_interface=DBUS_INTERFACE_NAME)
-        except Exception as e:
-            print(f"Error al intentar comunicar con la instancia existente: {e}")
-        sys.exit(0)
     except Exception as e:
         print(f"Error inesperado al iniciar la aplicación: {e}")
         sys.exit(1)
