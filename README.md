@@ -19,6 +19,8 @@
 
 La aplicación está desarrollada en Python con Tkinter y es compatible para agregar multiples idiomas (español e inglés por defecto).
 
+[![Descargar la última versión](https://img.shields.io/badge/Descargar-v1.0.0-blue?style=for-the-badge)](https://github.com/ayalarol/Easy-ocamlfuse/releases/tag/v1.0.0)
+
 ---
 
 ## ✨ Características Principales
