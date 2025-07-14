@@ -613,34 +613,58 @@ class AccountManager:
         """Carga credenciales desde un archivo JSON y bloquea los campos, usando el gestor de archivos nativo si es posible."""
         carpeta = os.path.expanduser("~")
         file_path = ""
-        # intentar ejecutar con diversos gestores si todo falla con tkinter
+        
+        # Estrategia: Probar Zenity, luego KDialog, y finalmente Tkinter.
+        # Si el usuario cancela un diálogo (código de salida 1), no se intenta el siguiente.
+
+        # Intento 1: Zenity (GTK)
         try:
             result = subprocess.run([
                 'zenity', '--file-selection',
                 '--title=Seleccionar archivo de credenciales JSON',
                 '--file-filter=Archivos JSON | *.json',
                 f'--filename={carpeta}/'
-            ], capture_output=True, text=True, check=True)
-            file_path = result.stdout.strip()
-        except FileNotFoundError:
+            ], capture_output=True, text=True, timeout=60)
+            
+            if result.returncode == 0:
+                file_path = result.stdout.strip()
+            elif result.returncode == 1:
+                # El usuario canceló el diálogo de Zenity, no hacer nada más.
+                return
+            # Para otros códigos de error, se considera un fallo y se pasará al siguiente método.
+
+        except (FileNotFoundError, subprocess.TimeoutExpired):
+            # Zenity no está instalado o no respondió, intentar con kdialog.
+            pass
+
+        # Intento 2: KDialog (KDE)
+        if not file_path:
             try:
+                # KDialog devuelve la ruta por stdout y código 0, o nada y código 1 si se cancela.
                 result = subprocess.run([
                     'kdialog', '--getopenfilename',
                     carpeta,
                     'Archivos JSON (*.json)'
-                ], capture_output=True, text=True, check=True)
-                file_path = result.stdout.strip()
-            except FileNotFoundError:
-                file_path = filedialog.askopenfilename(
-                    title=_("Seleccionar archivo de credenciales JSON"),
-                    filetypes=[(_("Archivos JSON"), '*.json')],
-                    initialdir=carpeta
-                )
-            except subprocess.CalledProcessError:
-        
-                return
-        except subprocess.CalledProcessError:
-            return
+                ], capture_output=True, text=True, timeout=60)
+
+                if result.returncode == 0:
+                    file_path = result.stdout.strip()
+                elif result.returncode == 1:
+                    # El usuario canceló el diálogo de KDialog, no hacer nada más.
+                    return
+
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                # Kdialog no está o no respondió, usar el de tkinter.
+                pass
+
+        # Fallback: Tkinter
+        if not file_path:
+            # askopenfilename devuelve una cadena vacía si el usuario cancela.
+            file_path = filedialog.askopenfilename(
+                title=_("Seleccionar archivo de credenciales JSON"),
+                filetypes=[(_("Archivos JSON"), '*.json')],
+                initialdir=carpeta
+            )
 
         if not file_path:
             return
