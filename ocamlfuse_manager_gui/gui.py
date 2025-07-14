@@ -99,6 +99,7 @@ class GoogleDriveManager:
         self.deleted_accounts = config_data.get("deleted_accounts", {})
         self.autostart_enabled = config_data.get("autostart_enabled", False)
         self.ask_before_delete = config_data.get("ask_before_delete", True)
+        self.do_not_show_gnome_tray_warning = tk.BooleanVar(value=config_data.get("do_not_show_gnome_tray_warning", False))
 
         # Inicializar autostart_var ANTES de cualquier save_config
         self.autostart_var = tk.BooleanVar()
@@ -155,24 +156,14 @@ class GoogleDriveManager:
 
         
        
-        if is_gnome and minimized:
-            messagebox.showinfo(
-                _("Información de la Bandeja del Sistema"),
-                _("Detectamos que estás usando GNOME y la aplicación se inició minimizada.\n\n"\
-                  "GNOME no siempre soporta los iconos de la bandeja del sistema de forma nativa. "\
-                  "Si no ves el icono, puedes instalar la extensión 'AppIndicator and KStatusNotifierItem Support' "\
-                  "para GNOME Shell.\n\n"\
-                  "La ventana principal se mostrará para que puedas interactuar con la aplicación.")
-            )
-            self.root.deiconify() # Ensure window is visible
-            self.root.lift()
-            self.root.focus_force()
-            self.tray_mgr.skip_tray_creation = True # Tell tray_mgr not to create icon
-        else:
-            threading.Thread(
-                target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
-                daemon=True
-            ).start()
+        if is_gnome and minimized and not self.do_not_show_gnome_tray_warning.get():
+            self.show_gnome_tray_warning_dialog()
+        
+        # Siempre intentar crear el icono de la bandeja
+        threading.Thread(
+            target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
+            daemon=True
+        ).start()
 
         self.check_for_updates_on_startup()
 
@@ -221,7 +212,8 @@ class GoogleDriveManager:
             "deleted_accounts": self.deleted_accounts,
             "autostart_enabled": self.autostart_var.get(),
             "ask_before_delete": self.ask_before_delete,
-            "language": i18n_instance.lang
+            "language": i18n_instance.lang,
+            "do_not_show_gnome_tray_warning": self.do_not_show_gnome_tray_warning.get()
         }
         self.config_mgr.save_config(config)
 
@@ -253,10 +245,9 @@ class GoogleDriveManager:
         is_problematic = any(name in xdg_desktop or name in desktop_session for name in problematic_desktops)
 
         exec_path = sys.executable
-        script_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../main.py"))
+        script_path = "/usr/share/easy-ocamlfuse/main.py"
         icon_path = os.path.abspath(LOGO_FILE)
-        desktop_entry = f'''[Desktop Entry]\nType=Application\nName=EasyOcamlfuse\nExec={exec_path} {script_path}
-          --minimized\nIcon={icon_path}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n'''
+        desktop_entry = f'''[Desktop Entry]\nType=Application\nName=EasyOcamlfuse\nExec={script_path} --minimized\nIcon={icon_path}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n'''
         autostart_line = (
             f'\n# Autoinicio EasyOcamlfuse\n'
             f'if ! pgrep -f "gdrive_manager.py" > /dev/null; then\n'
@@ -1522,6 +1513,34 @@ class GoogleDriveManager:
 
         banner.bind("<Button-1>", lambda e: open_about_and_hide())
         self.root.after(15000, lambda: banner.pack_forget() if banner.winfo_exists() else None)
+
+    def show_gnome_tray_warning_dialog(self):
+        dialog = tk.Toplevel(self.root)
+        dialog.title(_("Información de la Bandeja del Sistema"))
+        dialog.geometry("450x250")
+        dialog.resizable(False, False)
+        dialog.transient(self.root)
+        dialog.grab_set()
+        centrar_ventana(dialog, self.root)
+
+        msg = _("Detectamos que estás usando GNOME y la aplicación se inició minimizada.\n\n"\
+                  "GNOME no siempre soporta los iconos de la bandeja del sistema de forma nativa. "\
+                  "Si no ves el icono, puedes instalar la extensión 'AppIndicator and KStatusNotifierItem Support' "\
+                  "para GNOME Shell.")
+        tk.Label(dialog, text=msg, wraplength=430, justify=tk.LEFT).pack(padx=10, pady=10)
+
+        chk = tk.Checkbutton(dialog, text=_("No volver a mostrar este mensaje"), variable=self.do_not_show_gnome_tray_warning)
+        chk.pack(pady=5)
+
+        def on_ok():
+            self.root.withdraw() # Ocultar la ventana principal después de cerrar el diálogo
+            self._save_state()
+            dialog.destroy()
+
+        ttk.Button(dialog, text=_("Aceptar"), command=on_ok).pack(pady=10)
+
+        dialog.protocol("WM_DELETE_WINDOW", on_ok) # Manejar cierre de ventana
+        self.root.wait_window(dialog)
 
     def quit_application(self, icon=None, item=None):
         """Salir de la aplicación"""
