@@ -86,7 +86,7 @@ Puedes instalar Easy Ocamlfuse de varias maneras:
 
   **Instala el paquete .deb:**
      ``` bash
-     sudo apt install ./easy-ocamlfuse-latest.deb
+     sudo apt install ./easy-ocamlfuse_1.0.0_all.deb
      ```
 **Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` con `pip` si no se instalaron automáticamente.
 
@@ -125,7 +125,7 @@ Puedes instalar Easy Ocamlfuse de varias maneras:
 Si has descargado un binario precompilado (por ejemplo, desde la sección de "Releases" de GitHub) 
 y deseas instalarlo directamente en tu sistema sin usar los paquetes `.deb` o el código fuente, puedes usar el script `install_binary.sh`.
 
-1.  **Descarga el binario** (ej. `easy-ocamlfuse_1.0.0`) y el script `install_binary.sh`(viene incluido en el comprimido) en el mismo directorio.
+1.  **Descarga el binario** (ej. `easy-ocamlfuse-newDristos`) para versiones mas recientes y (ej. `easy-ocamlfuse-oldDristos`) para versiones mas antiguas  y el script `install_binary.sh`(viene incluido en el comprimido) en el mismo directorio.
 2.  **Dale permisos de ejecución** al script:
     ```bash
     chmod +x install_binary.sh
@@ -135,7 +135,10 @@ y deseas instalarlo directamente en tu sistema sin usar los paquetes `.deb` o el
     sudo ./install_binary.sh
     ```
     Este script moverá el binario a `/usr/local/bin`, creará un archivo `.desktop` para el menú de aplicaciones y gestionará los iconos.
-
+    **Para desinstalar**:
+    ```bash
+    sudo ./uninstall_binary.sh
+    ```
 ---
 
 ## 📖 Uso Básico
