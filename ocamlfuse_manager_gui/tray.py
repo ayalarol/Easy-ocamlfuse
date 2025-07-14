@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 import pystray
 from PIL import Image
-from tkinter import messagebox
-from .utils import centrar_ventana
+import threading
 from .i18n import i18n_instance
 _ = i18n_instance.gettext
 
@@ -14,53 +13,46 @@ class TrayIconManager:
         self.is_gnome = is_gnome
         self.minimized = minimized
         self.tray_icon = None
-        self.skip_tray_creation = False # New flag
+        self.skip_tray_creation = False
 
     def create_tray_icon(self, icon_path):
         if self.skip_tray_creation:
             return
 
         try:
-            image = Image.open(icon_path).resize((64, 64), Image.LANCZOS)
+            image = Image.open(icon_path).resize((64, 64), Image.Resampling.LANCZOS)
             menu = pystray.Menu(
-                pystray.MenuItem(_("Mostrar"), self.show_window),
-                pystray.MenuItem(_("Desmontar Todo"), self.unmount_all_tray),
+                pystray.MenuItem(_("Mostrar"), self.show_window, default=True),
+                pystray.MenuItem(_("Desmontar Todo"), self.unmount_cb),
                 pystray.Menu.SEPARATOR,
-                pystray.MenuItem(_("Salir"), self.quit_application)
+                pystray.MenuItem(_("Salir"), self.quit_app)
             )
-            self.tray_icon = pystray.Icon("gdrive_manager", image, _( "Google Drive Manager"), menu)
-            self.tray_icon.run()
+            self.tray_icon = pystray.Icon("easy-ocamlfuse", image, _("Easy Ocamlfuse"), menu)
+            
+            # Ejecutar en un hilo separado para no bloquear
+            threading.Thread(target=self.tray_icon.run, daemon=True).start()
+
         except Exception as e:
-            print(_(f"No se pudo crear bandeja: {e}"))
+            print(_(f"No se pudo crear la bandeja: {e}"))
 
     def show_window(self, icon=None, item=None):
-        self.root.deiconify()
-        centrar_ventana(self.root)
-        self.root.lift()
-        self.root.focus_force()
+        self.root.after(0, self._do_show_window)
 
-    def unmount_all_tray(self, icon=None, item=None):
-        self.unmount_cb()
-
-    def quit_application(self, icon=None, item=None):
-        if icon:
-            self.root.deiconify()
+    def _do_show_window(self):
+        try:
+            if self.root.state() == 'iconic':
+                self.root.deiconify()
+            else:
+                self.root.deiconify()
             self.root.lift()
             self.root.focus_force()
-        if not messagebox.askyesno(_("Desea salir"), _( "¿Está seguro de que desea salir?")):
-            if icon:
-                self.root.withdraw()
-            return
-        if self.tray_icon:
-            try:
-                self.tray_icon.stop()
-            except:
-                pass
-        self.quit_app()
+        except Exception as e:
+            print(f"Error al mostrar la ventana: {e}")
 
-    def on_closing(self):
+    def stop_tray(self):
         if self.tray_icon:
-            self.root.withdraw()
-        else:
-            if messagebox.askyesno(_("Salir"), _( "¿Está seguro de que desea salir?")):
-                self.quit_app()
+            self.tray_icon.stop()
+            self.tray_icon = None
+            
+    def quit_application(self, icon, item):
+        self.quit_app()

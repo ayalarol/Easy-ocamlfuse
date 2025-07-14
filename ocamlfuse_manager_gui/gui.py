@@ -120,7 +120,8 @@ class GoogleDriveManager:
             except FileNotFoundError:
                 self.autostart_var.set(False)
         else:
-            self.autostart_var.set(self.autostart_enabled)
+            # Comprobar si el archivo .desktop existe para mayor fiabilidad
+            self.autostart_var.set(self.check_autostart())
 
         # Managers
         self.mount_mgr = MountManager(self.mounted_accounts)
@@ -156,16 +157,22 @@ class GoogleDriveManager:
 
         
        
+        # GNOME puede necesitar una advertencia si el icono no aparece
         if is_gnome and minimized and not self.do_not_show_gnome_tray_warning.get():
             self.show_gnome_tray_warning_dialog()
-        
-        # Siempre intentar crear el icono de la bandeja
-        threading.Thread(
-            target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
-            daemon=True
-        ).start()
+
+        # Iniciar el icono de la bandeja de forma robusta después de que la UI esté lista
+        self.root.after(100, self.start_tray_icon)
 
         self.check_for_updates_on_startup()
+
+    def start_tray_icon(self):
+        """Inicia el icono de la bandeja en un hilo separado."""
+        if not self.tray_mgr.skip_tray_creation:
+            threading.Thread(
+                target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
+                daemon=True
+            ).start()
 
     def start_background_tasks(self):
         self._cargar_datos_pesados()
@@ -241,17 +248,33 @@ class GoogleDriveManager:
 
         # Lista negra de entornos donde el autoinicio estándar NO funciona bien
         problematic_desktops = ["enlightenment", "bodhi"]
-
         is_problematic = any(name in xdg_desktop or name in desktop_session for name in problematic_desktops)
 
-        exec_path = sys.executable
-        script_path = "/usr/share/easy-ocamlfuse/main.py"
-        icon_path = os.path.abspath(LOGO_FILE)
-        desktop_entry = f'''[Desktop Entry]\nType=Application\nName=EasyOcamlfuse\nExec={script_path} --minimized\nIcon={icon_path}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n'''
+        # --- Lógica de Autoinicio Unificada y Robusta ---
+        # --- Lógica de Autoinicio Unificada y Robusta ---
+        # Busca el ejecutable en el PATH para máxima robustez.
+        # Si no se encuentra, usa una ruta por defecto como fallback.
+        easy_ocamlfuse_path = shutil.which("easy-ocamlfuse") or "/usr/local/bin/easy-ocamlfuse"
+        exec_command = f"{easy_ocamlfuse_path} --minimized"
+        icon_name = "easy-ocamlfuse" # El sistema buscará el icono por su nombre.
+
+        # Contenido para el archivo .desktop estándar
+        desktop_entry = (
+            f"[Desktop Entry]\n"
+            f"Type=Application\n"
+            f"Name=EasyOcamlfuse\n"
+            f"Exec={exec_command}\n"
+            f"Icon={icon_name}\n"
+            f"Comment=Iniciar Easy Ocamlfuse al arrancar\n"
+            f"Terminal=false\n"
+            f"X-GNOME-Autostart-enabled=true\n"
+        )
+
+        # Contenido para el workaround de Bodhi/Enlightenment en ~/.profile
         autostart_line = (
             f'\n# Autoinicio EasyOcamlfuse\n'
-            f'if ! pgrep -f "gdrive_manager.py" > /dev/null; then\n'
-            f'    nohup python3 "{script_path}" --minimized >/dev/null 2>&1 &\n'
+            f'if ! pgrep -f "easy-ocamlfuse" > /dev/null; then\n'
+            f'    nohup {exec_command} >/dev/null 2>&1 &\n'
             f'fi\n'
         )
         profile_path = os.path.expanduser("~/.profile")
@@ -259,26 +282,27 @@ class GoogleDriveManager:
         def autostart_line_in_profile():
             try:
                 with open(profile_path, "r") as f:
-                    return autostart_line.strip() in f.read()
+                    # Usamos una comprobación más flexible por si hay pequeños cambios
+                    return "# Autoinicio EasyOcamlfuse" in f.read()
             except FileNotFoundError:
                 return False
 
         if self.autostart_var.get():
             if is_problematic:
-                # Lógica para Bodhi/Enlightenment
                 if not autostart_line_in_profile():
                     self.show_bodhi_autostart_dialog(autostart_line, profile_path)
             else:
-                # Lógica para todos los demás entornos (permitir autoinicio)
+                # Lógica para todos los demás entornos (crear .desktop)
                 with open(autostart_path, "w") as f:
                     f.write(desktop_entry)
         else:
-            # Desactivar autostart
+            # --- Desactivar autostart ---
             if is_problematic:
                 try:
                     if os.path.exists(profile_path):
                         with open(profile_path, "r") as f:
                             lines = f.readlines()
+                        # Reescribir el archivo excluyendo el bloque de autoinicio
                         with open(profile_path, "w") as f:
                             skip = False
                             for line in lines:
@@ -295,6 +319,7 @@ class GoogleDriveManager:
                         _("No se pudo eliminar la línea de autoinicio de ~/.profile:\n{}").format(e)
                     )
             else:
+                # Eliminar el archivo .desktop
                 if os.path.exists(autostart_path):
                     os.remove(autostart_path)
         self._save_state()

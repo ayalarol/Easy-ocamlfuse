@@ -20,8 +20,9 @@ import socket
 import tkinter as tk
 from gi.repository import GLib
 
-# Añadir el directorio 'vendor' a la ruta de búsqueda de Python
-vendor_dir = os.path.dirname(os.path.abspath(__file__))
+# Añadir el directorio 'vendor' a la ruta de búsqueda de Python para las dependencias empaquetadas
+base_dir = os.path.dirname(os.path.abspath(__file__))
+vendor_dir = os.path.join(base_dir, 'vendor')
 if vendor_dir not in sys.path:
     sys.path.insert(0, vendor_dir)
 
@@ -59,20 +60,24 @@ def main():
     try:
         # Esta es la primera instancia, iniciar la aplicación
         app = GoogleDriveManager(main_loop=main_loop)
-        app.root.after(0, app.start_background_tasks)
         
-        # Función para actualizar Tkinter dentro del bucle de GLib
+        # Iniciar tareas en segundo plano después de que la UI esté lista
+        app.root.after(100, app.start_background_tasks)
+        
+        # Bucle principal de Tkinter gestionado por GLib
         def tkinter_update():
-            if not app.is_quitting and app.root.winfo_exists():
-                try:
-                    app.root.update_idletasks()
+            try:
+                if app.root.winfo_exists():
                     app.root.update()
-                except tk.TclError:
-                    return False
-            elif app.is_quitting:
-                main_loop.quit()
-                return False
-            return True
+                    return True # Mantener el bucle
+                else:
+                    if not main_loop.is_running():
+                        main_loop.quit()
+                    return False # Detener el bucle
+            except tk.TclError:
+                if not main_loop.is_running():
+                    main_loop.quit()
+                return False # Detener el bucle
 
         GLib.idle_add(tkinter_update)
         main_loop.run()
