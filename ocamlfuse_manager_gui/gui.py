@@ -134,10 +134,13 @@ class GoogleDriveManager:
             self.refresh_accounts, 
             self.ask_before_delete
         )
+        is_gnome = "gnome" in xdg_desktop or "gnome" in desktop_session
         self.tray_mgr = TrayIconManager(
             self.root,
             unmount_cb=self.unmount_all,
-            quit_cb=self.quit_application
+            quit_cb=self.quit_application,
+            is_gnome=is_gnome,
+            minimized=minimized
         )
 
         # UI
@@ -152,11 +155,25 @@ class GoogleDriveManager:
 
         
        
-        threading.Thread(
-            target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
-            daemon=True
-        ).start()
-        
+        if is_gnome and minimized:
+            messagebox.showinfo(
+                _("Información de la Bandeja del Sistema"),
+                _("Detectamos que estás usando GNOME y la aplicación se inició minimizada.\n\n"\
+                  "GNOME no siempre soporta los iconos de la bandeja del sistema de forma nativa. "\
+                  "Si no ves el icono, puedes instalar la extensión 'AppIndicator and KStatusNotifierItem Support' "\
+                  "para GNOME Shell.\n\n"\
+                  "La ventana principal se mostrará para que puedas interactuar con la aplicación.")
+            )
+            self.root.deiconify() # Ensure window is visible
+            self.root.lift()
+            self.root.focus_force()
+            self.tray_mgr.skip_tray_creation = True # Tell tray_mgr not to create icon
+        else:
+            threading.Thread(
+                target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
+                daemon=True
+            ).start()
+
         self.check_for_updates_on_startup()
 
     def start_background_tasks(self):

@@ -7,13 +7,19 @@ from .i18n import i18n_instance
 _ = i18n_instance.gettext
 
 class TrayIconManager:
-    def __init__(self, root, unmount_cb, quit_cb):
+    def __init__(self, root, unmount_cb, quit_cb, is_gnome=False, minimized=False):
         self.root = root
         self.unmount_cb = unmount_cb
         self.quit_app = quit_cb
+        self.is_gnome = is_gnome
+        self.minimized = minimized
         self.tray_icon = None
+        self.skip_tray_creation = False # New flag
 
     def create_tray_icon(self, icon_path):
+        if self.skip_tray_creation:
+            return
+
         try:
             image = Image.open(icon_path).resize((64, 64), Image.LANCZOS)
             menu = pystray.Menu(
