@@ -1571,6 +1571,11 @@ class GoogleDriveManager:
         dialog.protocol("WM_DELETE_WINDOW", on_ok) # Manejar cierre de ventana
         self.root.wait_window(dialog)
 
+    def show_window(self):
+        """Muestra la ventana principal, trayéndola al frente."""
+        if self.tray_mgr:
+            self.tray_mgr.show_window()
+
     def quit_application(self, icon=None, item=None):
         """Salir de la aplicación"""
         if self.is_quitting: # Evitar procesamiento si ya estamos cerrando
