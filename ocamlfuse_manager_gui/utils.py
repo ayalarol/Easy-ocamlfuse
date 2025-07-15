@@ -173,7 +173,7 @@ def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_cal
     Devuelve el código de retorno del proceso.
     """
     try:
-        full_cmd = f"pkexec sh -c '{install_cmd}'"
+        full_cmd = ["pkexec", "sh", "-c", install_cmd]
         if status_callback:
             status_callback(_("Solicitando permisos..."))
         if output_callback:
@@ -181,7 +181,6 @@ def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_cal
 
         process = subprocess.Popen(
             full_cmd,
-            shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             text=True
