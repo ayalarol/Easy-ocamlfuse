@@ -30,61 +30,89 @@ from ocamlfuse_manager_gui.gui import GoogleDriveManager
 
 # Variable global para mantener el socket de bloqueo
 lock_socket = None
+socket_name = "\0easy_ocamlfuse_lock"
 
-def is_another_instance_running():
+def setup_instance_messaging(app):
     """
-    Verifica si ya hay otra instancia de la aplicación en ejecución
-    utilizando un socket de dominio Unix.
+    Configura el socket para escuchar mensajes de otras instancias
+    y mostrar la ventana de la aplicación si se recibe una señal.
     """
     global lock_socket
-    socket_name = "\0easy_ocamlfuse_lock"
-    
-    try:
-        # Crear un socket de dominio Unix
-        lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        # Intentar enlazar el socket al nombre abstracto
-        lock_socket.bind(socket_name)
-        return False
-    except socket.error:
-        # Si el enlace falla, es probable que otra instancia ya esté en ejecución.
-        return True
+    lock_socket.setblocking(False)
+    lock_socket.listen(1)
+
+    def handle_new_connection(sock, condition):
+        try:
+            conn, addr = sock.accept()
+            # La conexión es la señal. Mostrar la ventana.
+            print("Recibida señal de otra instancia. Mostrando ventana.")
+            app.show_window()
+            conn.close()
+        except Exception as e:
+            print(f"Error al manejar la conexión de otra instancia: {e}")
+        return True  # Mantener el watch activo
+
+    GLib.io_add_watch(lock_socket, GLib.IO_IN, handle_new_connection)
 
 def main():
-    # Verificar si ya hay una instancia en ejecución
-    if is_another_instance_running():
-        print("Easy Ocamlfuse ya se está ejecutando. Saliendo.")
-        sys.exit(0)
-
-    main_loop = GLib.MainLoop()
-
+    """
+    Punto de entrada principal. Maneja la lógica de instancia única
+    y lanza la aplicación.
+    """
+    global lock_socket
+    
     try:
-        # Esta es la primera instancia, iniciar la aplicación
-        app = GoogleDriveManager(main_loop=main_loop)
+        # Intentar ser la instancia principal
+        lock_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        lock_socket.bind(socket_name)
         
-        # Iniciar tareas en segundo plano después de que la UI esté lista
-        app.root.after(100, app.start_background_tasks)
-        
-        # Bucle principal de Tkinter gestionado por GLib
-        def tkinter_update():
-            try:
-                if app.root.winfo_exists():
-                    app.root.update()
-                    return True # Mantener el bucle
-                else:
-                    if not main_loop.is_running():
+        # --- Esta es la instancia principal ---
+        main_loop = GLib.MainLoop()
+        try:
+            app = GoogleDriveManager(main_loop=main_loop)
+            
+            # Configurar el listener para otras instancias
+            setup_instance_messaging(app)
+            
+            # Iniciar tareas en segundo plano después de que la UI esté lista
+            app.root.after(100, app.start_background_tasks)
+            
+            # Bucle principal de Tkinter gestionado por GLib
+            def tkinter_update():
+                try:
+                    if app.root.winfo_exists():
+                        app.root.update()
+                        return True  # Mantener el bucle
+                    else:
+                        if main_loop.is_running():
+                            main_loop.quit()
+                        return False  # Detener el bucle
+                except tk.TclError:
+                    if main_loop.is_running():
                         main_loop.quit()
-                    return False # Detener el bucle
-            except tk.TclError:
-                if not main_loop.is_running():
-                    main_loop.quit()
-                return False # Detener el bucle
+                    return False  # Detener el bucle
 
-        GLib.idle_add(tkinter_update)
-        main_loop.run()
+            GLib.idle_add(tkinter_update)
+            main_loop.run()
 
-    except Exception as e:
-        print(f"Error inesperado al iniciar la aplicación: {e}")
-        sys.exit(1)
+        except Exception as e:
+            print(f"Error inesperado al iniciar la aplicación: {e}")
+            if main_loop.is_running():
+                main_loop.quit()
+            sys.exit(1)
+
+    except socket.error:
+        # --- Ya hay otra instancia en ejecución ---
+        print("Easy Ocamlfuse ya se está ejecutando. Enviando señal para mostrar la ventana.")
+        try:
+            client_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+            client_socket.connect(socket_name)
+            client_socket.close()
+            print("Señal enviada correctamente.")
+        except socket.error as e:
+            print(f"No se pudo conectar a la instancia existente: {e}")
+        
+        sys.exit(0)  # Salir de la segunda instancia
 
 if __name__ == "__main__":
     main()
