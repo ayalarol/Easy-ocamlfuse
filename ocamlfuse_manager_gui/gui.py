@@ -137,6 +137,13 @@ class GoogleDriveManager:
             self.ask_before_delete
         )
         is_gnome = "gnome" in xdg_desktop or "gnome" in desktop_session
+
+        # Forzar la visualización en GNOME si se inicia minimizado para evitar
+        # problemas con el ícono de la bandeja del sistema.
+        if is_gnome and minimized:
+            print("GNOME detected with --minimized flag, forcing window to show to ensure tray icon.")
+            minimized = False
+
         self.tray_mgr = TrayIconManager(
             self.root,
             unmount_cb=self.unmount_all,
@@ -250,7 +257,7 @@ class GoogleDriveManager:
         problematic_desktops = ["enlightenment", "bodhi"]
         is_problematic = any(name in xdg_desktop or name in desktop_session for name in problematic_desktops)
 
-        # --- Lógica de Autoinicio Unificada y Robusta ---
+ 
         # --- Lógica de Autoinicio Unificada y Robusta ---
         # Busca el ejecutable en el PATH para máxima robustez.
         # Si no se encuentra, usa una ruta por defecto como fallback.
@@ -258,7 +265,6 @@ class GoogleDriveManager:
         exec_command = f"{easy_ocamlfuse_path} --minimized"
         icon_name = "easy-ocamlfuse" # El sistema buscará el icono por su nombre.
 
-        # Contenido para el archivo .desktop estándar
         desktop_entry = (
             f"[Desktop Entry]\n"
             f"Type=Application\n"
@@ -493,7 +499,7 @@ class GoogleDriveManager:
         self.btn_open_folder.pack(side=tk.LEFT, padx=8, pady=2)
 
     def create_accounts_tab(self):
-        """Crear la pestaña de gestión de cuentas con un layout mejorado."""
+        """Crear la pestaña de gestión de cuentas"""
         
       
         self.new_account_frame = tk.LabelFrame(self.accounts_frame, text=_("Agregar Nueva Cuenta"))
@@ -1676,8 +1682,8 @@ class GoogleDriveManager:
     def _do_show_window(self):
         """Realiza las acciones de UI para mostrar y enfocar la ventana."""
         try:
-            if self.root.state() == 'iconic':
-                self.root.deiconify()
+            # Deiconify si está minimizada, y luego levantar y enfocar.
+            self.root.deiconify()
             self.root.lift()
             self.root.focus_force()
         except tk.TclError:
