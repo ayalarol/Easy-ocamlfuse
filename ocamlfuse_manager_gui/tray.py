@@ -6,12 +6,10 @@ from .i18n import i18n_instance
 _ = i18n_instance.gettext
 
 class TrayIconManager:
-    def __init__(self, root, unmount_cb, quit_cb, is_gnome=False, minimized=False):
+    def __init__(self, root, unmount_cb, quit_cb):
         self.root = root
         self.unmount_cb = unmount_cb
         self.quit_app = quit_cb
-        self.is_gnome = is_gnome
-        self.minimized = minimized
         self.tray_icon = None
         self.skip_tray_creation = False
 
@@ -53,6 +51,3 @@ class TrayIconManager:
         if self.tray_icon:
             self.tray_icon.stop()
             self.tray_icon = None
-            
-    def quit_application(self, icon, item):
-        self.quit_app()

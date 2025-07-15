@@ -147,9 +147,7 @@ class GoogleDriveManager:
         self.tray_mgr = TrayIconManager(
             self.root,
             unmount_cb=self.unmount_all,
-            quit_cb=self.quit_application,
-            is_gnome=is_gnome,
-            minimized=minimized
+            quit_cb=self.quit_application
         )
 
         # UI
@@ -1675,21 +1673,6 @@ class GoogleDriveManager:
         # Actualizar las listas de cuentas y montajes
         self.refresh_accounts()
         self.refresh_mounts()
-    def show_window(self):
-        """Muestra la ventana principal de la aplicación y la trae al frente."""
-        self.root.after(0, self._do_show_window)
-
-    def _do_show_window(self):
-        """Realiza las acciones de UI para mostrar y enfocar la ventana."""
-        try:
-            # Deiconify si está minimizada, y luego levantar y enfocar.
-            self.root.deiconify()
-            self.root.lift()
-            self.root.focus_force()
-        except tk.TclError:
-            # La ventana puede haber sido destruida
-            pass
-
     def run(self):
         # El bucle principal de GLib se encarga de ejecutar la aplicación
         pass
