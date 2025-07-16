@@ -38,24 +38,30 @@ La aplicación está desarrollada en Python con Tkinter y es compatible para agr
 
 ## 📋 Requisitos
 
-Asegúrate de tener las siguientes dependencias instaladas en tu sistema.
-
 ### Dependencias del Sistema
 
-- **Python 3.7** o superior
+Para asegurar la máxima compatibilidad, el paquete `.deb` de Easy Ocamlfuse se construye en un entorno con `glibc` más antigua (como Debian 10). Esto permite que funcione en una amplia gama de distribuciones Linux modernas.
+
+Asegúrate de tener las siguientes dependencias del sistema instaladas. Estas son necesarias para el correcto funcionamiento de la interfaz gráfica, el icono de la bandeja del sistema y las notificaciones.
+
+- **Python 3.5** o superior (el paquete `.deb` requiere `python3 (>= 3.5)`)
 - **Tkinter**: Generalmente se instala con `python3-tk`
 - **gettext**: Para la internacionalización
 - **Librerías D-Bus**: Necesarias para la comunicación del sistema (ej. `libdbus-1-0`, `libdbus-glib-1-2`)
+- **Python GObject Introspection**: Para la integración con el escritorio y el icono de la bandeja (`python3-gi`)
+- **AppIndicator**: Para el icono de la bandeja del sistema en entornos de escritorio compatibles (`gir1.2-appindicator3-0.1`)
 
-
-En distribuciones basadas en Debian/Ubuntu, puedes instalar la mayoría con:
+En distribuciones basadas en Debian/Ubuntu (versiones como Ubuntu 16.04+ o Debian 9+), puedes instalar la mayoría con:
 
 ```bash
 sudo apt update
-sudo apt install python3-tk gettext python3-pil.imagetkpython3-dbus libdbus-1-0 libdbus-glib-1-2
+sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-1-0 libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1
 ```
+**Nota:** La dependencia `python3-pil.imagetk` no es necesaria si instalas `python3-pil`, ya que `ImageTk` viene incluido con `Pillow`.
 
 ### Dependencias de Python
+
+Las dependencias de Python se empaquetan directamente dentro del paquete `.deb` para asegurar la compatibilidad y evitar conflictos. Sin embargo, si estás ejecutando desde el código fuente o tienes problemas con la versión de `Pillow` en sistemas más antiguos (como Ubuntu 16.04), puedes forzar una actualización o instalación específica.
 
 Se recomienda el uso de un entorno virtual para evitar conflictos con otras dependencias del sistema.
 
@@ -77,6 +83,13 @@ O bien, si prefieres instalarlas manualmente:
 ```bash
 pip install notify2 pillow pystray requests cryptography
 ```
+**Nota sobre Pillow en Ubuntu 16.04:** En algunas versiones antiguas de Ubuntu (como 16.04), `Pillow` podría requerir una versión específica para que `ImageTk` funcione correctamente. Si experimentas problemas con `ImageTk` después de instalar las dependencias, puedes intentar actualizar `Pillow` con el siguiente comando:
+
+```bash
+pip3 install --upgrade Pillow
+```
+Esto debería actualizar `Pillow` a una versión compatible que incluya el módulo `ImageTk` necesario.
+
 
 ---
 
