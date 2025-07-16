@@ -500,7 +500,7 @@ class AccountManager:
                 _( "Carpeta de configuración no encontrada"),
                 _(
                     "La carpeta real de configuración para '{account}' no existe en:\n{gdfuse_path}\n\n"
-                    "¿Deseas reconfigurar la cuenta ahora (recomendado)? ahora (recomendado)?\n"
+                    "¿Deseas reconfigurar la cuenta ahora (recomendado)?\n"
                     "Si eliges 'No', solo se restaurará la configuración interna, pero no podrás montar la cuenta hasta reconfigurarla.\n"
                     "Podrás usar el botón 'Reautorizar' para completar la configuración más adelante."
                 ).format(account=account, gdfuse_path=gdfuse_path),
