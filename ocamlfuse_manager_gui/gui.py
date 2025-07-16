@@ -910,41 +910,42 @@ class GoogleDriveManager:
 
         # --- Define aquí los callbacks antes de llamar a instalar_ocamlfuse_async ---
         def output_callback(line):
-            output_text.insert('end', line)
-            output_text.see('end')
+            GLib.idle_add(lambda: output_text.insert('end', line))
+            GLib.idle_add(lambda: output_text.see('end'))
 
         def status_callback(text):
-            status_label.config(text=text)
+            GLib.idle_add(lambda: status_label.config(text=text))
 
         def finish_callback(returncode):
-            progress.stop()
+            GLib.idle_add(lambda: progress.stop())
             print(f"Código de retorno de la instalación: {returncode}")
 
-            if returncode == 0:
+            def handle_success():
                 status_label.config(text=_("¡Instalación completada con éxito!"))
-                output_text.insert('end', "\n✓ ¡Instalación exitosa!\n")
+                output_text.insert('end', _("\n✓ ¡Instalación exitosa!\n"))
                 messagebox.showinfo(
                     _("Instalación exitosa"),
                     _("google-drive-ocamlfuse se instaló correctamente.\n\n"
                       "Reinicia la aplicación para continuar."),
-                    parent=dialog
+                    parent=self.root
                 )
-                dialog.destroy()
-                self.root.destroy()
-            else:
+                dialog.destroy() # Destruir diálogo después de que el messagebox se cierre
+
+            def handle_error():
                 status_label.config(text=_("Error en la instalación"))
                 output_text.insert('end', f"\n✗ Error en instalación (código {returncode})\n")
-                
-               
-                close_button = ttk.Button(dialog, text=_("Cerrar"), command=dialog.destroy)
-                close_button.pack(pady=10)
-                
                 messagebox.showerror(
                     _("Error de instalación"),
                     _("Ocurrió un error durante la instalación.\n\n"
                       "Consulta la salida para más detalles."),
                     parent=dialog
                 )
+                ttk.Button(dialog, text=_("Cerrar"), command=dialog.destroy).pack(pady=10)
+
+            if returncode == 0:
+                GLib.idle_add(handle_success)
+            else:
+                GLib.idle_add(handle_error)
 
        # llama a la función de utilidades
         instalar_ocamlfuse_async(install_cmd, output_callback, status_callback, finish_callback)

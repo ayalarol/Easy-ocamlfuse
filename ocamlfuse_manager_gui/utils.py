@@ -182,8 +182,10 @@ def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_cal
         process = subprocess.Popen(
             full_cmd,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True
+            stderr=subprocess.PIPE, # Cambiado a PIPE para capturar stderr por separado
+            text=True,
+            # Añadir env=os.environ para asegurar que se hereden las variables de entorno
+            env=os.environ
         )
 
         if status_callback:
@@ -191,16 +193,56 @@ def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_cal
         if output_callback:
             output_callback(_("> Ejecutando: ") + install_cmd + "\n")
 
-        # Leer salida en tiempo real
+        # Leer salida en tiempo real y capturar stderr
+        stdout_lines = []
+        stderr_lines = []
+        
+        # Usar select para leer de ambos pipes sin bloquear
+        import select
+        
         while True:
-            line = process.stdout.readline()
-            if not line:
+            reads = [process.stdout.fileno(), process.stderr.fileno()]
+            ret = select.select(reads, [], [])
+            
+            for fd in ret[0]:
+                if fd == process.stdout.fileno():
+                    line = process.stdout.readline()
+                    if line:
+                        stdout_lines.append(line)
+                        if output_callback:
+                            output_callback(line)
+                if fd == process.stderr.fileno():
+                    line = process.stderr.readline()
+                    if line:
+                        stderr_lines.append(line)
+                        if output_callback: # También mostrar stderr en la salida
+                            output_callback(_("[ERROR] ") + line)
+            
+            if process.poll() is not None: # Proceso terminado
+                # Leer cualquier salida restante
+                for line in process.stdout.readlines():
+                    if line:
+                        stdout_lines.append(line)
+                        if output_callback:
+                            output_callback(line)
+                for line in process.stderr.readlines():
+                    if line:
+                        stderr_lines.append(line)
+                        if output_callback:
+                            output_callback(_("[ERROR] ") + line)
                 break
-            if output_callback:
-                output_callback(line)
 
-        process.wait()
-        return process.returncode
+        returncode = process.returncode
+        
+        if returncode != 0 and stderr_lines:
+            # Si hay un error y stderr no está vacío, añadirlo al output
+            if output_callback:
+                output_callback(_("\n--- Errores de pkexec/instalación ---\n"))
+                for line in stderr_lines:
+                    output_callback(line)
+                output_callback(_("-------------------------------------\n"))
+
+        return returncode
     except Exception as e:
         if output_callback:
             output_callback(_("\n✗ Error inesperado: ") + str(e) + "\n")
