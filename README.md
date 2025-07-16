@@ -39,15 +39,12 @@ La aplicación está desarrollada en Python con Tkinter y es compatible para agr
 ## 📋 Requisitos
 
 ### Dependencias del Sistema
-
-Para asegurar la máxima compatibilidad, el paquete `.deb` de Easy Ocamlfuse se construye en un entorno con `glibc` más antigua (como Debian 10). Esto permite que funcione en una amplia gama de distribuciones Linux modernas.
-
 Asegúrate de tener las siguientes dependencias del sistema instaladas. Estas son necesarias para el correcto funcionamiento de la interfaz gráfica, el icono de la bandeja del sistema y las notificaciones.
 
 - **Python 3.5** o superior (el paquete `.deb` requiere `python3 (>= 3.5)`)
 - **Tkinter**: Generalmente se instala con `python3-tk`
 - **gettext**: Para la internacionalización
-- **Librerías D-Bus**: Necesarias para la comunicación del sistema (ej. `libdbus-1-0`, `libdbus-glib-1-2`)
+- **Librerías D-Bus**: Necesarias para la comunicación del sistema
 - **Python GObject Introspection**: Para la integración con el escritorio y el icono de la bandeja (`python3-gi`)
 - **AppIndicator**: Para el icono de la bandeja del sistema en entornos de escritorio compatibles (`gir1.2-appindicator3-0.1`)
 
@@ -55,10 +52,8 @@ En distribuciones basadas en Debian/Ubuntu (versiones como Ubuntu 16.04+ o Debia
 
 ```bash
 sudo apt update
-sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-1-0 libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1
+sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1
 ```
-**Nota:** La dependencia `python3-pil.imagetk` no es necesaria si instalas `python3-pil`, ya que `ImageTk` viene incluido con `Pillow`.
-
 ### Dependencias de Python
 
 Las dependencias de Python se empaquetan directamente dentro del paquete `.deb` para asegurar la compatibilidad y evitar conflictos. Sin embargo, si estás ejecutando desde el código fuente o tienes problemas con la versión de `Pillow` en sistemas más antiguos (como Ubuntu 16.04), puedes forzar una actualización o instalación específica.
@@ -90,7 +85,6 @@ pip3 install --upgrade Pillow
 ```
 Esto debería actualizar `Pillow` a una versión compatible que incluya el módulo `ImageTk` necesario.
 
-
 ---
 
 ## 🚀 Instalación
@@ -100,10 +94,16 @@ Puedes instalar Easy Ocamlfuse de varias maneras:
 ### Desde paquete .deb (Recomendado)
 
   **Instala el paquete .deb:**
-     ``` bash
-     sudo apt install ./easy-ocamlfuse_1.0.0_all.deb
-     ```
-**Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` con `pip` si no se instalaron automáticamente.
+``` bash
+       sudo apt install ./easy-ocamlfuse_1.0.0_all.deb
+```
+     
+**Nota:** Si la bandeja del sistema o las notificaciones no funcionan, consulta la sección "Dependencias del Sistema" para instalar `pystray` y `notify2` `Pillow` con `pip` si no se instalaron automáticamente. Si la aplicación se ejecuta pero no carga los iconos correctamente (suele ocurrir cuando pillow no esta como estándar en los repositorios mas antiguos) prueba actualizando pillow con : 
+
+```bash
+  pip3 install --upgrade Pillow
+
+```
 
 ### Desde el código fuente
 
@@ -223,7 +223,6 @@ El proyecto utiliza `gettext` para las traducciones. Los archivos de idioma se e
 ¡Las contribuciones son bienvenidas! Si tienes ideas para mejoras, encuentras errores o quieres añadir nuevas funcionalidades, no dudes en:
 
 -   Abrir un **issue** para reportar problemas o sugerir mejoras
--   Hacer un **fork** del proyecto y enviar un **pull request**
 -   Ayudar con las traducciones a otros idiomas
 
 ---
