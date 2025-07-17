@@ -389,7 +389,7 @@ msgid "Carpeta de configuración no encontrada"
 msgstr "Configuration folder not found"
 
 #: account.py:502
-#, fuzzy, python-brace-format
+#,python-brace-format
 msgid ""
 "La carpeta real de configuración para '{account}' no existe en:\n"
 "{gdfuse_path}\n"
