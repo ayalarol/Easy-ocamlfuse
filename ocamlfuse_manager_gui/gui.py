@@ -938,7 +938,7 @@ class GoogleDriveManager:
                     _("Error de instalación"),
                     _("Ocurrió un error durante la instalación.\n\n"
                       "Consulta la salida para más detalles."),
-                    parent=dialog
+                    parent=self.root
                 )
                 ttk.Button(dialog, text=_("Cerrar"), command=dialog.destroy).pack(pady=10)
 
