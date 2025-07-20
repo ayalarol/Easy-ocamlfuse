@@ -15,7 +15,7 @@
   <br><em>Guía de credenciales</em>
 </p>
 
-**Easy Ocamlfuse** es una aplicación de escritorio con interfaz gráfica (GUI) para gestionar `google-drive-ocamlfuse`, facilitando el montaje y la administración de tus cuentas de Google Drive en sistemas Linux.
+**Easy Ocamlfuse** es una aplicación de escritorio con interfaz gráfica (GUI) para gestionar [google-drive-ocamlfuse](https://github.com/astrada/google-drive-ocamlfuse), facilitando el montaje y la administración de tus cuentas de Google Drive en sistemas Linux.
 
 La aplicación está desarrollada en Python con Tkinter y es compatible para agregar multiples idiomas (español e inglés por defecto).
 
