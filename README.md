@@ -52,7 +52,7 @@ En distribuciones basadas en Debian/Ubuntu (versiones como Ubuntu 16.04+ o Debia
 
 ```bash
 sudo apt update
-sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1
+sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1 python3-pip
 ```
 ### Dependencias de Python
 
