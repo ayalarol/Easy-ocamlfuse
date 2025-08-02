@@ -108,15 +108,19 @@ class GoogleDriveManager:
         is_bodhi = "enlightenment" in xdg_desktop or "enlightenment" in desktop_session or "bodhi" in desktop_session
         if is_bodhi:
             profile_path = os.path.expanduser("~/.profile")
+            # Usa shutil.which para encontrar la ruta del ejecutable
+            easy_ocamlfuse_path = shutil.which("easy-ocamlfuse") or "/usr/local/bin/easy-ocamlfuse"
+            exec_command = f"{easy_ocamlfuse_path} --minimized"
             autostart_line = (
                 f'# Autoinicio EasyOcamlfuse\n'
-                f'if ! pgrep -f "gdrive_manager.py" > /dev/null; then\n'
-                f'    nohup python3 "{os.path.abspath(__file__)}" --minimized >/dev/null 2>&1 &\n'
+                f'if ! pgrep -f "easy-ocamlfuse" > /dev/null; then\n'
+                f'    nohup {exec_command} >/dev/null 2>&1 &\n'
                 f'fi'
             )
             try:
                 with open(profile_path, "r") as f:
-                    self.autostart_var.set(autostart_line.strip() in f.read())
+                    # Comprobación más flexible
+                    self.autostart_var.set("# Autoinicio EasyOcamlfuse" in f.read())
             except FileNotFoundError:
                 self.autostart_var.set(False)
         else:
