@@ -1,5 +1,6 @@
 # Easy Ocamlfuse - Gestor Gráfico para google-drive-ocamlfuse
-[![Ver página](https://ayalarol.github.io/easy-ocamlfuse-landing/)
+[![Página principal](https://img.shields.io/badge/P%C3%A1gina%20principal-GitHub%20Pages-blue?logo=github)](https://ayalarol.github.io/easy-ocamlfuse-landing/)
+
 
 <p align="center">
   <img src="ocamlfuse_manager_gui/assets/capturas/EOFGEST1.png" alt="Gestión principal" width="600">
