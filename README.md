@@ -56,6 +56,23 @@ En distribuciones basadas en Debian/Ubuntu (versiones como Ubuntu 16.04+ o Debia
 sudo apt update
 sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1 python3-pip
 ```
+
+📋 Requisitos en Fedora
+
+Para instalar y ejecutar Easy Ocamlfuse en Fedora, asegúrate de tener las siguientes dependencias.
+Estas son las bibliotecas del sistema que necesitas para que la interfaz gráfica, las notificaciones y el manejo de iconos funcionen correctamente. Instálalas utilizando dnf:
+1. Dependencias del Sistema
+   ```bash
+    sudo dnf install gettext dbus-glib libappindicator-gtk3 libjpeg-turbo zlib freetype libtiff libwebp
+    ```
+2. Dependencias de Python
+
+Estas bibliotecas de Python son necesarias para que la aplicación funcione correctamente. Se recomienda instalarlas a través de dnf para una mejor integración con el sistema:
+ ```bash
+sudo dnf install python3-tkinter python3-pillow python3-dbus python3-pyxdg python3-gobject python3-notify2 python3-pystray python3-requests python3-cryptography
+   ```
+
+
 ### Dependencias de Python
 
 Las dependencias de Python se empaquetan directamente dentro del paquete `.deb` para asegurar la compatibilidad y evitar conflictos. Sin embargo, si estás ejecutando desde el código fuente o tienes problemas con la versión de `Pillow` en sistemas más antiguos (como Ubuntu 16.04), puedes forzar una actualización o instalación específica.
