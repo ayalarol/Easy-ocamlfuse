@@ -158,7 +158,7 @@ def obtener_comando_instalacion_ocamlfuse(distro_id, version_id, ppa_choice="nor
             "apt install -y google-drive-ocamlfuse"
         )
     elif distro_id in ["arch", "manjaro", "endeavouros"]:
-        return "pacman -Sy --noconfirm google-drive-ocamlfuse"
+        return None
     elif distro_id in ["fedora", "centos", "rhel"]:
         return "dnf install -y google-drive-ocamlfuse"
     elif distro_id in ["opensuse", "sles"]:
@@ -167,17 +167,21 @@ def obtener_comando_instalacion_ocamlfuse(distro_id, version_id, ppa_choice="nor
         return None
 
 
-def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_callback=None):
+def ejecutar_instalacion_ocamlfuse(install_cmd, use_pkexec=True, output_callback=None, status_callback=None):
     """
     Ejecuta el comando de instalación de ocamlfuse
     Devuelve el código de retorno del proceso.
     """
     try:
-        full_cmd = ["pkexec", "sh", "-c", install_cmd]
-        if status_callback:
-            status_callback(_("Solicitando permisos..."))
-        if output_callback:
-            output_callback(_("> Solicitando permisos de administrador...\n"))
+        if use_pkexec:
+            full_cmd = ["pkexec", "sh", "-c", install_cmd]
+            if status_callback:
+                status_callback(_("Solicitando permisos..."))
+            if output_callback:
+                output_callback(_("> Solicitando permisos de administrador...\n"))
+        else:
+            # Para ayudantes AUR que manejan sudo/pkexec internamente
+            full_cmd = ["sh", "-c", install_cmd]
 
         process = subprocess.Popen(
             full_cmd,
@@ -248,14 +252,15 @@ def ejecutar_instalacion_ocamlfuse(install_cmd, output_callback=None, status_cal
             output_callback(_("\n✗ Error inesperado: ") + str(e) + "\n")
         return -1
 
-def instalar_ocamlfuse_async(install_cmd, output_callback=None, status_callback=None, finish_callback=None):
+def instalar_ocamlfuse_async(install_cmd, output_callback=None, status_callback=None, finish_callback=None, use_pkexec=True):
     
     #Ejecuta la instalación de ocamlfuse en un hilo aparte.
     
     def worker():
-        returncode = ejecutar_instalacion_ocamlfuse(install_cmd, output_callback, status_callback)
+        returncode = ejecutar_instalacion_ocamlfuse(install_cmd, use_pkexec=use_pkexec, output_callback=output_callback, status_callback=status_callback)
         if finish_callback:
             finish_callback(returncode)
     thread = threading.Thread(target=worker, daemon=True)
     thread.start()
     return thread
+

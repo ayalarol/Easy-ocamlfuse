@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Copyright (c) 2025 ayalarol
@@ -265,7 +264,7 @@ class GoogleDriveManager:
         # Si no se encuentra, usa una ruta por defecto como fallback.
         easy_ocamlfuse_path = shutil.which("easy-ocamlfuse") or "/usr/local/bin/easy-ocamlfuse"
         exec_command = f"{easy_ocamlfuse_path} --minimized"
-        icon_name = "easy-ocamlfuse" # El sistema buscará el icono por su nombre.
+        icon_name = "easy-ocamlfuse" # El sistema buscará el icono por su nombre. 
 
         desktop_entry = (
             f"[Desktop Entry]\n"
@@ -340,10 +339,10 @@ class GoogleDriveManager:
         centrar_ventana(top, self.root)
         top.deiconify()
         msg = (
-            _("En Bodhi/Enlightenment el inicio automático estándar puede no funcionar.\n\n") +
-            _("Para asegurar el autoinicio, añade la siguiente línea al final de tu archivo ~/.profile:\n\n") +
-            f"{autostart_line}\n" +
-            _("Puedes copiar el texto, editarlo manualmente o pulsar el botón para añadirlo automáticamente.\n") +
+            _("En Bodhi/Enlightenment el inicio automático estándar puede no funcionar.\n\n") + 
+            _("Para asegurar el autoinicio, añade la siguiente línea al final de tu archivo ~/.profile:\n\n") + 
+            f"{autostart_line}\n" + 
+            _("Puedes copiar el texto, editarlo manualmente o pulsar el botón para añadirlo automáticamente.\n") + 
             _("Luego, reinicia sesión.")
         )
         # Widget Text solo lectura, seleccionable y copiable
@@ -387,7 +386,7 @@ class GoogleDriveManager:
                     f.write("\n" + autostart_line)
                 messagebox.showinfo(
                         _("Listo"),
-                        _("Se añadió la línea de autoinicio a tu ~/.profile correctamente.\n") +
+                        _("Se añadió la línea de autoinicio a tu ~/.profile correctamente.\n") + 
                         _("Reinicia sesión para que surta efecto.")
                     )
                 self.autostart_var.set(True)
@@ -815,8 +814,8 @@ class GoogleDriveManager:
         else:
             respuesta = messagebox.askyesno(
                 _("Instalar ocamlfuse"),
-                _("google-drive-ocamlfuse no está instalado.\n\n"
-                  "¿Deseas instalarlo automáticamente ahora?\n\n"
+                _("google-drive-ocamlfuse no está instalado.\n\n" 
+                  "¿Deseas instalarlo automáticamente ahora?\n\n" 
                   "Se requerirá tu contraseña de administrador."),
                 icon=messagebox.QUESTION,
                 parent=self.root
@@ -826,10 +825,10 @@ class GoogleDriveManager:
             else:
                 messagebox.showinfo(
                     _("Instalación manual"),
-                    _("Puedes instalar google-drive-ocamlfuse manually:\n\n"
-                      "1. Abre una terminal\n"
-                      "2. Sigue las instrucciones en:\n"
-                      "   https://github.com/astrada/google-drive-ocamlfuse\n\n"
+                    _("Puedes instalar google-drive-ocamlfuse manually:\n\n" 
+                      "1. Abre una terminal\n" 
+                      "2. Sigue las instrucciones en:\n" 
+                      "   https://github.com/astrada/google-drive-ocamlfuse\n\n" 
                       "Después de instalar, reinicia esta aplicación."),
                     parent=self.root
                 )
@@ -839,6 +838,8 @@ class GoogleDriveManager:
         distro_id, version_id = detectar_distro_id()
         install_cmd = ""
         ppa_choice = "normal"
+        use_pkexec = True  # Por defecto, usar pkexec
+
         if distro_id in ["ubuntu", "linuxmint", "pop"]:
             # Diálogo para elegir PPA
             ppa_dialog = tk.Toplevel(self.root)
@@ -867,17 +868,29 @@ class GoogleDriveManager:
             self.root.wait_window(ppa_dialog)
             if not ppa_choice:
                 return False
-            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id, ppa_choice)
+            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id, ppa_choice=ppa_choice)
+        elif distro_id in ["arch", "manjaro", "endeavouros"]:
+            messagebox.showinfo(
+                _("Instalación en Arch Linux"),
+                _("Para Arch Linux y derivados, la instalación automática ha sido deshabilitada.\n\n" 
+                  "Debido a la complejidad de la compilación, se recomienda instalar 'google-drive-ocamlfuse' manualmente desde el AUR.\n\n" 
+                  "Puedes usar un ayudante de AUR como 'yay' o 'paru':\n" 
+                  "yay -S google-drive-ocamlfuse\n\n" 
+                  "Una vez instalado, por favor reinicia esta aplicación."),
+                parent=self.root
+            )
+            return False
         else:
             install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id)
-            if not install_cmd:
-                messagebox.showerror(
-                    _("Distribución no soportada"),
-                    _("No se pudo determinar tu distribución o no es soportada para instalación automática.\n\n") +
-                    _("Por favor instala google-drive-ocamlfuse manualmente."),
-                    parent=self.root
-                )
-                return False
+
+        if not install_cmd:
+            messagebox.showerror(
+                _("Distribución no soportada"),
+                _("No se pudo determinar tu distribución o no es soportada para instalación automática.\n\n") + 
+                _("Por favor instala google-drive-ocamlfuse manualmente."),
+                parent=self.root
+            )
+            return False
 
         # Crear diálogo de progreso
         dialog = tk.Toplevel(self.root)
@@ -929,7 +942,7 @@ class GoogleDriveManager:
                 output_text.insert('end', _("\n✓ ¡Instalación exitosa!\n"))
                 messagebox.showinfo(
                     _("Instalación exitosa"),
-                    _("google-drive-ocamlfuse se instaló correctamente.\n\n"
+                    _("google-drive-ocamlfuse se instaló correctamente.\n\n" 
                       "Reinicia la aplicación para continuar."),
                     parent=self.root
                 )
@@ -940,7 +953,7 @@ class GoogleDriveManager:
                 output_text.insert('end', f"\n✗ Error en instalación (código {returncode})\n")
                 messagebox.showerror(
                     _("Error de instalación"),
-                    _("Ocurrió un error durante la instalación.\n\n"
+                    _("Ocurrió un error durante la instalación.\n\n" 
                       "Consulta la salida para más detalles."),
                     parent=self.root
                 )
@@ -952,7 +965,7 @@ class GoogleDriveManager:
                 GLib.idle_add(handle_error)
 
        # llama a la función de utilidades
-        instalar_ocamlfuse_async(install_cmd, output_callback, status_callback, finish_callback)
+        instalar_ocamlfuse_async(install_cmd, output_callback, status_callback, finish_callback, use_pkexec=use_pkexec)
 
         return False
         
@@ -985,7 +998,7 @@ class GoogleDriveManager:
                     "user_cancel": _( "Configuración cancelada por el usuario."),
                     "timeout": _( "No se recibió el código de autorización a tiempo"),
                     "oauth_error": _( "Error al completar la configuración OAuth"),
-                    "duplicate_email": _("Ya existe una cuenta configurada con el correo '{email}'.").format(email=email or ""),
+                    "duplicate_email": _("Ya existe una cuenta configurada con el correo '{email}'").format(email=email or ""),
                 }
                 messagebox.showwarning(
                     _( "cancelled"),
@@ -1191,7 +1204,7 @@ class GoogleDriveManager:
             if errores:
                 messagebox.showwarning(
                     _("Algunas cuentas no se desmontaron"),
-                    _("No se pudieron desmontar las siguientes cuentas:\n{errores_str}\n"
+                    _("No se pudieron desmontar las siguientes cuentas:\n{errores_str}\n" 
                       "Verifica que no estén en uso.").format(errores_str=', '.join(errores))
                 )
             else:
@@ -1557,9 +1570,9 @@ class GoogleDriveManager:
         dialog.grab_set()
         centrar_ventana(dialog, self.root)
 
-        msg = _("Detectamos que estás usando GNOME y la aplicación se inició minimizada.\n\n"\
-                  "GNOME no siempre soporta los iconos de la bandeja del sistema de forma nativa. "\
-                  "Si no ves el icono, puedes instalar la extensión 'AppIndicator and KStatusNotifierItem Support' "\
+        msg = _("Detectamos que estás usando GNOME y la aplicación se inició minimizada.\n\n" 
+                  "GNOME no siempre soporta los iconos de la bandeja del sistema de forma nativa. " 
+                  "Si no ves el icono, puedes instalar la extensión 'AppIndicator and KStatusNotifierItem Support' " 
                   "para GNOME Shell.")
         tk.Label(dialog, text=msg, wraplength=430, justify=tk.LEFT).pack(padx=10, pady=10)
 
