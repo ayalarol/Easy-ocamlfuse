@@ -40,65 +40,49 @@ La aplicación está desarrollada en Python con Tkinter y es compatible para agr
 
 ## 📋 Requisitos
 
-### Dependencias del Sistema
-Asegúrate de tener las siguientes dependencias del sistema instaladas. Estas son necesarias para el correcto funcionamiento de la interfaz gráfica, el icono de la bandeja del sistema y las notificaciones.
+Asegúrate de tener `google-drive-ocamlfuse` instalado. Si no lo tienes, la aplicación te guiará para instalarlo.
 
-- **Python 3.5** o superior (el paquete `.deb` requiere `python3 (>= 3.5)`)
-- **Tkinter**: Generalmente se instala con `python3-tk`
-- **gettext**: Para la internacionalización
-- **Librerías D-Bus**: Necesarias para la comunicación del sistema
-- **Python GObject Introspection**: Para la integración con el escritorio y el icono de la bandeja (`python3-gi`)
-- **AppIndicator**: Para el icono de la bandeja del sistema en entornos de escritorio compatibles (`gir1.2-appindicator3-0.1`)
+Además, necesitas las siguientes dependencias según tu distribución de Linux:
 
-En distribuciones basadas en Debian/Ubuntu (versiones como Ubuntu 16.04+ o Debian 9+), puedes instalar la mayoría con:
-
+### 🐧 Para Debian/Ubuntu y derivados
 ```bash
 sudo apt update
-sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1 python3-pip
+sudo apt install python3-tk gettext python3-pil python3-dbus libdbus-glib-1-2 python3-gi gir1.2-appindicator3-0.1 python3-pip python3-notify2 python3-pystray python3-requests python3-cryptography
 ```
 
-📋 Requisitos en Fedora
+###  Fedora
+```bash
+sudo dnf install gettext dbus-glib libappindicator-gtk3 libjpeg-turbo zlib freetype libtiff libwebp python3-tkinter python3-pillow python3-dbus python3-pyxdg python3-gobject python3-notify2 python3-pystray python3-requests python3-cryptography
+```
 
-Para instalar y ejecutar Easy Ocamlfuse en Fedora, asegúrate de tener las siguientes dependencias.
-Estas son las bibliotecas del sistema que necesitas para que la interfaz gráfica, las notificaciones y el manejo de iconos funcionen correctamente. Instálalas utilizando dnf:
-1. Dependencias del Sistema
-   ```bash
-    sudo dnf install gettext dbus-glib libappindicator-gtk3 libjpeg-turbo zlib freetype libtiff libwebp
+### 📦 Para Arch Linux y derivados
+```bash
+sudo pacman -S --needed python tk python-pillow python-dbus python-gobject libnotify python-pystray python-requests python-cryptography gettext dbus-glib libjpeg-turbo zlib freetype2 libtiff libwebp python-notify2
+```
+📝 **Notas para Arch Linux:**
+*   El flag `--needed` en `pacman` evita que se reinstalen los paquetes que ya tienes.
+*   Se recomienda ejecutar `sudo pacman -Syu` antes para asegurar que tu sistema esté actualizado.
+*   **Error común `libcrypt.so.1`**: En sistemas Arch recientes, es posible que encuentres un error como `libcrypt.so.1: cannot open shared object file`. Esto se debe a que `libcrypt.so.1` ha sido reemplazada por `libcrypt.so.2`. Para solucionarlo, instala el paquete de compatibilidad desde el AUR:
+    ```bash
+    yay -S libxcrypt-compat
     ```
-2. Dependencias de Python
 
-Estas bibliotecas de Python son necesarias para que la aplicación funcione correctamente. Se recomienda instalarlas a través de dnf para una mejor integración con el sistema:
- ```bash
-sudo dnf install python3-tkinter python3-pillow python3-dbus python3-pyxdg python3-gobject python3-notify2 python3-pystray python3-requests python3-cryptography
-   ```
+### 🐍 Dependencias de Python (si ejecutas desde el código fuente)
 
+Si clonas el repositorio y no usas un paquete pre-compilado, se recomienda usar un entorno virtual para instalar las dependencias de Python.
 
-### Dependencias de Python
-
-Las dependencias de Python se empaquetan directamente dentro del paquete `.deb` para asegurar la compatibilidad y evitar conflictos. Sin embargo, si estás ejecutando desde el código fuente o tienes problemas con la versión de `Pillow` en sistemas más antiguos (como Ubuntu 16.04), puedes forzar una actualización o instalación específica.
-
-Se recomienda el uso de un entorno virtual para evitar conflictos con otras dependencias del sistema.
-
-**Crear y activar un entorno virtual:**
-
+**1. Crear y activar un entorno virtual:**
 ```bash
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-**Instalar las dependencias usando pip:**
-
+**2. Instalar las dependencias usando pip:**
 ```bash
 pip install -r requirements.txt
 ```
 
-O bien, si prefieres instalarlas manualmente:
-
-```bash
-pip install notify2 pillow pystray requests cryptography
-```
-**Nota sobre Pillow en Ubuntu 16.04:** En algunas versiones antiguas de Ubuntu (como 16.04), `Pillow` podría requerir una versión específica para que `ImageTk` funcione correctamente. Si experimentas problemas con `ImageTk` después de instalar las dependencias, puedes intentar actualizar `Pillow` con el siguiente comando:
-
+**Nota sobre Pillow en Ubuntu 16.04:** En algunas versiones antiguas de Ubuntu (como 16.04), `Pillow` podría requerir una versión específica. Si experimentas problemas con los iconos, puedes intentar actualizar `Pillow` con:
 ```bash
 pip3 install --upgrade Pillow
 ```
