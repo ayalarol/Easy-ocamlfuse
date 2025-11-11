@@ -161,6 +161,9 @@ y deseas instalarlo directamente en tu sistema sin usar los paquetes `.deb` o el
 
 ## 📖 Uso Básico
 
+> Antes de crear credenciales OAuth: asegúrate de habilitar la "Google Drive API" en Google Cloud Console (APIs y servicios → Biblioteca → buscar "Google Drive API" → Habilitar). También configura la "Pantalla de consentimiento OAuth" y crea un ID de cliente OAuth (Aplicación de escritorio o Web) antes de descargar el JSON de credenciales.
+
+
 ### 1. Añadir una Cuenta
 
 1.  Ve a la pestaña **"Gestión de Cuentas"**

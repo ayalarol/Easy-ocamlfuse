@@ -697,6 +697,7 @@ class AccountManager:
     def mostrar_guia_oauth(self):
         """Muestra una guía paso a paso para crear credenciales OAuth 2.0 en Google Cloud Console"""
         guia = _(
+            "Antes de empezar: asegúrate de habilitar la 'Google Drive API' para el proyecto en Google Cloud Console (APIs y servicios -> Biblioteca -> buscar 'Google Drive API' -> Habilitar).\n\n"
             "Guía para crear credenciales OAuth 2.0 (Aplicación web o Aplicación de escritorio):\n\n"
             "1. Ve a {credentials_url}\n"
             "2. Haz clic en 'Crear credenciales' > 'ID de cliente de OAuth'\n"
