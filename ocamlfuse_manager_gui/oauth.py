@@ -77,33 +77,32 @@ class OAuthHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(html_response.encode("utf-8"))
             return
 
-        if self.path.startswith('/?code=') or self.path.startswith('/oauth2callback?code='):
-            if 'code' in params:
-                auth_code = params['code'][0]
-                self.oauth_manager.set_auth_code(auth_code)
-                self.send_response(200)
-                self.send_header('Content-type', 'text/html; charset=utf-8')
-                self.end_headers()
-                html_response = f"""
-                <html>
-                <head>
-                    <title>{_("Autorización Completada")}</title>
-                    {common_style}
-                </head>
-                <body>
-                    <div>
-                        <h2>✓ {_("Autorización Completada")}</h2>
-                        <p>{_("El código de autorización ha sido capturado correctamente.")}</p>
-                        <p>{_("Puedes cerrar esta ventana y volver a la aplicación.")}</p>
-                    </div>
-                    <script>setTimeout(function(){{window.close();}}, 3000);</script>
-                </body>
-                </html>
-                """
-                self.wfile.write(html_response.encode("utf-8"))
-                
-            else:
-                self.send_error(400, _( "No se encontró el código de autorización"))
+        if 'code' in params:
+            auth_code = params['code'][0]
+            self.oauth_manager.set_auth_code(auth_code)
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html; charset=utf-8')
+            self.end_headers()
+            html_response = f"""
+            <html>
+            <head>
+                <title>{_("Autorización Completada")}</title>
+                {common_style}
+            </head>
+            <body>
+                <div>
+                    <h2>✓ {_("Autorización Completada")}</h2>
+                    <p>{_("El código de autorización ha sido capturado correctamente.")}</p>
+                    <p>{_("Puedes cerrar esta ventana y volver a la aplicación.")}</p>
+                </div>
+                <script>setTimeout(function(){{window.close();}}, 3000);</script>
+            </body>
+            </html>
+            """
+            self.wfile.write(html_response.encode("utf-8"))
+        elif parsed_url.path in ['/', '/oauth2callback']:
+            # Si estamos en la ruta correcta pero no hay código ni error previo
+            self.send_error(400, _( "No se encontró el código de autorización"))
         else:
             self.send_error(404, _( "Página no encontrada"))
     
