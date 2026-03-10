@@ -27,6 +27,7 @@ if vendor_dir not in sys.path:
     sys.path.insert(0, vendor_dir)
 
 from ocamlfuse_manager_gui.gui import GoogleDriveManager
+from ocamlfuse_manager_gui.constants import MINIMIZED_FLAGS
 
 # Variable global para mantener el socket de bloqueo
 lock_socket = None
@@ -103,6 +104,10 @@ def main():
 
     except socket.error:
         # --- Ya hay otra instancia en ejecución ---
+        if any(flag in sys.argv for flag in MINIMIZED_FLAGS):
+            print("Easy Ocamlfuse ya se está ejecutando (instancia minimizada).")
+            sys.exit(0)
+            
         print("Easy Ocamlfuse ya se está ejecutando. Enviando señal para mostrar la ventana.")
         try:
             client_socket = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

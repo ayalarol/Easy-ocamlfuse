@@ -14,3 +14,4 @@ LOGO_FILE  = os.path.join(ICONS_DIR, "gdrive_logo.png")
 CONFIG_FILE = os.path.expanduser("~/.gdrivemanagerconfig/config.json")
 GDFUSE_DIR   = "~/.gdfuse"
 OAUTH_PORT   = 8080
+MINIMIZED_FLAGS = ["--minimized", "--hide", "--tray", "--background"]

@@ -26,7 +26,7 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import GLib
 
-from .constants import LOGO_FILE, GDFUSE_DIR, CONFIG_FILE, APP_VERSION
+from .constants import LOGO_FILE, GDFUSE_DIR, CONFIG_FILE, APP_VERSION, MINIMIZED_FLAGS
 from .utils import ToolTip,centrar_ventana,verificar_ocamlfuse, detectar_distro_id, obtener_comando_instalacion_ocamlfuse, instalar_ocamlfuse_async, check_for_updates
 from .config    import ConfigManager
 from .mount     import MountManager
@@ -51,7 +51,7 @@ class GoogleDriveManager:
 
         
 
-        minimized = "--minimized" in sys.argv
+        minimized = any(flag in sys.argv for flag in MINIMIZED_FLAGS)
         self.root = tk.Tk(className="EasyOcamlfuse")
         self.root.withdraw()
         
@@ -141,12 +141,6 @@ class GoogleDriveManager:
         )
         is_gnome = "gnome" in xdg_desktop or "gnome" in desktop_session
 
-        # Forzar la visualización en GNOME si se inicia minimizado para evitar
-        # problemas con el ícono de la bandeja del sistema.
-        if is_gnome and minimized:
-            print("GNOME detected with --minimized flag, forcing window to show to ensure tray icon.")
-            minimized = False
-
         self.tray_mgr = TrayIconManager(
             self.root,
             unmount_cb=self.unmount_all,
@@ -167,7 +161,7 @@ class GoogleDriveManager:
        
         # GNOME puede necesitar una advertencia si el icono no aparece
         if is_gnome and minimized and not self.do_not_show_gnome_tray_warning.get():
-            self.show_gnome_tray_warning_dialog()
+            self.root.after(2000, self._show_gnome_tray_notification)
 
         # Iniciar el icono de la bandeja de forma robusta después de que la UI esté lista
         self.root.after(100, self.start_tray_icon)
@@ -175,12 +169,9 @@ class GoogleDriveManager:
         self.check_for_updates_on_startup()
 
     def start_tray_icon(self):
-        """Inicia el icono de la bandeja en un hilo separado."""
+        """Inicia el icono de la bandeja."""
         if not self.tray_mgr.skip_tray_creation:
-            threading.Thread(
-                target=lambda: self.tray_mgr.create_tray_icon(LOGO_FILE),
-                daemon=True
-            ).start()
+            self.tray_mgr.create_tray_icon(LOGO_FILE)
 
     def start_background_tasks(self):
         self._cargar_datos_pesados()
@@ -1360,6 +1351,10 @@ class GoogleDriveManager:
             self._save_state()
             self._update_main_tab_button_states()
 
+        # Actualizar menú del icono de la bandeja
+        if self.tray_mgr:
+            self.tray_mgr.update_menu(self.mounted_accounts)
+
     def _update_main_tab_button_states(self):
         """Habilita o deshabilita los botones de la pestaña principal según si hay cuentas montadas."""
         has_mounted_accounts = bool(self.mounted_tree.get_children())
@@ -1560,6 +1555,23 @@ class GoogleDriveManager:
 
         banner.bind("<Button-1>", lambda e: open_about_and_hide())
         self.root.after(15000, lambda: banner.pack_forget() if banner.winfo_exists() else None)
+
+    def _show_gnome_tray_notification(self):
+        """Muestra una notificación sobre el icono de la bandeja en GNOME."""
+        try:
+            if not hasattr(self, '_notify_inited'):
+                notify2.init("EasyOcamlfuse")
+                self._notify_inited = True
+            
+            n = notify2.Notification(
+                _("Bandeja del Sistema en GNOME"),
+                _("Easy Ocamlfuse se inició minimizado. Si no ves el icono, instala la extensión 'AppIndicator' para GNOME Shell."),
+                icon=LOGO_FILE
+            )
+            n.set_urgency(notify2.URGENCY_NORMAL)
+            n.show()
+        except Exception as e:
+            print(f"Error al mostrar la notificación de GNOME: {e}")
 
     def show_gnome_tray_warning_dialog(self):
         dialog = tk.Toplevel(self.root)
