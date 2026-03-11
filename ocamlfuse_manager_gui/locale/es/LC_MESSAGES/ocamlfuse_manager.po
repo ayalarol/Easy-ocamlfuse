@@ -1509,7 +1509,7 @@ msgstr "Gestor gráfico para Google Drive Ocamlfuse"
 #: ocamlfuse_manager_gui/gui.py:1465
 
 msgid "Versión: {}"
-msgstr "Versión: 1.0"
+msgstr "Versión: {}"
 
 #: ocamlfuse_manager_gui/gui.py:1466
 msgid "Repositorio y descargas en:"
