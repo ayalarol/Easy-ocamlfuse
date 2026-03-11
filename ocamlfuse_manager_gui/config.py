@@ -45,7 +45,7 @@ class ConfigManager:
                     }
             return self._get_default_config()
         except Exception as e:
-            print(_(f"Error al cargar configuración: {e}"))
+            print(_("Error al cargar configuración: {}").format(e))
             return self._get_default_config()
 
     def save_config(self, data):
@@ -54,7 +54,7 @@ class ConfigManager:
             with open(self.config_file, 'w') as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
-            print(_(f"Error al guardar configuración: {e}"))
+            print(_("Error al guardar configuración: {}").format(e))
 
     def _get_default_config(self):
         return {

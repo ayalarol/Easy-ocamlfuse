@@ -78,7 +78,7 @@ def main():
             # Iniciar tareas en segundo plano después de que la UI esté lista
             app.root.after(100, app.start_background_tasks)
             
-            # Bucle principal de Tkinter gestionado por GLib
+            # Bucle principal de Tkinter gestionado por GLib con un pequeño retardo para ahorrar CPU
             def tkinter_update():
                 try:
                     if app.root.winfo_exists():
@@ -93,7 +93,9 @@ def main():
                         main_loop.quit()
                     return False  # Detener el bucle
 
-            GLib.idle_add(tkinter_update)
+            # Usamos timeout_add en lugar de idle_add para no saturar el CPU
+            # 20ms da unos 50 FPS, suficiente para que la UI se sienta fluida
+            GLib.timeout_add(20, tkinter_update)
             main_loop.run()
 
         except Exception as e:

@@ -37,7 +37,7 @@ class TrayIconManager:
             threading.Thread(target=run_tray, daemon=True).start()
 
         except Exception as e:
-            print(_(f"No se pudo crear la bandeja: {e}"))
+            print(_("No se pudo crear la bandeja: {}").format(e))
 
     def _create_menu(self):
         """Genera el menú dinámicamente basado en las cuentas montadas."""

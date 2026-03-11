@@ -52,7 +52,7 @@ class AccountManager:
             return False, _("La etiqueta no puede estar vacía. Escribe un nombre único para la cuenta.")
 
         if label in self.accounts:
-            return False, _(f"Ya existe una cuenta con la etiqueta '{label}'. Usa otra diferente.")
+            return False, _("Ya existe una cuenta con la etiqueta '{}'. Usa otra diferente.").format(label)
 
         if not all((client_id, client_secret)):
             return False, _("Client ID y Client Secret son obligatorios")
@@ -342,7 +342,7 @@ class AccountManager:
                         print(f"Carpeta {gdfuse_path} eliminada del sistema.")
                     except Exception as e:
                         print(f"Error al eliminar carpeta {gdfuse_path}: {e}")
-                        messagebox.showerror(_("Error"), _(f"No se pudo eliminar la carpeta:\n{gdfuse_path}\n\n{e}"))
+                        messagebox.showerror(_("Error"), _("No se pudo eliminar la carpeta:\n{}\n\n{}").format(gdfuse_path, e))
                         return
 
             # Eliminar carpeta de montaje

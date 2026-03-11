@@ -1524,12 +1524,76 @@ class GoogleDriveManager:
         license_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         license_label.config(yscrollcommand=license_scrollbar.set)
 
+    def show_custom_update_dialog(self, title, version, notes, url):
+        dialog = tk.Toplevel(self.root)
+        dialog.title(title)
+        
+        dialog.maxsize(600, 500)
+        dialog.minsize(400, 300)
+        dialog.withdraw()
+
+        main_frame = ttk.Frame(dialog, padding="15 15 15 15")
+        main_frame.pack(fill=tk.BOTH, expand=True)
+        main_frame.columnconfigure(0, weight=1)
+        main_frame.rowconfigure(1, weight=1)
+
+        msg_update = _('Hay una nueva versión disponible:')
+        header_text = f"{msg_update} {version}"
+        header_label = ttk.Label(main_frame, text=header_text, font=("Arial", 12, "bold"))
+        header_label.grid(row=0, column=0, pady=(0, 10), sticky="w")
+
+        text_container = ttk.Frame(main_frame)
+        text_container.grid(row=1, column=0, sticky="nsew")
+        text_container.rowconfigure(0, weight=1)
+        text_container.columnconfigure(0, weight=1)
+        
+        text_widget = tk.Text(text_container, wrap="word", relief="solid", borderwidth=1, font=("Arial", 10), padx=5, pady=5)
+        clean_notes = notes.replace('\r', '')
+        text_widget.insert("1.0", clean_notes)
+        text_widget.config(state="disabled")
+
+        scrollbar = ttk.Scrollbar(text_container, orient="vertical", command=text_widget.yview)
+        text_widget.config(yscrollcommand=scrollbar.set)
+
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        text_widget.grid(row=0, column=0, sticky="nsew")
+
+        bottom_frame = ttk.Frame(main_frame)
+        bottom_frame.grid(row=2, column=0, sticky="ew", pady=(15, 0))
+        bottom_frame.columnconfigure(0, weight=1)
+
+        question_label = ttk.Label(bottom_frame, text=_('¿Desea ir a la página de descarga?'))
+        question_label.grid(row=0, column=0, sticky="w")
+
+        button_group = ttk.Frame(bottom_frame)
+        button_group.grid(row=0, column=1, sticky="e")
+
+        def go_to_download():
+            webbrowser.open(url)
+            dialog.destroy()
+
+        yes_button = ttk.Button(button_group, text=_("Sí"), command=go_to_download)
+        yes_button.pack(side=tk.LEFT, padx=(0, 5))
+
+        no_button = ttk.Button(button_group, text=_("No"), command=dialog.destroy)
+        no_button.pack(side=tk.LEFT)
+
+        centrar_ventana(dialog, self.root)
+        
+        dialog.transient(self.root)
+        dialog.grab_set()
+        dialog.deiconify()
+        self.root.wait_window(dialog)
+
     def check_for_updates_manual(self):
         update_info = check_for_updates()
         if update_info:
-            if messagebox.askyesno(_("Actualización disponible"), 
-                                f"{_('Hay una nueva versión disponible:')} {update_info['version']}\n\n{update_info['notes']}\n\n{_('¿Desea ir a la página de descarga?')}"):
-                webbrowser.open(update_info['url'])
+            self.show_custom_update_dialog(
+                title=_("Actualización disponible"),
+                version=update_info['version'],
+                notes=update_info['notes'],
+                url=update_info['url']
+            )
         else:
             messagebox.showinfo(_("Sin actualizaciones"), _("Tu versión está actualizada."))
 
@@ -1539,10 +1603,12 @@ class GoogleDriveManager:
     def _check_for_updates_background(self):
         update_info = check_for_updates()
         if update_info:
-            self.show_update_notification(update_info)
+            GLib.idle_add(self.show_update_notification, update_info)
 
     def show_update_notification(self, update_info):
-        message = f"{_('Nueva versión disponible:')} {update_info['version']}. {_('Haz clic en Ayuda -> Acerca de para más detalles.')}"
+        msg_update = _('Hay una nueva versión disponible:')
+        msg_details = _('Haz clic en Ayuda -> Acerca de para más detalles.')
+        message = f"{msg_update} {update_info['version']}. {msg_details}"
         self.show_notification_banner(message)
 
     def show_notification_banner(self, message):
