@@ -31,7 +31,7 @@ class TrayIconManager:
             threading.Thread(target=self.tray_icon.run, daemon=True).start()
 
         except Exception as e:
-            print(_(f"No se pudo crear la bandeja: {e}"))
+            print(_("No se pudo crear la bandeja: {}").format(e))
 
     def show_window(self, icon=None, item=None):
         self.root.after(0, self._do_show_window)

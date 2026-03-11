@@ -59,16 +59,21 @@ class OAuthHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
+            
+            title = _("Autorización Cancelada")
+            subtitle = _("Autorización Cancelada")
+            message = _("Cancelaste el acceso en Google. Puedes cerrar esta ventana y volver a la aplicación.")
+            
             html_response = f"""
             <html>
             <head>
-                <title>{_("Autorización Cancelada")}</title>
+                <title>{title}</title>
                 {common_style}
             </head>
             <body>
                 <div>
-                    <h2>✗ {_("Autorización Cancelada")}</h2>
-                    <p>{_("Cancelaste el acceso en Google. Puedes cerrar esta ventana y volver a la aplicación.")}</p>
+                    <h2>✗ {subtitle}</h2>
+                    <p>{message}</p>
                 </div>
                 <script>setTimeout(function(){{window.close();}}, 3000);</script>
             </body>
@@ -83,17 +88,23 @@ class OAuthHandler(http.server.BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header('Content-type', 'text/html; charset=utf-8')
             self.end_headers()
+            
+            title = _("Autorización Completada")
+            subtitle = _("Autorización Completada")
+            message = _("El código de autorización ha sido capturado correctamente.")
+            close_message = _("Puedes cerrar esta ventana y volver a la aplicación.")
+            
             html_response = f"""
             <html>
             <head>
-                <title>{_("Autorización Completada")}</title>
+                <title>{title}</title>
                 {common_style}
             </head>
             <body>
                 <div>
-                    <h2>✓ {_("Autorización Completada")}</h2>
-                    <p>{_("El código de autorización ha sido capturado correctamente.")}</p>
-                    <p>{_("Puedes cerrar esta ventana y volver a la aplicación.")}</p>
+                    <h2>✓ {subtitle}</h2>
+                    <p>{message}</p>
+                    <p>{close_message}</p>
                 </div>
                 <script>setTimeout(function(){{window.close();}}, 3000);</script>
             </body>
@@ -102,9 +113,11 @@ class OAuthHandler(http.server.BaseHTTPRequestHandler):
             self.wfile.write(html_response.encode("utf-8"))
         elif parsed_url.path in ['/', '/oauth2callback']:
             # Si estamos en la ruta correcta pero no hay código ni error previo
-            self.send_error(400, _( "No se encontró el código de autorización"))
+            error_msg = _("No se encontró el código de autorización")
+            self.send_error(400, error_msg)
         else:
-            self.send_error(404, _( "Página no encontrada"))
+            not_found_msg = _("Página no encontrada")
+            self.send_error(404, not_found_msg)
     
     def log_message(self, format, *args):
         pass
@@ -129,10 +142,10 @@ class OAuthServer:
             self.stopped = False  # Reinicia el flag al iniciar
             self.server_thread = threading.Thread(target=self.server.serve_forever, daemon=True)
             self.server_thread.start()
-            print(_(f"Servidor OAuth iniciado en http://localhost:{self.port}"))
+            print(_("Servidor OAuth iniciado en http://localhost:{}").format(self.port))
             return True
         except Exception as e:
-            print(_(f"Error al iniciar servidor OAuth: {e}"))
+            print(_("Error al iniciar servidor OAuth: {}").format(e))
             return False
     
     def stop_server(self):
@@ -145,7 +158,7 @@ class OAuthServer:
     
     def set_auth_code(self, code):
         self.auth_code = code
-        print(_(f"Código OAuth capturado: {code[:10]}..."))
+        print(_("Código OAuth capturado: {}...").format(code[:10]))
     
     def cancel_auth(self):
         self.cancelled = True

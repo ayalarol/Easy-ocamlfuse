@@ -54,16 +54,16 @@ class MountManager:
                     self.accounts[label]['mount_point'] = mount_point
                     if hasattr(self, '_save_state'):
                         self._save_state()
-                messagebox.showinfo(_("Éxito"), _(f"Cuenta '{label}' montada en {mount_point}"))
+                messagebox.showinfo(_("Éxito"), _("Cuenta '{}' montada en {}").format(label, mount_point))
                 return True
             else:
-                messagebox.showerror(_("Error"), _(f"Error al montar:\n{result.stderr}"))
+                messagebox.showerror(_("Error"), _("Error al montar:\n{}").format(result.stderr))
                 return False
         except subprocess.TimeoutExpired:
             messagebox.showerror(_("Error"), _( "Timeout al montar la cuenta"))
             return False
         except Exception as e:
-            messagebox.showerror(_("Error"), _(f"Error inesperado: {str(e)}"))
+            messagebox.showerror(_("Error"), _("Error inesperado: {}").format(str(e)))
             return False
 
     def unmount_account(self, account, mount_point):
@@ -74,19 +74,17 @@ class MountManager:
             return True
         except subprocess.CalledProcessError as e:
             messagebox.showerror(
-                _( "Error al desmontar"),
-                _(f"No se pudo desmontar '{account}' en '{mount_point}':\n"
-                  "Asegúrate de que ningún archivo, terminal o ventana esté usando la carpeta de montaje.\n\n"
-                  f"Detalle: {e}")
+                _( "Error al montar"),
+                _("No se pudo desmontar '{}' en '{}':\nAsegúrate de que ningún archivo, terminal o ventana esté usando la carpeta de montaje.\n\nDetalle: {}").format(account, mount_point, e)
             )
-            print(_(f"Error al desmontar {account} en {mount_point}: {e}"))
+            print(_("Error al desmontar {} en {}: {}").format(account, mount_point, e))
             return False
         except Exception as e:
             messagebox.showerror(
                 _( "Error al desmontar"),
-                _(f"Error inesperado al desmontar '{account}' en '{mount_point}':\n{e}")
+                _("Error inesperado al desmontar '{}' en '{}':\n{}").format(account, mount_point, e)
             )
-            print(_(f"Error al desmontar {account} en {mount_point}: {e}"))
+            print(_("Error al desmontar {} en {}: {}").format(account, mount_point, e))
             return False
 
     def unmount_all(self):
@@ -105,8 +103,7 @@ class MountManager:
             if errores:
                 messagebox.showwarning(
                     _( "Algunas cuentas no se desmontaron"),
-                    _(f"No se pudieron desmontar las siguientes cuentas:\n{', '.join(errores)}\n"
-                      "Verifica que no estén en uso.")
+                    _("No se pudieron desmontar las siguientes cuentas:\n{}\nVerifica que no estén en uso.").format(', '.join(errores))
                 )
             else:
                 messagebox.showinfo(_("Éxito"), _( "Todas las cuentas fueron desmontadas correctamente."))
@@ -136,7 +133,7 @@ class MountManager:
                                 label = UNKNOWN_LABEL
                         active_mounts[mount_point] = label
         except Exception as e:
-            print(_(f"Error al refrescar montajes: {e}"))
+            print(_("Error al refrescar montajes: {}").format(e))
         
         for account, mount_point in list(self.mounted_accounts.items()):
             if mount_point not in seen_mount_points:
@@ -145,7 +142,7 @@ class MountManager:
                         seen_mount_points.add(mount_point)
                         active_mounts[mount_point] = account
                 except Exception as e:
-                    print(_(f"Error comprobando punto de montaje {mount_point}: {e}"))
+                    print(_("Error comprobando punto de montaje {}: {}").format(mount_point, e))
             elif mount_point in active_mounts and active_mounts[mount_point] == UNKNOWN_LABEL:
                 active_mounts[mount_point] = account
         
@@ -178,9 +175,9 @@ class MountManager:
                         if result.returncode == 0:
                             self.mounted_accounts[label] = mount_point
                         else:
-                            print(_(f"Error al montar '{label}': {result.stderr}"))
+                            print(_("Error al montar '{}': {}").format(label, result.stderr))
                     except Exception as e:
-                        print(_(f"Error al montar '{label}': {e}"))
+                        print(_("Error al montar '{}': {}").format(label, e))
 
     def get_label_from_mount_point(self, mount_point):
         """Intentar obtener etiqueta real para un punto de montaje"""
@@ -198,7 +195,7 @@ class MountManager:
                                     if config_mount == mount_point:
                                         return label
         except Exception as e:
-            print(_(f"Error obteniendo etiqueta: {e}"))
+            print(_("Error obteniendo etiqueta: {}").format(e))
         return UNKNOWN_LABEL
 
     def start_mount_monitor(self, interval=5, on_unmount_callback=None):
@@ -212,31 +209,28 @@ class MountManager:
 
         self._monitoring = True
         self._already_encrypted = set()  # Para evitar encriptar varias veces el mismo client_id
-
-        def monitor():
+        
+        # --- Pre-encriptar cuentas al inicio del monitor una sola vez ---
+        if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
             from .encryption import EncryptionManager
             enc_mgr = EncryptionManager()
+            for label, data in self.main_app.accounts.items():
+                client_id = data.get('client_id')
+                if client_id:
+                    client_secret = data.get('client_secret')
+                    try:
+                        enc_mgr.decrypt(client_secret)
+                        self._already_encrypted.add(client_id)
+                    except Exception:
+                        encrypted = enc_mgr.encrypt(client_secret)
+                        data['client_secret'] = encrypted
+                        self._already_encrypted.add(client_id)
+            if hasattr(self.main_app, '_save_state'):
+                self.main_app._save_state()
+
+        def monitor():
             while self._monitoring:
                 time.sleep(interval)
-
-                # --- Encriptar client_secret si es necesario ---
-                if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
-                    for label, data in self.main_app.accounts.items():
-                        client_id = data.get('client_id')
-                        if not client_id or client_id in self._already_encrypted:
-                            continue
-                        client_secret = data.get('client_secret')
-                        # Intentar desencriptar, si falla, significa que no está encriptado
-                        try:
-                            enc_mgr.decrypt(client_secret)
-                            self._already_encrypted.add(client_id)
-                        except Exception:
-                            # No está encriptado, así que lo encriptamos y guardamos
-                            encrypted = enc_mgr.encrypt(client_secret)
-                            data['client_secret'] = encrypted
-                            self._already_encrypted.add(client_id)
-                            if hasattr(self.main_app, '_save_state'):
-                                self.main_app._save_state()
 
                 if not self.mounted_accounts:
                     continue
@@ -249,7 +243,7 @@ class MountManager:
                         if not os.path.ismount(mount_point):
                             unmounted_labels.append((label, mount_point))
                     except Exception as e:
-                        print(_(f"Error in mount monitor while checking '{label}': {e}"))
+                        print(_("Error in mount monitor while checking '{}': {}").format(label, e))
 
                 if unmounted_labels:
                     for label, mount_point in unmounted_labels:
