@@ -328,7 +328,8 @@ class AccountManager:
             # Confirmar eliminación física de ~/.gdfuse/<label>
             gdfuse_path = os.path.expanduser(f"~/.gdfuse/{account}")
             if os.path.isdir(gdfuse_path):
-                confirm_fisico = messagebox.askyesno(
+                # Usamos askyesnocancel para permitir abortar todo el proceso
+                confirm_fisico = messagebox.askyesnocancel(
                     _("Eliminar del sistema"),
                     _(
                         "¿También quieres eliminar la configuración real de la cuenta en:\n{gdfuse_path}\n\n"
@@ -336,6 +337,10 @@ class AccountManager:
                         "¿Eliminar del sistema?"
                     ).format(gdfuse_path=gdfuse_path)
                 )
+                
+                if confirm_fisico is None: # Usuario pulsó Cancelar
+                    return
+                
                 if confirm_fisico:
                     try:
                         shutil.rmtree(gdfuse_path)
@@ -343,14 +348,17 @@ class AccountManager:
                     except Exception as e:
                         print(f"Error al eliminar carpeta {gdfuse_path}: {e}")
                         messagebox.showerror(_("Error"), _("No se pudo eliminar la carpeta:\n{}\n\n{}").format(gdfuse_path, e))
+                        # Si falla el borrado físico, no seguimos para evitar inconsistencias
                         return
+                # Si confirm_fisico es False (usuario pulsó "No"), simplemente seguimos sin borrar esa carpeta específica.
 
             # Eliminar carpeta de montaje
             if mount_point_to_delete and os.path.isdir(mount_point_to_delete):
                 if self.main_app.ask_before_delete:
                     dialog = tk.Toplevel(self.root)
                     dialog.title(_("Eliminar punto de montaje"))
-                    dialog.geometry("400x200")
+                    # Aumentamos el tamaño para evitar que los botones queden fuera
+                    dialog.geometry("450x250")
                     dialog.resizable(False, False)
                     dialog.withdraw()
                     from .utils import centrar_ventana
@@ -361,34 +369,50 @@ class AccountManager:
                         "¿También quieres eliminar la carpeta de montaje local?\n{mount_point}\n\n"
                         "¡ADVERTENCIA! Esto eliminará la carpeta y TODO su contenido de forma permanente."
                     ).format(mount_point=mount_point_to_delete)
-                    tk.Label(dialog, text=msg, wraplength=380).pack(pady=10)
+                    
+                    # Usamos un Frame con scroll si el texto es muy largo, o simplemente aseguramos espacio
+                    main_msg_frame = tk.Frame(dialog)
+                    main_msg_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+                    
+                    tk.Label(main_msg_frame, text=msg, wraplength=420, justify=tk.LEFT).pack(pady=5)
 
                     var = tk.BooleanVar(value=True)
                     chk = tk.Checkbutton(dialog, text=_("No volver a preguntar"), variable=var)
-                    chk.pack(pady=5)
+                    chk.pack(pady=2)
 
-                    result = {"delete": False}
+                    result = {"action": "cancel"} # Por defecto cancelar
 
                     def on_yes():
-                        result["delete"] = True
+                        result["action"] = "yes"
                         if not var.get():
                             self.main_app.ask_before_delete = False
                             self.main_app._save_state()
                         dialog.destroy()
 
                     def on_no():
+                        result["action"] = "no"
+                        dialog.destroy()
+                        
+                    def on_cancel():
+                        result["action"] = "cancel"
                         dialog.destroy()
 
                     btn_frame = tk.Frame(dialog)
-                    btn_frame.pack(pady=10)
+                    btn_frame.pack(side=tk.BOTTOM, pady=15)
                     ttk.Button(btn_frame, text=_("Sí"), command=on_yes).pack(side=tk.LEFT, padx=10)
                     ttk.Button(btn_frame, text=_("No"), command=on_no).pack(side=tk.LEFT, padx=10)
+                    ttk.Button(btn_frame, text=_("Cancelar"), command=on_cancel).pack(side=tk.LEFT, padx=10)
 
                     dialog.transient(self.root)
                     dialog.grab_set()
+                    dialog.protocol("WM_DELETE_WINDOW", on_cancel)
                     self.root.wait_window(dialog)
 
-                    confirm_mount_point_delete = result["delete"]
+                    if result["action"] == "cancel":
+                        # IMPORTANTE: Aquí estaba el error. Si es cancel, debemos salir de la función.
+                        return
+                    
+                    confirm_mount_point_delete = (result["action"] == "yes")
                 else:
                     confirm_mount_point_delete = True
 
@@ -401,6 +425,8 @@ class AccountManager:
                     except Exception as e:
                         print(f"Error al eliminar la carpeta de montaje {mount_point_to_delete}: {e}")
                         messagebox.showerror(_("Error"), _("No se pudo eliminar la carpeta de montaje:\n{}\n\n{}").format(mount_point_to_delete, e))
+            
+            # Solo si llegamos aquí (no canceló nada), procedemos a borrar de la app
             # mover a blacklist
             if account in self.accounts:
                 cuenta = self.accounts[account]
@@ -430,7 +456,7 @@ class AccountManager:
 
         dialog = tk.Toplevel(self.root)
         dialog.title(_("Restaurar Cuenta Eliminada"))
-        dialog.geometry("350x280")
+        dialog.geometry("450x320")
         dialog.resizable(False, False)
         tk.Label(dialog, text=_("Selecciona la cuenta a restaurar:")).pack(pady=12)
         dialog.withdraw()
@@ -439,7 +465,7 @@ class AccountManager:
 
         
         tree = ttk.Treeview(dialog, columns=("cuenta",), show="", height=8)
-        tree.column("cuenta", anchor="center")
+        tree.column("cuenta", anchor="center", width=400)
         tree.heading("cuenta", text=_("Cuenta"))
         
         deleted_names = list(self.deleted_accounts.keys())
@@ -480,9 +506,10 @@ class AccountManager:
                 self.refresh_accounts()
                 self.main_app._update_accounts_tab_button_states()
         btn_frame = tk.Frame(dialog)
-        btn_frame.pack(pady=(8, 16))
-        ttk.Button(btn_frame, text=_("Restaurar"), command=on_restore).pack(side=tk.LEFT, padx=8, ipadx=10, ipady=4)
-        ttk.Button(btn_frame, text=_("Eliminar definitivamente"), command=on_delete_forever).pack(side=tk.LEFT, padx=8, ipadx=10, ipady=4)
+        btn_frame.pack(pady=(8, 16), side=tk.BOTTOM)
+        ttk.Button(btn_frame, text=_("Restaurar"), command=on_restore).pack(side=tk.LEFT, padx=8)
+        ttk.Button(btn_frame, text=_("Eliminar"), command=on_delete_forever).pack(side=tk.LEFT, padx=8)
+        ttk.Button(btn_frame, text=_("Cerrar"), command=dialog.destroy).pack(side=tk.LEFT, padx=8)
 
         dialog.transient(self.root)
         dialog.grab_set()
@@ -697,6 +724,7 @@ class AccountManager:
     def mostrar_guia_oauth(self):
         """Muestra una guía paso a paso para crear credenciales OAuth 2.0 en Google Cloud Console"""
         guia = _(
+            "IMPORTANTE (Requisito 2026): Google ahora exige tener activada la 'Verificación en 2 pasos' en tu cuenta para acceder a Google Cloud Console.\n\n"
             "Antes de empezar: asegúrate de habilitar la 'Google Drive API' para el proyecto en Google Cloud Console (APIs y servicios -> Biblioteca -> buscar 'Google Drive API' -> Habilitar).\n\n"
             "Guía para crear credenciales OAuth 2.0 (Aplicación web o Aplicación de escritorio):\n\n"
             "1. Ve a {credentials_url}\n"
