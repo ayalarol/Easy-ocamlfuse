@@ -422,6 +422,7 @@ class GoogleDriveManager:
     def create_widgets(self):
         self.notebook = ttk.Notebook(self.root)
         self.notebook.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.notebook.bind("<<NotebookTabChanged>>", self._update_edit_menu_state)
 
         self.main_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.main_frame, text=_("Gestión Principal"))
@@ -708,13 +709,13 @@ class GoogleDriveManager:
         menubar.add_cascade(label=_("Archivo"), menu=filemenu, underline=0)
 
         # Menú Edición
-        edit_menu = tk.Menu(menubar, tearoff=0)
-        edit_menu.add_command(label=_("Copiar"), accelerator="Ctrl+C", command=self.copiar_entry_focused)
-        edit_menu.add_command(label=_("Pegar"), accelerator="Ctrl+V", command=self.pegar_entry_focused)
-        edit_menu.add_command(label=_("Cortar"), accelerator="Ctrl+X", command=self.cortar_entry_focused)
-        edit_menu.add_separator()
-        edit_menu.add_command(label=_("Limpiar campos"), accelerator="Ctrl+L", command=self.limpiar_campos_credenciales)
-        menubar.add_cascade(label=_("Edición"), menu=edit_menu, underline=0)
+        self.edit_menu = tk.Menu(menubar, tearoff=0)
+        self.edit_menu.add_command(label=_("Copiar"), accelerator="Ctrl+C", command=self.copiar_entry_focused)
+        self.edit_menu.add_command(label=_("Pegar"), accelerator="Ctrl+V", command=self.pegar_entry_focused)
+        self.edit_menu.add_command(label=_("Cortar"), accelerator="Ctrl+X", command=self.cortar_entry_focused)
+        self.edit_menu.add_separator()
+        self.edit_menu.add_command(label=_("Limpiar campos"), accelerator="Ctrl+L", command=self.limpiar_campos_credenciales)
+        menubar.add_cascade(label=_("Edición"), menu=self.edit_menu, underline=0)
 
         # Menú Preferencias
         preferences_menu = tk.Menu(menubar, tearoff=0)
@@ -1005,6 +1006,7 @@ class GoogleDriveManager:
                 self._update_credential_fields_state(locked=False)
                 self.account_mgr.refresh_accounts()
                 self.refresh_accounts()  
+                self.refresh_mounts() # Actualizar también la primera pestaña
 
         except Exception as e:
             messagebox.showerror(_("Error inesperado"), str(e))
@@ -1146,7 +1148,8 @@ class GoogleDriveManager:
                 self.mounted_accounts[account] = mount_point
                 self.accounts[account]['mount_point'] = mount_point
                 self._save_state()
-                self.refresh_mounts()
+                # Esperar un breve momento para que el SO registre el montaje antes de refrescar
+                self.root.after(1500, self.refresh_mounts)
                 messagebox.showinfo(
                     _("Éxito"),
                     _("Cuenta '{account}' montada en {mount_point}").format(account=account, mount_point=mount_point)
@@ -1318,24 +1321,29 @@ class GoogleDriveManager:
             mount_lines = result.stdout.split('\n')
 
             for line in mount_lines:
-                if 'google-drive-ocamlfuse' in line:
+                # Detección más flexible para diferentes distribuciones (gdfuse, google-drive-ocamlfuse, etc.)
+                if 'google-drive-ocamlfuse' in line or 'gdfuse' in line:
                     parts = line.split()
                     if len(parts) >= 3:
                         mount_point = parts[2]
-                        seen_mount_points.add(mount_point)
+                        # Asegurarnos de que es un punto de montaje real
+                        if os.path.ismount(mount_point):
+                            seen_mount_points.add(mount_point)
 
-                        # 1. Buscar la etiqueta en nuestro mapa de configuración
-                        label = mount_point_to_label_map.get(mount_point)
+                            # 1. Buscar la etiqueta en nuestro mapa de configuración
+                            label = mount_point_to_label_map.get(mount_point)
 
-                        # 2. Si no se encuentra, usar métodos de fallback
-                        if not label:
-                            label = self.mount_mgr.get_label_from_mount_point(mount_point)
-                            if label == _("Desconocido"):
+                            # 2. Si no se encuentra, intentar extraerla del dispositivo (device)
+                            if not label:
                                 device = parts[0]
-                                if '@' in device and 'google-drive-ocamlfuse' in device:
-                                    label = device.split('@')[0]
+                                if 'google-drive-ocamlfuse' in device or 'gdfuse' in device:
+                                    # Formato común: google-drive-ocamlfuse@label
+                                    if '@' in device:
+                                        label = device.split('@')[1] if device.split('@')[1] else device.split('@')[0]
+                                    else:
+                                        label = self.mount_mgr.get_label_from_mount_point(mount_point)
 
-                        active_mounts[mount_point] = label or _("Desconocido")
+                            active_mounts[mount_point] = label or _("Desconocido")
 
         except Exception as e:
             print(f"Error al ejecutar el comando 'mount': {e}")
@@ -1710,8 +1718,7 @@ class GoogleDriveManager:
         sys.exit(0)
 
     def change_language(self, lang):
-        i18n_instance.lang = lang
-        i18n_instance.translation = i18n_instance._setup_translation()
+        i18n_instance.update_language(lang)
         global _
         _ = i18n_instance.gettext
         self.language_var.set(lang)
@@ -1774,6 +1781,25 @@ class GoogleDriveManager:
         # Actualizar las listas de cuentas y montajes
         self.refresh_accounts()
         self.refresh_mounts()
+    def _update_edit_menu_state(self, event=None):
+        """Habilita o deshabilita el menú de edición según la pestaña activa."""
+        if not hasattr(self, 'edit_menu'):
+            return
+            
+        # Pestaña 0: Gestión Principal, Pestaña 1: Gestión de Cuentas
+        current_tab = self.notebook.index(self.notebook.select())
+        
+        state = "normal" if current_tab == 1 else "disabled"
+        
+        # Actualizar todos los ítems del menú de edición
+        # El ítem 4 es el separador, así que lo saltamos o manejamos con cuidado
+        for i in range(self.edit_menu.index("end") + 1):
+            try:
+                self.edit_menu.entryconfigure(i, state=state)
+            except tk.TclError:
+                # Los separadores lanzan error al intentar cambiarles el estado
+                pass
+
     def run(self):
         # El bucle principal de GLib se encarga de ejecutar la aplicación
         pass

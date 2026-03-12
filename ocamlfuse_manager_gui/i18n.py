@@ -31,6 +31,11 @@ class I18N:
     def gettext(self, text):
         return self.translation.gettext(text)
 
+    def update_language(self, lang):
+        """Actualiza el idioma de la instancia actual."""
+        self.lang = lang
+        self.translation = self._setup_translation()
+
 # Instancia global (idioma predeterminado: español)
 i18n_instance = I18N("es")
 _ = i18n_instance.gettext
