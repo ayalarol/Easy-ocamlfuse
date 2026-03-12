@@ -21,7 +21,7 @@
 
 La aplicación está desarrollada en Python con Tkinter y es compatible para agregar multiples idiomas (español e inglés por defecto).
 
-[![Descargar la última versión](https://img.shields.io/badge/Descargar-v1.0.1-blue?style=for-the-badge)](https://github.com/ayalarol/Easy-ocamlfuse/releases/tag/v1.0.1)
+[![Descargar la última versión](https://img.shields.io/badge/Descargar-v1.0.2-blue?style=for-the-badge)](https://github.com/ayalarol/Easy-ocamlfuse/releases/tag/v1.0.2)
 
 ---
 
@@ -161,6 +161,8 @@ y deseas instalarlo directamente en tu sistema sin usar los paquetes `.deb` o el
 
 ## 📖 Uso Básico
 
+> **IMPORTANTE (Requisito 2026):** Google ahora exige tener activada la **"Verificación en 2 pasos"** en tu cuenta de Google para poder acceder a Google Cloud Console y gestionar credenciales.
+> 
 > Antes de crear credenciales OAuth: asegúrate de habilitar la "Google Drive API" en Google Cloud Console (APIs y servicios → Biblioteca → buscar "Google Drive API" → Habilitar). También configura la "Pantalla de consentimiento OAuth" y crea un ID de cliente OAuth (Aplicación de escritorio o Web) antes de descargar el JSON de credenciales.
 
 
