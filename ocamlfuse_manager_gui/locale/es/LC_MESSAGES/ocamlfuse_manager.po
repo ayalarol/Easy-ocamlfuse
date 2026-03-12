@@ -1239,8 +1239,6 @@ msgid ""
 "Error al montar:\n"
 "{stderr}"
 msgstr "Error al montar:\n{stderr}"
-"Error al montar:\n"
-"{stderr}"
 
 #: ocamlfuse_manager_gui/gui.py:1166 ocamlfuse_manager_gui/mount.py:63
 msgid "Timeout al montar la cuenta"
@@ -1502,8 +1500,6 @@ msgid ""
 msgstr "Error al montar:\n{}"
 "Error al montar:\n"
 "{}"
-
-#: ocamlfuse_manager_gui/mount.py:77
 msgid "Error al montar"
 msgstr "Error al montar"
 

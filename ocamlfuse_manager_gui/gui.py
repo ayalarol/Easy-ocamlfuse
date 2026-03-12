@@ -1132,17 +1132,31 @@ class GoogleDriveManager:
         mount_point = data.get('mount_point')
         if not mount_point:
             default_path = os.path.expanduser(f"~/{account}")
-            os.makedirs(default_path, exist_ok=True)
             mount_point = default_path
             self.accounts[account]['mount_point'] = mount_point
             self._save_state()
 
+        # Asegurar que el directorio existe y está vacío/limpio para evitar errores de FUSE
         try:
+            if not os.path.exists(mount_point):
+                os.makedirs(mount_point, exist_ok=True)
+            elif os.path.ismount(mount_point):
+                # Si por alguna razón cree que está montado pero no lo rastreamos, intentar desmontar
+                subprocess.run(["fusermount", "-u", mount_point], capture_output=True)
+        except Exception as e:
+            print(f"Aviso al preparar mount_point: {e}")
+
+        try:
+            # Limpiar etiquetas y rutas de posibles espacios invisibles o saltos de línea
+            account_clean = account.strip()
+            mount_point_clean = os.path.abspath(mount_point.strip())
+            
             mount_cmd = [
                 "google-drive-ocamlfuse",
-                "-label", account,
-                mount_point
+                "-label", account_clean,
+                mount_point_clean
             ]
+            print(f"DEBUG: Ejecutando comando de montaje: {' '.join(mount_cmd)}")
             result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
             if result.returncode == 0:
                 self.mounted_accounts[account] = mount_point
