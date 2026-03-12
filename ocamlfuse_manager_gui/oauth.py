@@ -135,17 +135,29 @@ class OAuthServer:
     
     def start_server(self):
         try:
+            import errno
             socketserver.TCPServer.allow_reuse_address = True
             handler = lambda *args, **kwargs: OAuthHandler(self, *args, **kwargs)
             self.server = socketserver.TCPServer(("", self.port), handler)
             self.running = True
-            self.stopped = False  # Reinicia el flag al iniciar
+            self.stopped = False  
             self.server_thread = threading.Thread(target=self.server.serve_forever, daemon=True)
             self.server_thread.start()
             print(_("Servidor OAuth iniciado en http://localhost:{}").format(self.port))
             return True
+        except OSError as e:
+            if e.errno == errno.EADDRINUSE:
+                error_msg = _("El puerto {} está ocupado por otra aplicación (ej: Docker, Apache, Nginx).\n\nDetén temporalmente esa aplicación e inténtalo de nuevo.").format(self.port)
+            else:
+                error_msg = _("Error de red al iniciar servidor: {}").format(e)
+            print(error_msg)
+            # Guardamos el error para que la GUI pueda mostrarlo
+            self.last_error = error_msg
+            return False
         except Exception as e:
-            print(_("Error al iniciar servidor OAuth: {}").format(e))
+            error_msg = _("Error inesperado al iniciar servidor OAuth: {}").format(e)
+            print(error_msg)
+            self.last_error = error_msg
             return False
     
     def stop_server(self):
