@@ -52,7 +52,7 @@ class GoogleDriveManager:
         
 
         minimized = any(flag in sys.argv for flag in MINIMIZED_FLAGS)
-        self.root = tk.Tk(className="EasyOcamlfuse")
+        self.root = tk.Tk(className="easy-ocamlfuse")
         self.root.withdraw()
         
         self.root.title(_("Easy Ocamlfuse"))

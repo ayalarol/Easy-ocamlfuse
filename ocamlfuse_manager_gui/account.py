@@ -358,8 +358,8 @@ class AccountManager:
                     dialog = tk.Toplevel(self.root)
                     dialog.title(_("Eliminar punto de montaje"))
                     # Aumentamos el tamaño para evitar que los botones queden fuera
-                    dialog.geometry("450x250")
-                    dialog.resizable(False, False)
+                    dialog.geometry("450x300")
+                    dialog.resizable(True, True)
                     dialog.withdraw()
                     from .utils import centrar_ventana
                     centrar_ventana(dialog, self.root)
