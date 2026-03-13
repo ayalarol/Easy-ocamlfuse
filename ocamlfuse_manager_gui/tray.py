@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
-import pystray
-from PIL import Image
 import threading
 import sys
 import os
 import subprocess
+from PIL import Image
 from .i18n import i18n_instance
 _ = i18n_instance.gettext
+
+# Intentar importar pystray de forma segura, ya que puede fallar por librerías de sistema ausentes
+try:
+    import pystray
+    PYSTRAY_AVAILABLE = True
+except (ImportError, Exception) as e:
+    print(f"Pystray no disponible o error de librerías: {e}")
+    PYSTRAY_AVAILABLE = False
 
 class TrayIconManager:
     def __init__(self, root, unmount_cb, quit_cb):
@@ -14,39 +21,47 @@ class TrayIconManager:
         self.unmount_cb = unmount_cb
         self.quit_app = quit_cb
         self.tray_icon = None
-        self.skip_tray_creation = False
+        self.skip_tray_creation = not PYSTRAY_AVAILABLE
         self.mounted_accounts = {} # Almacenar {etiqueta: punto_montaje}
 
     def create_tray_icon(self, icon_path):
-        if self.skip_tray_creation:
+        if self.skip_tray_creation or not PYSTRAY_AVAILABLE:
+            print(_("Saltando creación de bandeja del sistema (no disponible o error de librerías)."))
             return
 
-        try:
-            image = Image.open(icon_path).resize((64, 64), Image.Resampling.LANCZOS)
-            self.tray_icon = pystray.Icon("easy-ocamlfuse", image, _("Easy Ocamlfuse"), menu=self._create_menu())
-            
-            def run_tray():
+        def run_tray():
+            try:
+                # Truco: Sobrescribir temporalmente signal.signal para evitar el error en hilos secundarios
                 import signal
                 original_signal = signal.signal
-                signal.signal = lambda s, h: None
-                try:
-                    self.tray_icon.run()
-                finally:
-                    signal.signal = original_signal
+                signal.signal = lambda s, h: original_signal(s, h) if threading.current_thread() is threading.main_thread() else None
+                
+                image = Image.open(icon_path).resize((64, 64), Image.Resampling.LANCZOS)
+                self.tray_icon = pystray.Icon(
+                    "easy-ocamlfuse", 
+                    image, 
+                    _("Easy Ocamlfuse"), 
+                    menu=self._create_menu()
+                )
+                self.tray_icon.run()
+            except Exception as e:
+                print(_("Error crítico al ejecutar la bandeja: {}").format(e))
+                self.skip_tray_creation = True
+                self.tray_icon = None
 
-            threading.Thread(target=run_tray, daemon=True).start()
-
-        except Exception as e:
-            print(_("No se pudo crear la bandeja: {}").format(e))
+        # Ejecutar en un hilo separado para no bloquear la GUI
+        threading.Thread(target=run_tray, daemon=True).start()
 
     def _create_menu(self):
         """Genera el menú dinámicamente basado en las cuentas montadas."""
+        if not PYSTRAY_AVAILABLE:
+            return None
+            
         menu_items = []
 
         # Añadir sección de "Abrir carpeta" al inicio si hay cuentas montadas
         if self.mounted_accounts:
             for label, path in self.mounted_accounts.items():
-                # Usamos una función fábrica para capturar el path actual en el closure
                 menu_items.append(pystray.MenuItem(
                     _("Abrir: {label}").format(label=label),
                     self._make_open_folder_cb(path)
@@ -82,8 +97,11 @@ class TrayIconManager:
     def update_menu(self, mounted_accounts):
         """Actualiza la lista de cuentas montadas y refresca el menú."""
         self.mounted_accounts = mounted_accounts
-        if self.tray_icon:
-            self.tray_icon.menu = self._create_menu()
+        if self.tray_icon and PYSTRAY_AVAILABLE:
+            try:
+                self.tray_icon.menu = self._create_menu()
+            except Exception as e:
+                print(f"Error actualizando menú de bandeja: {e}")
 
     def show_window(self, icon=None, item=None):
         self.root.after(0, self._do_show_window)
@@ -100,6 +118,9 @@ class TrayIconManager:
             print(f"Error al mostrar la ventana: {e}")
 
     def stop_tray(self):
-        if self.tray_icon:
-            self.tray_icon.stop()
+        if self.tray_icon and PYSTRAY_AVAILABLE:
+            try:
+                self.tray_icon.stop()
+            except Exception:
+                pass
             self.tray_icon = None

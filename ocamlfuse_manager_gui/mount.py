@@ -28,10 +28,25 @@ class MountManager:
         self.mounted_accounts = mounted_accounts_ref
 
     def mount_account(self, label, mount_point):
-        """Montar una cuenta específica"""
-        os.makedirs(mount_point, exist_ok=True)
+        """Montar una cuenta específica con verificaciones de seguridad"""
         try:
+            # Si el directorio no existe, crearlo
+            if not os.path.exists(mount_point):
+                os.makedirs(mount_point, exist_ok=True)
+            
+            # Verificar si ya está montado algo ahí
+            if os.path.ismount(mount_point):
+                # Si ya está montado, comprobamos si es nuestra cuenta
+                self.refresh_mounts()
+                if label in self.mounted_accounts and self.mounted_accounts[label] == mount_point:
+                    messagebox.showinfo(_("Info"), _("La cuenta '{}' ya está montada en {}").format(label, mount_point))
+                    return True
+                else:
+                    messagebox.showwarning(_("Aviso"), _("El punto de montaje {} ya está en uso por otro proceso.").format(mount_point))
+                    return False
+
             # --- Obtener client_secret desencriptado si es necesario ---
+            # (El resto del código de desencriptación se mantiene igual)
             if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
                 account_data = self.main_app.accounts.get(label)
                 if account_data:
@@ -41,23 +56,44 @@ class MountManager:
                         client_secret = enc_mgr.decrypt(account_data['client_secret'])
                     except Exception:
                         client_secret = account_data['client_secret']
+
             mount_cmd = ["google-drive-ocamlfuse", "-label", label, mount_point]
-            result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
+            # Ejecutamos el montaje
+            result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=45)
 
             if result.returncode == 0:
                 self.mounted_accounts[label] = mount_point
-                # --- GUARDAR EN LA CONFIGURACIÓN GLOBAL ---
-                if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
-                    self.main_app.accounts[label]['mount_point'] = mount_point
-                    self.main_app._save_state()
-                elif hasattr(self, 'accounts'):
-                    self.accounts[label]['mount_point'] = mount_point
-                    if hasattr(self, '_save_state'):
-                        self._save_state()
+                
+                # --- ACTUALIZAR ESTADO EN LA GUI ---
+                if hasattr(self, 'main_app'):
+                    if hasattr(self.main_app, 'mounted_accounts'):
+                        self.main_app.mounted_accounts[label] = mount_point
+                    
+                    if hasattr(self.main_app, 'accounts') and label in self.main_app.accounts:
+                        self.main_app.accounts[label]['mount_point'] = mount_point
+                    
+                    if hasattr(self.main_app, '_save_state'):
+                        self.main_app._save_state()
+                    
+                    # Forzar refresco de la UI si existe el método
+                    if hasattr(self.main_app, 'refresh_accounts_ui'):
+                        self.main_app.refresh_accounts_ui()
+
                 messagebox.showinfo(_("Éxito"), _("Cuenta '{}' montada en {}").format(label, mount_point))
                 return True
             else:
-                messagebox.showerror(_("Error"), _("Error al montar:\n{}").format(result.stderr))
+                # Si falla porque el punto de montaje está "sucio" (transporte no conectado, etc)
+                error_msg = result.stderr.lower()
+                if "transport endpoint is not connected" in error_msg or "device or resource busy" in error_msg:
+                    # Intentar un desmontaje forzado y reintentar una vez
+                    subprocess.run(["fusermount", "-uz", mount_point], capture_output=True)
+                    time.sleep(1)
+                    result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
+                    if result.returncode == 0:
+                        self.mounted_accounts[label] = mount_point
+                        return True
+                
+                messagebox.showerror(_("Error"), _("Error al montar '{}':\n{}").format(label, result.stderr))
                 return False
         except subprocess.TimeoutExpired:
             messagebox.showerror(_("Error"), _( "Timeout al montar la cuenta"))

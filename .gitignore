@@ -29,6 +29,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Herramientas internas
+build-tools/
+translate-tool/
+
 # Temporary files
 *~
 #*#

@@ -21,6 +21,7 @@ import subprocess
 import webbrowser
 import random
 import shutil
+import time
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import requests
@@ -80,12 +81,13 @@ class AccountManager:
         dlg.geometry("400x230")
         dlg.resizable(False, False)
         dlg.transient(self.root)
+        
+        # En lugar de grab_set() que bloquea todo, usamos un diálogo modal más amable
+        # pero permitimos que la ventana sea cerrada.
         dlg.grab_set()
-        dlg.protocol("WM_DELETE_WINDOW", lambda: None)
-        dlg.withdraw()
+        
         from .utils import centrar_ventana
         centrar_ventana(dlg, self.root)
-        dlg.deiconify()
         
         tk.Label(dlg, text=message, font=("Arial", 10)).pack(pady=20)
         
@@ -95,11 +97,16 @@ class AccountManager:
         
         tk.Label(dlg, text=_("Autoriza en navegador..."), font=("Arial", 9), fg="gray").pack(pady=5)
         
-        if cancel_event:
-            def cancel():
+        def on_cancel():
+            if cancel_event:
                 cancel_event.set()
-                dlg.destroy()
-            ttk.Button(dlg, text=_("Cancelar"), command=cancel).pack(pady=10)
+            dlg.destroy()
+
+        # Permitir cerrar la ventana con la X
+        dlg.protocol("WM_DELETE_WINDOW", on_cancel)
+
+        if cancel_event:
+            ttk.Button(dlg, text=_("Cancelar"), command=on_cancel).pack(pady=10)
         
         dlg.update()
         return dlg
@@ -163,10 +170,24 @@ class AccountManager:
             cancel_evt = threading.Event()
             dlg = self.show_progress_dialog(_("Reautorizando..."), cancel_evt)
             
-            auth_code, error = oauth.authenticate(
-                data['client_id'], client_secret, OAUTH_PORT, cancel_evt, timeout=120
-            )
+            # Usamos un hilo para evitar congelar la GUI
+            results = {"auth_code": None, "error": None}
+            def auth_thread():
+                results["auth_code"], results["error"] = oauth.authenticate(
+                    data['client_id'], client_secret, OAUTH_PORT, cancel_evt, timeout=120
+                )
+
+            thread = threading.Thread(target=auth_thread, daemon=True)
+            thread.start()
+
+            # Mientras el hilo esté vivo y no se haya cancelado, mantenemos la GUI viva
+            while thread.is_alive():
+                self.root.update()
+                time.sleep(0.1)
+
             dlg.destroy()
+            auth_code = results["auth_code"]
+            error = results["error"]
 
             if error:
                 error_messages = {
@@ -642,32 +663,31 @@ class AccountManager:
         file_path = ""
         
         # Estrategia: Probar Zenity, luego KDialog, y finalmente Tkinter.
-        # Si el usuario cancela un diálogo (código de salida 1), no se intenta el siguiente.
+        # En sistemas modernos (Ubuntu 22.04+), las herramientas externas pueden fallar 
+        # si el binario es antiguo debido a conflictos de librerías (Wayland/X11).
 
         # Intento 1: Zenity (GTK)
         try:
             result = subprocess.run([
                 'zenity', '--file-selection',
-                '--title=Seleccionar archivo de credenciales JSON',
-                '--file-filter=Archivos JSON | *.json',
+                '--title=' + _("Seleccionar archivo de credenciales JSON"),
+                '--file-filter=' + _("Archivos JSON") + ' | *.json',
                 f'--filename={carpeta}/'
             ], capture_output=True, text=True, timeout=60)
             
             if result.returncode == 0:
                 file_path = result.stdout.strip()
             elif result.returncode == 1:
-                # El usuario canceló el diálogo de Zenity, no hacer nada más.
-                return
-            # Para otros códigos de error, se considera un fallo y se pasará al siguiente método.
-
-        except (FileNotFoundError, subprocess.TimeoutExpired):
-            # Zenity no está instalado o no respondió, intentar con kdialog.
-            pass
+                return # Cancelado por usuario
+            elif result.returncode != 0:
+                # Si zenity da error (ej: fallo de librerías), lo imprimimos para debug
+                print(f"DEBUG: Zenity falló con código {result.returncode}: {result.stderr}")
+        except Exception as e:
+            print(f"DEBUG: Error al ejecutar Zenity: {e}")
 
         # Intento 2: KDialog (KDE)
         if not file_path:
             try:
-                # KDialog devuelve la ruta por stdout y código 0, o nada y código 1 si se cancela.
                 result = subprocess.run([
                     'kdialog', '--getopenfilename',
                     carpeta,
@@ -677,27 +697,33 @@ class AccountManager:
                 if result.returncode == 0:
                     file_path = result.stdout.strip()
                 elif result.returncode == 1:
-                    # El usuario canceló el diálogo de KDialog, no hacer nada más.
-                    return
+                    return # Cancelado por usuario
+                elif result.returncode != 0:
+                    print(f"DEBUG: KDialog falló con código {result.returncode}: {result.stderr}")
+            except Exception as e:
+                print(f"DEBUG: Error al ejecutar KDialog: {e}")
 
-            except (FileNotFoundError, subprocess.TimeoutExpired):
-                # Kdialog no está o no respondió, usar el de tkinter.
-                pass
-
-        # Fallback: Tkinter
+        # Fallback: Tkinter (El más compatible pero a veces el menos estético en Linux)
         if not file_path:
-            # askopenfilename devuelve una cadena vacía si el usuario cancela.
-            file_path = filedialog.askopenfilename(
-                title=_("Seleccionar archivo de credenciales JSON"),
-                filetypes=[(_("Archivos JSON"), '*.json')],
-                initialdir=carpeta
-            )
+            try:
+                print(_("Intentando abrir diálogo de archivos con Tkinter..."))
+                file_path = filedialog.askopenfilename(
+                    title=_("Seleccionar archivo de credenciales JSON"),
+                    filetypes=[(_("Archivos JSON"), '*.json')],
+                    initialdir=carpeta
+                )
+            except Exception as e:
+                # ERROR CRÍTICO: Si incluso Tkinter falla, necesitamos saber por qué en el binario
+                error_info = f"Error al abrir filedialog:\n{type(e).__name__}: {str(e)}"
+                print(error_info)
+                messagebox.showerror(_("Error Crítico"), _("No se pudo abrir el gestor de archivos:\n{}").format(error_info))
+                return
 
         if not file_path:
             return
 
         try:
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             
             cred = data.get("web") or data.get("installed") or {}
@@ -848,7 +874,7 @@ class AccountManager:
         self.accounts[label] = self._account_to_dict(
             label, client_id, client_secret, redirect_url=redirect_url, configured=True, externally_detected=False, email=email
         )
-        self.save_config()
+        # self.save_config() ya no se llama aquí por errores de hilos
         return True, email, None
 
     def _ensure_encrypted(self, client_secret):

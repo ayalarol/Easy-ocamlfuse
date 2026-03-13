@@ -200,7 +200,19 @@ def authenticate(client_id, client_secret, port, cancel_event, timeout=120):
             "&prompt=select_account"
             "&include_granted_scopes=true"
         )
-        webbrowser.open(auth_url)
+        
+        # Intentar abrir el navegador con manejo de errores
+        try:
+            print(_("Intentando abrir navegador para autorización..."))
+            if not webbrowser.open(auth_url):
+                # Si webbrowser.open devuelve False (algunas plataformas), informamos
+                print(_("Error: No se pudo detectar un navegador predeterminado para abrir la URL."))
+                # No cancelamos aquí porque a veces devuelve False pero sí lo abre, 
+                # o el usuario puede copiar la URL manualmente si la ve en consola.
+        except Exception as e:
+            print(_("Error crítico al intentar abrir el navegador: {}").format(e))
+            # Aquí sí es un fallo real de la librería, informamos pero dejamos que el usuario 
+            # tenga la oportunidad de cancelar manualmente en la GUI.
 
         start_time = time.time()
         auth_code = None

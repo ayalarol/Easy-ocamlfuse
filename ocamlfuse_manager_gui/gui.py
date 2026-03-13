@@ -18,6 +18,7 @@ import subprocess
 import notify2
 import webbrowser
 import threading
+import time
 import tkinter as tk
 from tkinter import ttk, messagebox
 from PIL import Image, ImageTk
@@ -128,6 +129,7 @@ class GoogleDriveManager:
 
         # Managers
         self.mount_mgr = MountManager(self.mounted_accounts)
+        self.mount_mgr.main_app = self
         self.mount_mgr.start_mount_monitor(
             interval=5,
             on_unmount_callback=self.on_external_unmount
@@ -977,11 +979,25 @@ class GoogleDriveManager:
             cancel_event = threading.Event()
             progress_dialog = self.show_progress_dialog(_("Esperando autorización..."), cancel_event)
 
-            success, email, error = self.account_mgr.setup_account_logic(
-                label, client_id, client_secret, cancel_event
-            )
+            # Ejecutar en un hilo para no congelar la GUI
+            results = {"success": False, "email": None, "error": None}
+            def run_setup():
+                results["success"], results["email"], results["error"] = self.account_mgr.setup_account_logic(
+                    label, client_id, client_secret, cancel_event
+                )
+            
+            setup_thread = threading.Thread(target=run_setup, daemon=True)
+            setup_thread.start()
+
+            # Esperar a que el hilo termine manteniendo la GUI viva
+            while setup_thread.is_alive():
+                self.root.update()
+                time.sleep(0.1)
 
             progress_dialog.destroy()
+            success = results["success"]
+            email = results["email"]
+            error = results["error"]
 
             if not success:
                 error_messages = {
@@ -993,10 +1009,21 @@ class GoogleDriveManager:
                     "duplicate_email": _("Ya existe una cuenta configurada con el correo '{email}'").format(email=email or ""),
                 }
                 messagebox.showwarning(
-                    _( "cancelled"),
+                    _( "Error"),
                     error_messages.get(error, _( "La cuenta no fue configurada completamente.")),
                     parent=self.root
                 )
+            else:
+                # Configuración exitosa: Guardar y refrescar en el hilo principal
+                self._save_state()
+                self.refresh_accounts()
+                self.limpiar_campos_credenciales()
+                
+                msg = _("La cuenta '{account}' ha sido configurada correctamente.").format(account=label)
+                if email:
+                    msg = _("La cuenta '{account}' ({email}) ha sido configurada correctamente.").format(account=label, email=email)
+                
+                messagebox.showinfo(_("Éxito"), msg, parent=self.root)
                 return
 
             if success:
@@ -1018,10 +1045,16 @@ class GoogleDriveManager:
         dialog.resizable(False, False)
         dialog.transient(self.root)
         dialog.grab_set()
-        dialog.protocol("WM_DELETE_WINDOW", lambda: None)  
-        dialog.withdraw()
+        
+        def on_cancel():
+            if cancel_event:
+                cancel_event.set()
+            if dialog.winfo_exists():
+                dialog.destroy()
+
+        dialog.protocol("WM_DELETE_WINDOW", on_cancel)  
         centrar_ventana(dialog, self.root)
-        dialog.deiconify()
+        
         tk.Label(dialog, text=message, font=("Arial", 10)).pack(pady=20)
         progress = ttk.Progressbar(dialog, mode='indeterminate')
         progress.pack(pady=10, padx=20, fill='x')
@@ -1032,17 +1065,11 @@ class GoogleDriveManager:
 
         # Añadir botón de cancelación si se proporciona el evento
         if cancel_event is not None:
-            def cancel():
-                cancel_event.set()
-                dialog.destroy()
-            ttk.Button(dialog, text=_("Cancelar"), command=cancel).pack(pady=10)
+            ttk.Button(dialog, text=_("Cancelar"), command=on_cancel).pack(pady=10)
+        
         # Permitir que el callback de OAuth también cierre y cancele
         dialog._cancel_event = cancel_event
-        def close_and_cancel():
-            if dialog.winfo_exists():
-                cancel_event.set()
-                dialog.destroy()
-        dialog.close_and_cancel = close_and_cancel
+        dialog.close_and_cancel = on_cancel
         dialog.update()
         return dialog
 
@@ -1136,50 +1163,16 @@ class GoogleDriveManager:
             self.accounts[account]['mount_point'] = mount_point
             self._save_state()
 
-        # Asegurar que el directorio existe y está vacío/limpio para evitar errores de FUSE
-        try:
-            if not os.path.exists(mount_point):
-                os.makedirs(mount_point, exist_ok=True)
-            elif os.path.ismount(mount_point):
-                # Si por alguna razón cree que está montado pero no lo rastreamos, intentar desmontar
-                subprocess.run(["fusermount", "-u", mount_point], capture_output=True)
-        except Exception as e:
-            print(f"Aviso al preparar mount_point: {e}")
-
-        try:
-            # Limpiar etiquetas y rutas de posibles espacios invisibles o saltos de línea
-            account_clean = account.strip()
-            mount_point_clean = os.path.abspath(mount_point.strip())
+        # Delegar el montaje al MountManager
+        success = self.mount_mgr.mount_account(account, mount_point)
+        
+        if success:
+            # Esperar un breve momento para que el SO registre el montaje antes de refrescar
+            self.root.after(1000, self.refresh_mounts)
             
-            mount_cmd = [
-                "google-drive-ocamlfuse",
-                "-label", account_clean,
-                mount_point_clean
-            ]
-            print(f"DEBUG: Ejecutando comando de montaje: {' '.join(mount_cmd)}")
-            result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
-            if result.returncode == 0:
-                self.mounted_accounts[account] = mount_point
-                self.accounts[account]['mount_point'] = mount_point
-                self._save_state()
-                # Esperar un breve momento para que el SO registre el montaje antes de refrescar
-                self.root.after(1500, self.refresh_mounts)
-                messagebox.showinfo(
-                    _("Éxito"),
-                    _("Cuenta '{account}' montada en {mount_point}").format(account=account, mount_point=mount_point)
-                )
-                # --- Abrir carpeta solo si el checkbox está marcado ---
-                if open_folder_var.get():
-                    self.open_folder(mount_point)
-            else:
-                messagebox.showerror(
-                    _("Error"),
-                    _("Error al montar:\n{stderr}").format(stderr=result.stderr)
-                )
-        except subprocess.TimeoutExpired:
-            messagebox.showerror(_("Error"), _("Timeout al montar la cuenta"))
-        except Exception as e:
-            messagebox.showerror(_("Error"), _("Error inesperado: {}").format(str(e)))
+            # --- Abrir carpeta solo si el checkbox está marcado ---
+            if open_folder_var.get():
+                self.open_folder(mount_point)
 
     def unmount_selected(self):
         """Desmontar cuenta seleccionada"""
