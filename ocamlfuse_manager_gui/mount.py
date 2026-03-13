@@ -26,6 +26,7 @@ UNKNOWN_LABEL = "__UNKNOWN__"
 class MountManager:
     def __init__(self, mounted_accounts_ref):
         self.mounted_accounts = mounted_accounts_ref
+        self._internal_unmounting = set() # Etiquetas que se están desmontando internamente
 
     def mount_account(self, label, mount_point):
         """Montar una cuenta específica con verificaciones de seguridad"""
@@ -46,7 +47,6 @@ class MountManager:
                     return False
 
             # --- Obtener client_secret desencriptado si es necesario ---
-            # (El resto del código de desencriptación se mantiene igual)
             if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
                 account_data = self.main_app.accounts.get(label)
                 if account_data:
@@ -103,24 +103,48 @@ class MountManager:
             return False
 
     def unmount_account(self, account, mount_point):
-        """Desmontar una cuenta específica"""
+        """Desmontar una cuenta específica con verificación previa"""
+        # Si ya no está montado (desmontaje externo previo), limpiar y salir
+        if not os.path.exists(mount_point) or not os.path.ismount(mount_point):
+            if account in self.mounted_accounts:
+                del self.mounted_accounts[account]
+            self._internal_unmounting.discard(account)
+            # Refrescar UI si es posible
+            if hasattr(self, 'main_app') and hasattr(self.main_app, 'refresh_mounts'):
+                self.main_app.refresh_mounts()
+            return True
+
+        self._internal_unmounting.add(account)
         try:
             unmount_cmd = ["fusermount", "-u", mount_point]
-            subprocess.check_call(unmount_cmd)
-            return True
-        except subprocess.CalledProcessError as e:
-            messagebox.showerror(
-                _( "Error al montar"),
-                _("No se pudo desmontar '{}' en '{}':\nAsegúrate de que ningún archivo, terminal o ventana esté usando la carpeta de montaje.\n\nDetalle: {}").format(account, mount_point, e)
-            )
-            print(_("Error al desmontar {} en {}: {}").format(account, mount_point, e))
-            return False
+            # Usamos subprocess.run para capturar el stderr
+            result = subprocess.run(unmount_cmd, capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                if account in self.mounted_accounts:
+                    del self.mounted_accounts[account]
+                # Damos un pequeño margen para que el monitor registre el cambio
+                time.sleep(0.3)
+                return True
+            else:
+                # Si el error es que no se encontró en mtab, lo tratamos como éxito (ya se desmontó)
+                if "not found in /etc/mtab" in result.stderr or "no se encuentra en /etc/mtab" in result.stderr:
+                    if account in self.mounted_accounts:
+                        del self.mounted_accounts[account]
+                    return True
+                
+                self._internal_unmounting.discard(account)
+                messagebox.showerror(
+                    _( "Error al desmontar"),
+                    _("No se pudo desmontar '{}' en '{}':\nAsegúrate de que ningún archivo esté usando la carpeta.\n\nDetalle: {}").format(account, mount_point, result.stderr.strip())
+                )
+                return False
         except Exception as e:
+            self._internal_unmounting.discard(account)
             messagebox.showerror(
                 _( "Error al desmontar"),
-                _("Error inesperado al desmontar '{}' en '{}':\n{}").format(account, mount_point, e)
+                _("Error inesperado: {}").format(str(e))
             )
-            print(_("Error al desmontar {} en {}: {}").format(account, mount_point, e))
             return False
 
     def unmount_all(self):
@@ -234,17 +258,16 @@ class MountManager:
             print(_("Error obteniendo etiqueta: {}").format(e))
         return UNKNOWN_LABEL
 
-    def start_mount_monitor(self, interval=5, on_unmount_callback=None):
+    def start_mount_monitor(self, interval=2, on_unmount_callback=None):
         """
         Inicia un hilo que monitorea los puntos de montaje. Si detecta un desmontaje,
         llama al callback y termina su ciclo para que la GUI actualice el estado.
-        Además, si detecta cuentas con client_secret sin encriptar, las encripta una sola vez.
         """
         if hasattr(self, '_monitoring') and self._monitoring:
             return
 
         self._monitoring = True
-        self._already_encrypted = set()  # Para evitar encriptar varias veces el mismo client_id
+        self._already_encrypted = set() 
         
         # --- Pre-encriptar cuentas al inicio del monitor una sola vez ---
         if hasattr(self, 'main_app') and hasattr(self.main_app, 'accounts'):
@@ -277,14 +300,20 @@ class MountManager:
                 for label, mount_point in accounts_snapshot:
                     try:
                         if not os.path.ismount(mount_point):
+                            # Si no está montado, comprobamos si fue un desmontaje interno
+                            if label in self._internal_unmounting:
+                                # Es interno, lo eliminamos de la lista sin notificar
+                                self._internal_unmounting.discard(label)
+                                if label in self.mounted_accounts:
+                                    del self.mounted_accounts[label]
+                                continue
+                            
                             unmounted_labels.append((label, mount_point))
                     except Exception as e:
                         print(_("Error in mount monitor while checking '{}': {}").format(label, e))
 
                 if unmounted_labels:
                     for label, mount_point in unmounted_labels:
-                        # Eliminar la cuenta de la lista de monitoreo para evitar notificaciones repetidas.
-                        # La GUI se encargará de la actualización final del estado.
                         if label in self.mounted_accounts:
                             del self.mounted_accounts[label]
                         

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-12 23:29-0300\n"
+"POT-Creation-Date: 2026-03-13 01:03-0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -137,7 +137,7 @@ msgid ""
 "Google Cloud Console."
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:80 ocamlfuse_manager_gui/gui.py:1043
+#: ocamlfuse_manager_gui/account.py:80 ocamlfuse_manager_gui/gui.py:1041
 msgid "Configurando cuenta"
 msgstr ""
 
@@ -146,15 +146,15 @@ msgid "Autoriza en navegador..."
 msgstr ""
 
 #: ocamlfuse_manager_gui/account.py:109 ocamlfuse_manager_gui/account.py:425
-#: ocamlfuse_manager_gui/gui.py:859 ocamlfuse_manager_gui/gui.py:1068
+#: ocamlfuse_manager_gui/gui.py:857 ocamlfuse_manager_gui/gui.py:1066
 msgid "Cancelar"
 msgstr ""
 
 #: ocamlfuse_manager_gui/account.py:154 ocamlfuse_manager_gui/account.py:289
 #: ocamlfuse_manager_gui/account.py:343 ocamlfuse_manager_gui/account.py:502
-#: ocamlfuse_manager_gui/account.py:509 ocamlfuse_manager_gui/gui.py:1082
-#: ocamlfuse_manager_gui/gui.py:1128 ocamlfuse_manager_gui/gui.py:1181
-#: ocamlfuse_manager_gui/gui.py:1218
+#: ocamlfuse_manager_gui/account.py:509 ocamlfuse_manager_gui/gui.py:1080
+#: ocamlfuse_manager_gui/gui.py:1126 ocamlfuse_manager_gui/gui.py:1179
+#: ocamlfuse_manager_gui/gui.py:1216
 msgid "Advertencia"
 msgstr ""
 
@@ -166,11 +166,11 @@ msgstr ""
 #: ocamlfuse_manager_gui/account.py:216 ocamlfuse_manager_gui/account.py:371
 #: ocamlfuse_manager_gui/account.py:448 ocamlfuse_manager_gui/account.py:628
 #: ocamlfuse_manager_gui/account.py:746 ocamlfuse_manager_gui/account.py:748
-#: ocamlfuse_manager_gui/gui.py:318 ocamlfuse_manager_gui/gui.py:388
-#: ocamlfuse_manager_gui/gui.py:612 ocamlfuse_manager_gui/gui.py:680
-#: ocamlfuse_manager_gui/gui.py:690 ocamlfuse_manager_gui/gui.py:975
-#: ocamlfuse_manager_gui/gui.py:1012 ocamlfuse_manager_gui/gui.py:1146
-#: ocamlfuse_manager_gui/gui.py:1255 ocamlfuse_manager_gui/gui.py:1364
+#: ocamlfuse_manager_gui/gui.py:316 ocamlfuse_manager_gui/gui.py:386
+#: ocamlfuse_manager_gui/gui.py:610 ocamlfuse_manager_gui/gui.py:678
+#: ocamlfuse_manager_gui/gui.py:688 ocamlfuse_manager_gui/gui.py:973
+#: ocamlfuse_manager_gui/gui.py:1010 ocamlfuse_manager_gui/gui.py:1144
+#: ocamlfuse_manager_gui/gui.py:1253 ocamlfuse_manager_gui/gui.py:1362
 #: ocamlfuse_manager_gui/mount.py:96 ocamlfuse_manager_gui/mount.py:99
 #: ocamlfuse_manager_gui/mount.py:102
 msgid "Error"
@@ -195,7 +195,7 @@ msgid "Reautorizando..."
 msgstr ""
 
 #: ocamlfuse_manager_gui/account.py:194 ocamlfuse_manager_gui/account.py:598
-#: ocamlfuse_manager_gui/gui.py:1004
+#: ocamlfuse_manager_gui/gui.py:1002
 msgid "No se pudo iniciar el servidor OAuth"
 msgstr ""
 
@@ -204,7 +204,7 @@ msgid "Reautorización cancelada por el usuario."
 msgstr ""
 
 #: ocamlfuse_manager_gui/account.py:197 ocamlfuse_manager_gui/account.py:601
-#: ocamlfuse_manager_gui/gui.py:1007
+#: ocamlfuse_manager_gui/gui.py:1005
 msgid "No se recibió el código de autorización a tiempo"
 msgstr ""
 
@@ -217,10 +217,10 @@ msgid "Error desconocido"
 msgstr ""
 
 #: ocamlfuse_manager_gui/account.py:214 ocamlfuse_manager_gui/account.py:468
-#: ocamlfuse_manager_gui/account.py:744 ocamlfuse_manager_gui/gui.py:699
-#: ocamlfuse_manager_gui/gui.py:1026 ocamlfuse_manager_gui/gui.py:1030
-#: ocamlfuse_manager_gui/gui.py:1212 ocamlfuse_manager_gui/mount.py:82
-#: ocamlfuse_manager_gui/mount.py:145
+#: ocamlfuse_manager_gui/account.py:744 ocamlfuse_manager_gui/gui.py:697
+#: ocamlfuse_manager_gui/gui.py:1024 ocamlfuse_manager_gui/gui.py:1028
+#: ocamlfuse_manager_gui/gui.py:1210 ocamlfuse_manager_gui/mount.py:82
+#: ocamlfuse_manager_gui/mount.py:169
 msgid "Éxito"
 msgstr ""
 
@@ -257,7 +257,7 @@ msgid ""
 "Selecciona una cuenta antes de hacerla desaparecer como por arte de magia."
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:298 ocamlfuse_manager_gui/gui.py:655
+#: ocamlfuse_manager_gui/account.py:298 ocamlfuse_manager_gui/gui.py:653
 msgid "Cuenta Montada"
 msgstr ""
 
@@ -296,8 +296,8 @@ msgstr ""
 msgid "¿Estás listo para decirle adiós a '{account}'? ¡Despedidas en la cima!"
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:336 ocamlfuse_manager_gui/gui.py:1197
-#: ocamlfuse_manager_gui/mount.py:132
+#: ocamlfuse_manager_gui/account.py:336 ocamlfuse_manager_gui/gui.py:1195
+#: ocamlfuse_manager_gui/mount.py:156
 msgid "Confirmar"
 msgstr ""
 
@@ -349,11 +349,11 @@ msgstr ""
 msgid "No volver a preguntar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:423 ocamlfuse_manager_gui/gui.py:1590
+#: ocamlfuse_manager_gui/account.py:423 ocamlfuse_manager_gui/gui.py:1589
 msgid "Sí"
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:424 ocamlfuse_manager_gui/gui.py:1593
+#: ocamlfuse_manager_gui/account.py:424 ocamlfuse_manager_gui/gui.py:1592
 msgid "No"
 msgstr ""
 
@@ -407,8 +407,8 @@ msgstr ""
 msgid "Selecciona la cuenta a restaurar:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:490 ocamlfuse_manager_gui/gui.py:452
-#: ocamlfuse_manager_gui/gui.py:1752
+#: ocamlfuse_manager_gui/account.py:490 ocamlfuse_manager_gui/gui.py:450
+#: ocamlfuse_manager_gui/gui.py:1751
 msgid "Cuenta"
 msgstr ""
 
@@ -449,8 +449,8 @@ msgstr ""
 msgid "Eliminar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:533 ocamlfuse_manager_gui/gui.py:397
-#: ocamlfuse_manager_gui/gui.py:954
+#: ocamlfuse_manager_gui/account.py:533 ocamlfuse_manager_gui/gui.py:395
+#: ocamlfuse_manager_gui/gui.py:952
 msgid "Cerrar"
 msgstr ""
 
@@ -609,15 +609,15 @@ msgid "Guía para crear credenciales OAuth 2.0"
 msgstr ""
 
 #: ocamlfuse_manager_gui/account.py:793 ocamlfuse_manager_gui/account.py:831
-#: ocamlfuse_manager_gui/gui.py:353
+#: ocamlfuse_manager_gui/gui.py:351
 msgid "Texto copiado al portapapeles"
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:797 ocamlfuse_manager_gui/gui.py:715
+#: ocamlfuse_manager_gui/account.py:797 ocamlfuse_manager_gui/gui.py:713
 msgid "Copiar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/account.py:798 ocamlfuse_manager_gui/gui.py:720
+#: ocamlfuse_manager_gui/account.py:798 ocamlfuse_manager_gui/gui.py:718
 msgid "Edición"
 msgstr ""
 
@@ -625,224 +625,224 @@ msgstr ""
 msgid "Abrir Google Cloud Console"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:59 ocamlfuse_manager_gui/gui.py:1741
+#: ocamlfuse_manager_gui/gui.py:60 ocamlfuse_manager_gui/gui.py:1740
 #: ocamlfuse_manager_gui/tray.py:43
 msgid "Easy Ocamlfuse"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:74
+#: ocamlfuse_manager_gui/gui.py:75
 msgid "No se pudo cargar el icono de ventana: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:319
+#: ocamlfuse_manager_gui/gui.py:317
 msgid ""
 "No se pudo eliminar la línea de autoinicio de ~/.profile:\n"
 "{}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:329
+#: ocamlfuse_manager_gui/gui.py:327
 msgid "Autoinicio en Bodhi/Enlightenment"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:335
+#: ocamlfuse_manager_gui/gui.py:333
 msgid ""
 "En Bodhi/Enlightenment el inicio automático estándar puede no funcionar.\n"
 "\n"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:336
+#: ocamlfuse_manager_gui/gui.py:334
 msgid ""
 "Para asegurar el autoinicio, añade la siguiente línea al final de tu archivo "
 "~/.profile:\n"
 "\n"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:338
+#: ocamlfuse_manager_gui/gui.py:336
 msgid ""
 "Puedes copiar el texto, editarlo manualmente o pulsar el botón para añadirlo "
 "automáticamente.\n"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:339
+#: ocamlfuse_manager_gui/gui.py:337
 msgid "Luego, reinicia sesión."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:381
+#: ocamlfuse_manager_gui/gui.py:379
 msgid "Listo"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:382
+#: ocamlfuse_manager_gui/gui.py:380
 msgid "Se añadió la línea de autoinicio a tu ~/.profile correctamente.\n"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:383
+#: ocamlfuse_manager_gui/gui.py:381
 msgid "Reinicia sesión para que surta efecto."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:389
+#: ocamlfuse_manager_gui/gui.py:387
 msgid ""
 "No se pudo modificar ~/.profile:\n"
 "{}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:393
+#: ocamlfuse_manager_gui/gui.py:391
 msgid "Añadir automáticamente a ~/.profile"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:413
+#: ocamlfuse_manager_gui/gui.py:411
 msgid "Desmontaje Detectado"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:414
+#: ocamlfuse_manager_gui/gui.py:412
 #, python-brace-format
 msgid "La cuenta '{label}' fue desmontada externamente."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:430 ocamlfuse_manager_gui/gui.py:1745
+#: ocamlfuse_manager_gui/gui.py:428 ocamlfuse_manager_gui/gui.py:1744
 msgid "Gestión Principal"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:433 ocamlfuse_manager_gui/gui.py:1746
+#: ocamlfuse_manager_gui/gui.py:431 ocamlfuse_manager_gui/gui.py:1745
 msgid "Gestión de Cuentas"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:441 ocamlfuse_manager_gui/gui.py:1748
+#: ocamlfuse_manager_gui/gui.py:439 ocamlfuse_manager_gui/gui.py:1747
 msgid "Estado del Sistema"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:444 ocamlfuse_manager_gui/gui.py:1749
+#: ocamlfuse_manager_gui/gui.py:442 ocamlfuse_manager_gui/gui.py:1748
 msgid "Verificando instalación..."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:448 ocamlfuse_manager_gui/gui.py:1750
+#: ocamlfuse_manager_gui/gui.py:446 ocamlfuse_manager_gui/gui.py:1749
 msgid "Cuentas Montadas"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:452 ocamlfuse_manager_gui/gui.py:556
-#: ocamlfuse_manager_gui/gui.py:1752 ocamlfuse_manager_gui/gui.py:1775
+#: ocamlfuse_manager_gui/gui.py:450 ocamlfuse_manager_gui/gui.py:554
+#: ocamlfuse_manager_gui/gui.py:1751 ocamlfuse_manager_gui/gui.py:1774
 msgid "Etiqueta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:452 ocamlfuse_manager_gui/gui.py:1752
+#: ocamlfuse_manager_gui/gui.py:450 ocamlfuse_manager_gui/gui.py:1751
 msgid "Punto de Montaje"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:452 ocamlfuse_manager_gui/gui.py:556
-#: ocamlfuse_manager_gui/gui.py:1752 ocamlfuse_manager_gui/gui.py:1775
+#: ocamlfuse_manager_gui/gui.py:450 ocamlfuse_manager_gui/gui.py:554
+#: ocamlfuse_manager_gui/gui.py:1751 ocamlfuse_manager_gui/gui.py:1774
 msgid "Estado"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:480 ocamlfuse_manager_gui/gui.py:1756
+#: ocamlfuse_manager_gui/gui.py:478 ocamlfuse_manager_gui/gui.py:1755
 msgid "Montar Cuenta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:482 ocamlfuse_manager_gui/gui.py:1757
+#: ocamlfuse_manager_gui/gui.py:480 ocamlfuse_manager_gui/gui.py:1756
 msgid "Desmontar Seleccionada"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:484 ocamlfuse_manager_gui/gui.py:1758
+#: ocamlfuse_manager_gui/gui.py:482 ocamlfuse_manager_gui/gui.py:1757
 msgid "Desmontar Todas"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:491 ocamlfuse_manager_gui/gui.py:1759
+#: ocamlfuse_manager_gui/gui.py:489 ocamlfuse_manager_gui/gui.py:1758
 msgid "Actualizar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:493 ocamlfuse_manager_gui/gui.py:1760
+#: ocamlfuse_manager_gui/gui.py:491 ocamlfuse_manager_gui/gui.py:1759
 msgid "Abrir Carpeta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:500 ocamlfuse_manager_gui/gui.py:1762
+#: ocamlfuse_manager_gui/gui.py:498 ocamlfuse_manager_gui/gui.py:1761
 msgid "Agregar Nueva Cuenta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:505 ocamlfuse_manager_gui/gui.py:1763
+#: ocamlfuse_manager_gui/gui.py:503 ocamlfuse_manager_gui/gui.py:1762
 msgid "Etiqueta:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:509
+#: ocamlfuse_manager_gui/gui.py:507
 msgid ""
 "Nombre identificador para tu cuenta (ej: personal, trabajo) NO! dejes este "
 "campo vacio"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:512 ocamlfuse_manager_gui/gui.py:1764
+#: ocamlfuse_manager_gui/gui.py:510 ocamlfuse_manager_gui/gui.py:1763
 msgid "Client ID:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:516
+#: ocamlfuse_manager_gui/gui.py:514
 msgid "Client ID de tu proyecto en Google Cloud Console."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:519 ocamlfuse_manager_gui/gui.py:1765
+#: ocamlfuse_manager_gui/gui.py:517 ocamlfuse_manager_gui/gui.py:1764
 msgid "Client Secret:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:523
+#: ocamlfuse_manager_gui/gui.py:521
 msgid "Client Secret de tu proyecto en Google Cloud Console."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:540 ocamlfuse_manager_gui/gui.py:1767
+#: ocamlfuse_manager_gui/gui.py:538 ocamlfuse_manager_gui/gui.py:1766
 msgid "Cargar JSON"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:543 ocamlfuse_manager_gui/gui.py:1768
+#: ocamlfuse_manager_gui/gui.py:541 ocamlfuse_manager_gui/gui.py:1767
 msgid "Configurar Cuenta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:546 ocamlfuse_manager_gui/gui.py:1769
+#: ocamlfuse_manager_gui/gui.py:544 ocamlfuse_manager_gui/gui.py:1768
 msgid "Limpiar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:549 ocamlfuse_manager_gui/gui.py:756
-#: ocamlfuse_manager_gui/gui.py:1770
+#: ocamlfuse_manager_gui/gui.py:547 ocamlfuse_manager_gui/gui.py:754
+#: ocamlfuse_manager_gui/gui.py:1769
 msgid "Ayuda"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:553 ocamlfuse_manager_gui/gui.py:1772
+#: ocamlfuse_manager_gui/gui.py:551 ocamlfuse_manager_gui/gui.py:1771
 msgid "Cuentas Configuradas"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:556 ocamlfuse_manager_gui/gui.py:1775
+#: ocamlfuse_manager_gui/gui.py:554 ocamlfuse_manager_gui/gui.py:1774
 msgid "Client ID"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:556 ocamlfuse_manager_gui/gui.py:560
-#: ocamlfuse_manager_gui/gui.py:1775
+#: ocamlfuse_manager_gui/gui.py:554 ocamlfuse_manager_gui/gui.py:558
+#: ocamlfuse_manager_gui/gui.py:1774
 msgid "Montar al iniciar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:593 ocamlfuse_manager_gui/gui.py:1779
+#: ocamlfuse_manager_gui/gui.py:591 ocamlfuse_manager_gui/gui.py:1778
 msgid "Eliminar Cuenta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:596 ocamlfuse_manager_gui/gui.py:1780
+#: ocamlfuse_manager_gui/gui.py:594 ocamlfuse_manager_gui/gui.py:1779
 msgid "Reautorizar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:599 ocamlfuse_manager_gui/gui.py:1781
+#: ocamlfuse_manager_gui/gui.py:597 ocamlfuse_manager_gui/gui.py:1780
 msgid "Actualizar Lista"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:602 ocamlfuse_manager_gui/gui.py:1782
+#: ocamlfuse_manager_gui/gui.py:600 ocamlfuse_manager_gui/gui.py:1781
 msgid "Restaurar Cuenta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:612 ocamlfuse_manager_gui/gui.py:1302
+#: ocamlfuse_manager_gui/gui.py:610 ocamlfuse_manager_gui/gui.py:1300
 msgid "Pendiente"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:655
+#: ocamlfuse_manager_gui/gui.py:653
 msgid ""
 "No puedes cambiar el nombre de '{}' mientras esté montada. Desmóntala "
 "primero."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:680
+#: ocamlfuse_manager_gui/gui.py:678
 msgid "La etiqueta '{}' ya existe."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:690
+#: ocamlfuse_manager_gui/gui.py:688
 msgid ""
 "No se pudo renombrar la carpeta de configuración de ocamlfuse:\n"
 "{} a {}\n"
@@ -853,64 +853,64 @@ msgid ""
 "necesites corregir la carpeta manualmente para evitar problemas."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:699
+#: ocamlfuse_manager_gui/gui.py:697
 msgid "La cuenta '{}' ha sido renombrada a '{}'."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:710 ocamlfuse_manager_gui/gui.py:1701
+#: ocamlfuse_manager_gui/gui.py:708 ocamlfuse_manager_gui/gui.py:1700
 #: ocamlfuse_manager_gui/tray.py:77
 msgid "Salir"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:711
+#: ocamlfuse_manager_gui/gui.py:709
 msgid "Archivo"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:716
+#: ocamlfuse_manager_gui/gui.py:714
 msgid "Pegar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:717
+#: ocamlfuse_manager_gui/gui.py:715
 msgid "Cortar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:719
+#: ocamlfuse_manager_gui/gui.py:717
 msgid "Limpiar campos"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:725
+#: ocamlfuse_manager_gui/gui.py:723
 msgid "Iniciar con el sistema"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:730 ocamlfuse_manager_gui/gui.py:1241
+#: ocamlfuse_manager_gui/gui.py:728 ocamlfuse_manager_gui/gui.py:1239
 msgid "Restaurar configuración"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:737
+#: ocamlfuse_manager_gui/gui.py:735
 msgid "Español"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:743
+#: ocamlfuse_manager_gui/gui.py:741
 msgid "English"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:748
+#: ocamlfuse_manager_gui/gui.py:746
 msgid "Idioma"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:750
+#: ocamlfuse_manager_gui/gui.py:748
 msgid "Preferencias"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:755
+#: ocamlfuse_manager_gui/gui.py:753
 msgid "Acerca de..."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:810
+#: ocamlfuse_manager_gui/gui.py:808
 msgid "Instalar ocamlfuse"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:811
+#: ocamlfuse_manager_gui/gui.py:809
 msgid ""
 "google-drive-ocamlfuse no está instalado.\n"
 "\n"
@@ -919,11 +919,11 @@ msgid ""
 "Se requerirá tu contraseña de administrador."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:821
+#: ocamlfuse_manager_gui/gui.py:819
 msgid "Instalación manual"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:822
+#: ocamlfuse_manager_gui/gui.py:820
 msgid ""
 "Puedes instalar google-drive-ocamlfuse manually:\n"
 "\n"
@@ -934,31 +934,31 @@ msgid ""
 "Después de instalar, reinicia esta aplicación."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:840
+#: ocamlfuse_manager_gui/gui.py:838
 msgid "Seleccionar una versión de PPA"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:845
+#: ocamlfuse_manager_gui/gui.py:843
 msgid "¿Qué versión deseas instalar?"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:850
+#: ocamlfuse_manager_gui/gui.py:848
 msgid "Estable (ppa:alessandro-strada/ppa)"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:851
+#: ocamlfuse_manager_gui/gui.py:849
 msgid "Beta (ppa:alessandro-strada/google-drive-ocamlfuse-beta)"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:858
+#: ocamlfuse_manager_gui/gui.py:856
 msgid "Continuar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:868
+#: ocamlfuse_manager_gui/gui.py:866
 msgid "Instalación en Arch Linux"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:869
+#: ocamlfuse_manager_gui/gui.py:867
 msgid ""
 "Para Arch Linux y derivados, la instalación automática ha sido "
 "deshabilitada.\n"
@@ -972,185 +972,185 @@ msgid ""
 "Una vez instalado, por favor reinicia esta aplicación."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:882
+#: ocamlfuse_manager_gui/gui.py:880
 msgid "Distribución no soportada"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:883
+#: ocamlfuse_manager_gui/gui.py:881
 msgid ""
 "No se pudo determinar tu distribución o no es soportada para instalación "
 "automática.\n"
 "\n"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:884
+#: ocamlfuse_manager_gui/gui.py:882
 msgid "Por favor instala google-drive-ocamlfuse manualmente."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:891
+#: ocamlfuse_manager_gui/gui.py:889
 msgid "Proceso de instalación"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:900
+#: ocamlfuse_manager_gui/gui.py:898
 msgid "Instalando google-drive-ocamlfuse..."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:902
+#: ocamlfuse_manager_gui/gui.py:900
 msgid "Preparando instalación..."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:919
+#: ocamlfuse_manager_gui/gui.py:917
 msgid "Ejecutando comandos de instalación...\n"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:935
+#: ocamlfuse_manager_gui/gui.py:933
 msgid "¡Instalación completada con éxito!"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:936
+#: ocamlfuse_manager_gui/gui.py:934
 msgid ""
 "\n"
 "✓ ¡Instalación exitosa!\n"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:938
+#: ocamlfuse_manager_gui/gui.py:936
 msgid "Instalación exitosa"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:939
+#: ocamlfuse_manager_gui/gui.py:937
 msgid ""
 "google-drive-ocamlfuse se instaló correctamente.\n"
 "\n"
 "Reinicia la aplicación para continuar."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:946
+#: ocamlfuse_manager_gui/gui.py:944
 msgid "Error en la instalación"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:949
+#: ocamlfuse_manager_gui/gui.py:947
 msgid "Error de instalación"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:950
+#: ocamlfuse_manager_gui/gui.py:948
 msgid ""
 "Ocurrió un error durante la instalación.\n"
 "\n"
 "Consulta la salida para más detalles."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:980
+#: ocamlfuse_manager_gui/gui.py:978
 msgid "Esperando autorización..."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1005 ocamlfuse_manager_gui/gui.py:1006
+#: ocamlfuse_manager_gui/gui.py:1003 ocamlfuse_manager_gui/gui.py:1004
 msgid "Configuración cancelada por el usuario."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1008
+#: ocamlfuse_manager_gui/gui.py:1006
 msgid "Error al completar la configuración OAuth"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1009
+#: ocamlfuse_manager_gui/gui.py:1007
 #, python-brace-format
 msgid "Ya existe una cuenta configurada con el correo '{email}'"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1013
+#: ocamlfuse_manager_gui/gui.py:1011
 msgid "La cuenta no fue configurada completamente."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1022
+#: ocamlfuse_manager_gui/gui.py:1020
 #, python-brace-format
 msgid "La cuenta '{account}' ha sido configurada correctamente."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1024
+#: ocamlfuse_manager_gui/gui.py:1022
 #, python-brace-format
 msgid "La cuenta '{account}' ({email}) ha sido configurada correctamente."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1030
+#: ocamlfuse_manager_gui/gui.py:1028
 #, python-brace-format
 msgid "Cuenta '{label}' configurada correctamente"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1039
+#: ocamlfuse_manager_gui/gui.py:1037
 msgid "Error inesperado"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1063
+#: ocamlfuse_manager_gui/gui.py:1061
 msgid "Autoriza la aplicación en tu navegador..."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1082
+#: ocamlfuse_manager_gui/gui.py:1080
 msgid "No hay cuentas configuradas"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1086
+#: ocamlfuse_manager_gui/gui.py:1084
 msgid "Seleccionar Cuenta a Montar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1089
+#: ocamlfuse_manager_gui/gui.py:1087
 msgid "Selecciona la cuenta que deseas montar:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1104
+#: ocamlfuse_manager_gui/gui.py:1102
 msgid "Montada"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1106
+#: ocamlfuse_manager_gui/gui.py:1104
 msgid "No configurada"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1120
+#: ocamlfuse_manager_gui/gui.py:1118
 msgid "Abrir carpeta al montar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1128
+#: ocamlfuse_manager_gui/gui.py:1126
 msgid "Selecciona una cuenta para montar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1133
+#: ocamlfuse_manager_gui/gui.py:1131
 msgid "Montar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1147
+#: ocamlfuse_manager_gui/gui.py:1145
 #, python-brace-format
 msgid "La cuenta '{account}' no está configurada correctamente."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1153
+#: ocamlfuse_manager_gui/gui.py:1151
 msgid "Información"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1154
+#: ocamlfuse_manager_gui/gui.py:1152
 #, python-brace-format
 msgid "La cuenta '{account}' ya está montada en {mount_point}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1181
+#: ocamlfuse_manager_gui/gui.py:1179
 msgid "Selecciona una cuenta para desmontar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1194 ocamlfuse_manager_gui/mount.py:42
-#: ocamlfuse_manager_gui/mount.py:129
+#: ocamlfuse_manager_gui/gui.py:1192 ocamlfuse_manager_gui/mount.py:43
+#: ocamlfuse_manager_gui/mount.py:153
 msgid "Info"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1194 ocamlfuse_manager_gui/mount.py:129
+#: ocamlfuse_manager_gui/gui.py:1192 ocamlfuse_manager_gui/mount.py:153
 msgid "No hay cuentas montadas"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1197 ocamlfuse_manager_gui/mount.py:132
+#: ocamlfuse_manager_gui/gui.py:1195 ocamlfuse_manager_gui/mount.py:156
 msgid "¿Desmontar todas las cuentas?"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1207 ocamlfuse_manager_gui/mount.py:141
+#: ocamlfuse_manager_gui/gui.py:1205 ocamlfuse_manager_gui/mount.py:165
 msgid "Algunas cuentas no se desmontaron"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1208
+#: ocamlfuse_manager_gui/gui.py:1206
 #, python-brace-format
 msgid ""
 "No se pudieron desmontar las siguientes cuentas:\n"
@@ -1158,153 +1158,153 @@ msgid ""
 "Verifica que no estén en uso."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1212 ocamlfuse_manager_gui/mount.py:145
+#: ocamlfuse_manager_gui/gui.py:1210 ocamlfuse_manager_gui/mount.py:169
 msgid "Todas las cuentas fueron desmontadas correctamente."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1218
+#: ocamlfuse_manager_gui/gui.py:1216
 msgid "Selecciona una cuenta montada"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1231
+#: ocamlfuse_manager_gui/gui.py:1229
 msgid "Error al abrir la carpeta {}: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1242
+#: ocamlfuse_manager_gui/gui.py:1240
 msgid ""
 "¿Seguro que quieres restaurar la configuración?\n"
 "Se perderán todas las cuentas y preferencias guardadas."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1253
+#: ocamlfuse_manager_gui/gui.py:1251
 msgid "Restaurado"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1253
+#: ocamlfuse_manager_gui/gui.py:1251
 msgid ""
 "Configuración restaurada. Reinicia la aplicación para aplicar los cambios."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1255
+#: ocamlfuse_manager_gui/gui.py:1253
 msgid ""
 "No se pudo restaurar la configuración:\n"
 "{}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1304
+#: ocamlfuse_manager_gui/gui.py:1302
 msgid "Importada"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1306
+#: ocamlfuse_manager_gui/gui.py:1304
 msgid "Configurada"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1353 ocamlfuse_manager_gui/mount.py:164
+#: ocamlfuse_manager_gui/gui.py:1351 ocamlfuse_manager_gui/mount.py:188
 msgid "Desconocido"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1364
+#: ocamlfuse_manager_gui/gui.py:1362
 msgid "Montado"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1438
+#: ocamlfuse_manager_gui/gui.py:1437
 msgid ""
 "No se monta '{}' porque el token OAuth no es válido o ha caducado. Por "
 "favor, reautoriza la cuenta."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1440 ocamlfuse_manager_gui/gui.py:1442
-#: ocamlfuse_manager_gui/mount.py:214 ocamlfuse_manager_gui/mount.py:216
+#: ocamlfuse_manager_gui/gui.py:1439 ocamlfuse_manager_gui/gui.py:1441
+#: ocamlfuse_manager_gui/mount.py:238 ocamlfuse_manager_gui/mount.py:240
 msgid "Error al montar '{}': {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1447
+#: ocamlfuse_manager_gui/gui.py:1446
 msgid "Acerca de Easy Ocamlfuse"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1459
+#: ocamlfuse_manager_gui/gui.py:1458
 msgid "Acerca de"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1479
+#: ocamlfuse_manager_gui/gui.py:1478
 msgid "Gestor gráfico para Google Drive Ocamlfuse"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1480
+#: ocamlfuse_manager_gui/gui.py:1479
 msgid "Versión: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1481
+#: ocamlfuse_manager_gui/gui.py:1480
 msgid "Repositorio y descargas en:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1488
+#: ocamlfuse_manager_gui/gui.py:1487
 msgid "Basado en el software original:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1496
+#: ocamlfuse_manager_gui/gui.py:1495
 msgid "Buscar actualizaciones"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1501
+#: ocamlfuse_manager_gui/gui.py:1500
 msgid "Créditos"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1503
+#: ocamlfuse_manager_gui/gui.py:1502
 msgid "Autor: ayalarol"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1504
+#: ocamlfuse_manager_gui/gui.py:1503
 msgid "¡Gracias por usar Easy Ocamlfuse!"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1509
+#: ocamlfuse_manager_gui/gui.py:1508
 msgid "¿Te gusta el proyecto? ¡Dame energías con un café en PayPal! :D"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1517
+#: ocamlfuse_manager_gui/gui.py:1516
 msgid "Licencia"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1555 ocamlfuse_manager_gui/gui.py:1624
+#: ocamlfuse_manager_gui/gui.py:1554 ocamlfuse_manager_gui/gui.py:1623
 msgid "Hay una nueva versión disponible:"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1580
+#: ocamlfuse_manager_gui/gui.py:1579
 msgid "¿Desea ir a la página de descarga?"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1607
+#: ocamlfuse_manager_gui/gui.py:1606
 msgid "Actualización disponible"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1613
+#: ocamlfuse_manager_gui/gui.py:1612
 msgid "Sin actualizaciones"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1613
+#: ocamlfuse_manager_gui/gui.py:1612
 msgid "Tu versión está actualizada."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1625
+#: ocamlfuse_manager_gui/gui.py:1624
 msgid "Haz clic en Ayuda -> Acerca de para más detalles."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1648
+#: ocamlfuse_manager_gui/gui.py:1647
 msgid "Bandeja del Sistema en GNOME"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1649
+#: ocamlfuse_manager_gui/gui.py:1648
 msgid ""
 "Easy Ocamlfuse se inició minimizado. Si no ves el icono, instala la "
 "extensión 'AppIndicator' para GNOME Shell."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1659
+#: ocamlfuse_manager_gui/gui.py:1658
 msgid "Información de la Bandeja del Sistema"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1666
+#: ocamlfuse_manager_gui/gui.py:1665
 msgid ""
 "Detectamos que estás usando GNOME y la aplicación se inició minimizada.\n"
 "\n"
@@ -1313,23 +1313,23 @@ msgid ""
 "KStatusNotifierItem Support' para GNOME Shell."
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1672
+#: ocamlfuse_manager_gui/gui.py:1671
 msgid "No volver a mostrar este mensaje"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1680
+#: ocamlfuse_manager_gui/gui.py:1679
 msgid "Aceptar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1701
+#: ocamlfuse_manager_gui/gui.py:1700
 msgid "¿Deseas cerrar la aplicación?"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1735
+#: ocamlfuse_manager_gui/gui.py:1734
 msgid "Idioma cambiado"
 msgstr ""
 
-#: ocamlfuse_manager_gui/gui.py:1736
+#: ocamlfuse_manager_gui/gui.py:1735
 msgid ""
 "El idioma se ha cambiado. Reinicia la aplicación para aplicar todos los "
 "cambios."
@@ -1358,15 +1358,15 @@ msgstr ""
 msgid "Desmontar Todo"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:42
+#: ocamlfuse_manager_gui/mount.py:43
 msgid "La cuenta '{}' ya está montada en {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:45
+#: ocamlfuse_manager_gui/mount.py:46
 msgid "Aviso"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:45
+#: ocamlfuse_manager_gui/mount.py:46
 msgid "El punto de montaje {} ya está en uso por otro proceso."
 msgstr ""
 
@@ -1384,57 +1384,42 @@ msgstr ""
 msgid "Timeout al montar la cuenta"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:102
+#: ocamlfuse_manager_gui/mount.py:102 ocamlfuse_manager_gui/mount.py:146
 msgid "Error inesperado: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:113
-msgid "Error al montar"
+#: ocamlfuse_manager_gui/mount.py:138 ocamlfuse_manager_gui/mount.py:145
+msgid "Error al desmontar"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:114
+#: ocamlfuse_manager_gui/mount.py:139
 msgid ""
 "No se pudo desmontar '{}' en '{}':\n"
-"Asegúrate de que ningún archivo, terminal o ventana esté usando la carpeta "
-"de montaje.\n"
+"Asegúrate de que ningún archivo esté usando la carpeta.\n"
 "\n"
 "Detalle: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:116 ocamlfuse_manager_gui/mount.py:123
-msgid "Error al desmontar {} en {}: {}"
-msgstr ""
-
-#: ocamlfuse_manager_gui/mount.py:120
-msgid "Error al desmontar"
-msgstr ""
-
-#: ocamlfuse_manager_gui/mount.py:121
-msgid ""
-"Error inesperado al desmontar '{}' en '{}':\n"
-"{}"
-msgstr ""
-
-#: ocamlfuse_manager_gui/mount.py:142
+#: ocamlfuse_manager_gui/mount.py:166
 msgid ""
 "No se pudieron desmontar las siguientes cuentas:\n"
 "{}\n"
 "Verifica que no estén en uso."
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:172
+#: ocamlfuse_manager_gui/mount.py:196
 msgid "Error al refrescar montajes: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:181
+#: ocamlfuse_manager_gui/mount.py:205
 msgid "Error comprobando punto de montaje {}: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:234
+#: ocamlfuse_manager_gui/mount.py:258
 msgid "Error obteniendo etiqueta: {}"
 msgstr ""
 
-#: ocamlfuse_manager_gui/mount.py:282
+#: ocamlfuse_manager_gui/mount.py:313
 msgid "Error in mount monitor while checking '{}': {}"
 msgstr ""
 

@@ -14,6 +14,7 @@
 
 import os
 import sys
+import re
 import subprocess
 import notify2
 import webbrowser
@@ -224,9 +225,6 @@ class GoogleDriveManager:
             "do_not_show_gnome_tray_warning": self.do_not_show_gnome_tray_warning.get()
         }
         self.config_mgr.save_config(config)
-
-    def refresh_accounts(self):
-         self.account_mgr.refresh_accounts()
 
     def on_closing(self):
         """Maneja el evento de cierre de la ventana principal"""
@@ -1363,8 +1361,9 @@ class GoogleDriveManager:
         for label, mount_point in self.mounted_accounts.items():
             status = _("Montado") if os.path.ismount(mount_point) else _("Error")
             self.mounted_tree.insert("", tk.END, values=(label, label, mount_point, status))
-            self._save_state()
-            self._update_main_tab_button_states()
+
+        self._save_state()
+        self._update_main_tab_button_states()
 
         # Actualizar menú del icono de la bandeja
         if self.tray_mgr:
