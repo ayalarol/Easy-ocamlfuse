@@ -14,7 +14,6 @@
 
 import os
 import sys
-import re
 import subprocess
 import notify2
 import webbrowser
