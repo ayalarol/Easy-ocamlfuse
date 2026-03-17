@@ -846,12 +846,15 @@ class GoogleDriveManager:
                 return False
 
     def instalar_ocamlfuse(self):
-        distro_id, version_id = detectar_distro_id()
+        distro_id, version_id, id_like = detectar_distro_id()
         install_cmd = ""
         ppa_choice = "normal"
         use_pkexec = True  # Por defecto, usar pkexec
 
-        if distro_id in ["ubuntu", "linuxmint", "pop"]:
+        # Detectar si es una distro basada en Ubuntu/Debian para el diálogo del PPA
+        is_ubuntu_based = distro_id in ["ubuntu", "linuxmint", "pop", "zorin"] or 'ubuntu' in id_like.lower()
+
+        if is_ubuntu_based:
             # Diálogo para elegir PPA
             ppa_dialog = tk.Toplevel(self.root)
             ppa_dialog.title(_("Seleccionar una versión de PPA"))
@@ -879,8 +882,8 @@ class GoogleDriveManager:
             self.root.wait_window(ppa_dialog)
             if not ppa_choice:
                 return False
-            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id, ppa_choice=ppa_choice)
-        elif distro_id in ["arch", "manjaro", "endeavouros"]:
+            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id, id_like, ppa_choice=ppa_choice)
+        elif distro_id in ["arch", "manjaro", "endeavouros"] or 'arch' in id_like.lower():
             messagebox.showinfo(
                 _("Instalación en Arch Linux"),
                 _("Para Arch Linux y derivados, la instalación automática ha sido deshabilitada.\n\n" 
@@ -892,7 +895,7 @@ class GoogleDriveManager:
             )
             return False
         else:
-            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id)
+            install_cmd = obtener_comando_instalacion_ocamlfuse(distro_id, version_id, id_like)
 
         if not install_cmd:
             messagebox.showerror(
