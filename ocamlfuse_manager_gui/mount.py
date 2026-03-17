@@ -18,6 +18,7 @@ import subprocess
 from tkinter import messagebox
 import threading
 import time
+from gi.repository import GLib
 from .i18n import i18n_instance
 _ = i18n_instance.gettext
 
@@ -212,32 +213,73 @@ class MountManager:
         
         return self.mounted_accounts
 
-    def automount_accounts(self, accounts):
-        """Montar automáticamente las cuentas marcadas como 'automount' al iniciar"""
+    def automount_accounts(self, accounts, deleted_accounts=None):
+        """
+        Lógica de negocio para montar automáticamente las cuentas marcadas al inicio.
+        Mantenemos la lógica aquí para separar la funcionalidad de la interfaz.
+        """
         from .encryption import EncryptionManager
         enc_mgr = EncryptionManager()
+        
         for label, data in accounts.items():
-            if data.get("automount", False):
+            # 1. Comprobar blacklist
+            if deleted_accounts and label in deleted_accounts and deleted_accounts[label].get("blacklist"):
+                continue
+            
+            # 2. Validar que la cuenta esté lista para montar
+            if (
+                data.get("automount", False)
+                and data.get("configured", False)
+                and data.get("client_id")
+                and data.get("client_secret")
+            ):
                 mount_point = data.get('mount_point')
                 if not mount_point:
                     mount_point = os.path.expanduser(f"~/{label}")
                     os.makedirs(mount_point, exist_ok=True)
                     data['mount_point'] = mount_point
-                if label not in self.mounted_accounts or not os.path.ismount(mount_point):
-                    try:
-                        # Desencriptar client_secret si es necesario (por si se usa en el futuro)
-                        try:
-                            client_secret = enc_mgr.decrypt(data['client_secret'])
-                        except Exception:
-                            client_secret = data['client_secret']
-                        mount_cmd = ["google-drive-ocamlfuse", "-label", label, mount_point]
-                        result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
-                        if result.returncode == 0:
-                            self.mounted_accounts[label] = mount_point
+                    if hasattr(self, 'main_app') and hasattr(self.main_app, '_save_state'):
+                        GLib.idle_add(self.main_app._save_state)
+
+                # 3. Comprobar si ya está montado físicamente en el sistema
+                if os.path.ismount(mount_point):
+                    print(f"[DEBUG] '{label}' ya estaba montada físicamente en {mount_point}. Sincronizando...")
+                    self.mounted_accounts[label] = mount_point
+                    if hasattr(self, 'main_app') and hasattr(self.main_app, 'refresh_mounts'):
+                        GLib.idle_add(self.main_app.refresh_mounts)
+                    continue
+
+                # 4. Si no está montado, procedemos a montar
+                try:
+                    print(f"[DEBUG] Automontando cuenta '{label}' en {mount_point}...")
+                    
+                    mount_cmd = ["google-drive-ocamlfuse", "-label", label, mount_point]
+                    # Ejecutar montaje con timeout
+                    result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
+                    
+                    if result.returncode == 0:
+                        self.mounted_accounts[label] = mount_point
+                        # Notificar a la app principal para que guarde y refresque
+                        if hasattr(self, 'main_app'):
+                            if hasattr(self.main_app, '_save_state'):
+                                GLib.idle_add(self.main_app._save_state)
+                            
+                            # En Fedora/Linux, damos un pequeño margen para que FUSE registre el montaje
+                            # antes de pedirle a la UI que refresque la tabla
+                            time.sleep(0.5) 
+                            if hasattr(self.main_app, 'refresh_mounts'):
+                                GLib.idle_add(self.main_app.refresh_mounts)
+                        print(f"[DEBUG] '{label}' montada con éxito.")
+                    else:
+                        error_msg = result.stderr.strip()
+                        # Lógica de detección de errores específicos
+                        if "access_token" in error_msg or "invalid_grant" in error_msg:
+                            print(_("No se monta '{}' porque el token OAuth no es válido o ha caducado.").format(label))
                         else:
-                            print(_("Error al montar '{}': {}").format(label, result.stderr))
-                    except Exception as e:
-                        print(_("Error al montar '{}': {}").format(label, e))
+                            print(_("Error al montar '{}': {}").format(label, error_msg))
+                                
+                except Exception as e:
+                    print(_("Error crítico en automontaje de '{}': {}").format(label, e))
 
     def get_label_from_mount_point(self, mount_point):
         """Intentar obtener etiqueta real para un punto de montaje"""
@@ -258,10 +300,15 @@ class MountManager:
             print(_("Error obteniendo etiqueta: {}").format(e))
         return UNKNOWN_LABEL
 
-    def start_mount_monitor(self, interval=2, on_unmount_callback=None):
+    def start_mount_monitor(self, interval=5, on_unmount_callback=None, start_delay=30):
         """
         Inicia un hilo que monitorea los puntos de montaje. Si detecta un desmontaje,
         llama al callback y termina su ciclo para que la GUI actualice el estado.
+        
+        Args:
+            interval (int): Segundos entre cada comprobación.
+            on_unmount_callback (callable): Función a llamar cuando se detecta desmontaje externo.
+            start_delay (int): Tiempo de gracia al inicio antes de empezar a notificar (evita falsos positivos al arrancar).
         """
         if hasattr(self, '_monitoring') and self._monitoring:
             return
@@ -288,6 +335,10 @@ class MountManager:
                 self.main_app._save_state()
 
         def monitor():
+            # Tiempo de gracia inicial para permitir que los automontajes se completen
+            if start_delay > 0:
+                time.sleep(start_delay)
+
             while self._monitoring:
                 time.sleep(interval)
 

@@ -29,7 +29,15 @@ gi.require_version('Gtk', '3.0')
 from gi.repository import GLib
 
 from .constants import LOGO_FILE, GDFUSE_DIR, CONFIG_FILE, APP_VERSION, MINIMIZED_FLAGS
-from .utils import ToolTip,centrar_ventana,verificar_ocamlfuse, detectar_distro_id, obtener_comando_instalacion_ocamlfuse, instalar_ocamlfuse_async, check_for_updates
+from .utils import (
+    ToolTip,
+    centrar_ventana,
+    verificar_ocamlfuse,
+    detectar_distro_id,
+    obtener_comando_instalacion_ocamlfuse,
+    instalar_ocamlfuse_async,
+    check_for_updates
+)
 from .config    import ConfigManager
 from .mount     import MountManager
 from .account   import AccountManager
@@ -177,12 +185,24 @@ class GoogleDriveManager:
             self.tray_mgr.create_tray_icon(LOGO_FILE)
 
     def start_background_tasks(self):
-        self._cargar_datos_pesados()
+        """Inicia tareas pesadas en segundo plano al arrancar la app."""
+        # Se lanza en un hilo separado para no bloquear la UI al inicio (evita lag en Fedora)
+        threading.Thread(target=self._cargar_datos_pesados, daemon=True).start()
 
     def _cargar_datos_pesados(self):
-        self.refresh_accounts()
-        self.refresh_mounts()
+        """Carga datos de cuentas y montajes de forma asíncrona."""
+        # Primero actualizamos cuentas registradas (de forma segura en hilo principal)
+        GLib.idle_add(self.refresh_accounts)
+        GLib.idle_add(self.refresh_mounts)
+        
+        # Pequeño retardo inicial para dar tiempo a que la red esté estable
+        time.sleep(1)
+        
+        # Intentamos el automontaje (esto puede tardar varios segundos según la red)
         self.automount_accounts()
+        
+        # Un último refresco final tras el automontaje para asegurar la sincronización
+        GLib.idle_add(self.refresh_mounts)
     def _load_icon(self, path, size=ICON_SIZE, bg_color=None):
         try:
             full_path = os.path.join(os.path.dirname(__file__), path)
@@ -1403,42 +1423,8 @@ class GoogleDriveManager:
 
     def automount_accounts(self):
         """Montar automáticamente las cuentas marcadas como 'automount' al iniciar la app."""
-        for label, data in self.accounts.items():
-            if label in self.deleted_accounts and self.deleted_accounts[label].get("blacklist"):
-                continue
-            if (
-                data.get("automount", False)
-                and data.get("configured", False)
-                and data.get("client_id")
-                and data.get("client_secret")
-            ):
-                mount_point = data.get('mount_point')
-                if not mount_point:
-                    mount_point = os.path.expanduser(f"~/{label}")
-                    os.makedirs(mount_point, exist_ok=True)
-                    self.accounts[label]['mount_point'] = mount_point
-                    self._save_state()
-                if label not in self.mounted_accounts or not os.path.ismount(mount_point):
-                    try:
-                        mount_cmd = [
-                            "google-drive-ocamlfuse",
-                            "-label", label,
-                            mount_point
-                        ]
-                        result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
-                        if result.returncode == 0:
-                            self.mounted_accounts[label] = mount_point
-                            self.accounts[label]['mount_point'] = mount_point
-                            self._save_state()
-                            self.refresh_mounts()
-                        else:
-                            error_msg = result.stderr.strip()
-                            if "access_token" in error_msg or "invalid_grant" in error_msg:
-                                print(_("No se monta '{}' porque el token OAuth no es válido o ha caducado. Por favor, reautoriza la cuenta.").format(label))
-                            else:
-                                print(_("Error al montar '{}': {}").format(label, error_msg))
-                    except Exception as e:
-                        print(_("Error al montar '{}': {}").format(label, e))
+        # Se delega la lógica al manager para mantener gui.py enfocado en la interfaz
+        self.mount_mgr.automount_accounts(self.accounts, self.deleted_accounts)
 
     def show_about_dialog(self):
         """Mostrar información de la aplicación y enlaces en pestañas."""
@@ -1492,7 +1478,7 @@ class GoogleDriveManager:
         enlace2.bind("<Button-1>", lambda e: webbrowser.open("https://github.com/astrada/google-drive-ocamlfuse"))
         
         # Botón de Actualizar
-        update_button = ttk.Button(about_frame, text=_("Buscar actualizaciones"), command=self.check_for_updates_manual)
+        update_button = ttk.Button(about_frame, text=_("Buscar actualizaciones"), command=lambda: self.check_for_updates_manual(parent_window=top))
         update_button.pack(side=tk.BOTTOM, pady=19)
         
         # --- Pestaña "Créditos" ---
@@ -1538,8 +1524,9 @@ class GoogleDriveManager:
         license_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         license_label.config(yscrollcommand=license_scrollbar.set)
 
-    def show_custom_update_dialog(self, title, version, notes, url):
-        dialog = tk.Toplevel(self.root)
+    def show_custom_update_dialog(self, title, version, notes, url, parent_window=None):
+        p = parent_window or self.root
+        dialog = tk.Toplevel(p)
         dialog.title(title)
         
         dialog.maxsize(600, 500)
@@ -1592,24 +1579,28 @@ class GoogleDriveManager:
         no_button = ttk.Button(button_group, text=_("No"), command=dialog.destroy)
         no_button.pack(side=tk.LEFT)
 
-        centrar_ventana(dialog, self.root)
-        
-        dialog.transient(self.root)
+        centrar_ventana(dialog, p)
+
+        dialog.transient(p)
         dialog.grab_set()
         dialog.deiconify()
         self.root.wait_window(dialog)
-
-    def check_for_updates_manual(self):
+    def check_for_updates_manual(self, parent_window=None):
+        """Busca actualizaciones manualmente y muestra el resultado."""
+        # Si no se pasa padre, usamos el root por defecto
+        p = parent_window or self.root
+        
         update_info = check_for_updates()
         if update_info:
             self.show_custom_update_dialog(
                 title=_("Actualización disponible"),
                 version=update_info['version'],
                 notes=update_info['notes'],
-                url=update_info['url']
+                url=update_info['url'],
+                parent_window=p
             )
         else:
-            messagebox.showinfo(_("Sin actualizaciones"), _("Tu versión está actualizada."))
+            messagebox.showinfo(_("Sin actualizaciones"), _("Tu versión está actualizada."), parent=p)
 
     def check_for_updates_on_startup(self):
         threading.Thread(target=self._check_for_updates_background, daemon=True).start()

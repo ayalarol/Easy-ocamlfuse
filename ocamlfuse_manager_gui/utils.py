@@ -40,7 +40,12 @@ def check_for_updates():
                 "notes": latest_release.get("body")
             }
     except requests.RequestException as e:
-        print(f"Error checking for updates: {e}")
+        # Silenciar por completo errores de límite de tasa (403) de GitHub
+        if hasattr(e, 'response') and e.response is not None:
+            if e.response.status_code == 403:
+                return None
+        # Otros errores sí los mostramos pero de forma discreta
+        print(f"Update check skipped: {e}")
     return None
 
 class ToolTip:
