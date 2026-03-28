@@ -9,7 +9,7 @@
 # Este programa se distribuye con la esperanza de que sea útil, pero
 # SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
 # MERCANTIL o de APTITUD PARA UN PROPÓSITO PARTICULAR.
-# Consulta los detalles de la Licencia Pública General GNU para más información ve a /assets/resources/LICENSE.txt
+# Consulta los detalles de la Licencia Pública General GNU para más información ve a LICENSE.txt
 # Debes haber recibido una copia de la Licencia Pública General GNU
 # junto a este programa. En caso contrario, consulta <http://www.gnu.org/licenses/>.
 

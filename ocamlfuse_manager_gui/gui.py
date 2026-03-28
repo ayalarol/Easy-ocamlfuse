@@ -8,7 +8,7 @@
 # Este programa se distribuye con la esperanza de que sea útil, pero
 # SIN GARANTÍA ALGUNA; ni siquiera la garantía implícita
 # MERCANTIL o de APTITUD PARA UN PROPÓSITO PARTICULAR.
-# Consulta los detalles de la Licencia Pública General GNU para más información ve a /assets/resources/LICENSE.txt
+# Consulta los detalles de la Licencia Pública General GNU para más información ve a LICENSE.txt
 # Debes haber recibido una copia de la Licencia Pública General GNU
 # junto a este programa. En caso contrario, consulta <http://www.gnu.org/licenses/>.
 
@@ -1506,7 +1506,11 @@ class GoogleDriveManager:
         license_text_frame = tk.Frame(license_frame, bg="#f7f7f7")
         license_text_frame.pack(fill=tk.BOTH, padx=10, pady=10, expand=True)
         
-        license_path = os.path.join(os.path.dirname(__file__), "assets/resources", "LICENSE.txt")
+        # Buscar la licencia en la raíz del proyecto (un nivel arriba de la carpeta actual)
+        license_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "LICENSE.txt"))
+        if not os.path.exists(license_path):
+            # Fallback a la ubicación anterior por si acaso
+            license_path = os.path.join(os.path.dirname(__file__), "assets/resources", "LICENSE.txt")
         license_text = ""
         try:
             with open(license_path, "r") as f:
