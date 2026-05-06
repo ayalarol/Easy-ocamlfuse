@@ -29,6 +29,37 @@ class MountManager:
         self.mounted_accounts = mounted_accounts_ref
         self._internal_unmounting = set() # Etiquetas que se están desmontando internamente
 
+    def _run_safe_mount(self, mount_cmd, mount_point, timeout=45):
+        """
+        Ejecuta el comando de montaje y verifica cada segundo si el montaje ya es efectivo.
+        Si se detecta el montaje, retorna éxito inmediatamente sin esperar a que el proceso termine.
+        """
+        try:
+            proc = subprocess.Popen(mount_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            start_time = time.time()
+            
+            while time.time() - start_time < timeout:
+                # 1. ¿El proceso terminó rápido? (Caso ideal/normal)
+                retcode = proc.poll()
+                if retcode is not None:
+                    stdout, stderr = proc.communicate()
+                    return retcode, stdout, stderr
+
+                # 2. ¿El montaje ya es visible para el SO? (Caso con retardo de demonización)
+                # Si os.path.ismount es True, el usuario ya puede usar los archivos.
+                if os.path.ismount(mount_point):
+                    print(f"[DEBUG] Montaje detectado en {mount_point}. Liberando UI...")
+                    return 0, "", ""
+                
+                time.sleep(1) # Verificación rápida cada segundo
+
+            # 3. Timeout real: el proceso no terminó y no hay montaje visible
+            proc.kill()
+            stdout, stderr = proc.communicate()
+            return -1, stdout, stderr or "Timeout al montar la cuenta"
+        except Exception as e:
+            return -1, "", str(e)
+
     def mount_account(self, label, mount_point):
         """Montar una cuenta específica con verificaciones de seguridad"""
         try:
@@ -59,10 +90,10 @@ class MountManager:
                         client_secret = account_data['client_secret']
 
             mount_cmd = ["google-drive-ocamlfuse", "-label", label, mount_point]
-            # Ejecutamos el montaje
-            result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=45)
+            # Ejecutamos el montaje con nuestra lógica de verificación rápida
+            retcode, stdout, stderr = self._run_safe_mount(mount_cmd, mount_point, timeout=45)
 
-            if result.returncode == 0:
+            if retcode == 0:
                 self.mounted_accounts[label] = mount_point
                 
                 # --- ACTUALIZAR ESTADO EN LA GUI ---
@@ -84,21 +115,18 @@ class MountManager:
                 return True
             else:
                 # Si falla porque el punto de montaje está "sucio" (transporte no conectado, etc)
-                error_msg = result.stderr.lower()
+                error_msg = stderr.lower()
                 if "transport endpoint is not connected" in error_msg or "device or resource busy" in error_msg:
                     # Intentar un desmontaje forzado y reintentar una vez
                     subprocess.run(["fusermount", "-uz", mount_point], capture_output=True)
                     time.sleep(1)
-                    result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
-                    if result.returncode == 0:
+                    retcode, stdout, stderr = self._run_safe_mount(mount_cmd, mount_point, timeout=30)
+                    if retcode == 0:
                         self.mounted_accounts[label] = mount_point
                         return True
                 
-                messagebox.showerror(_("Error"), _("Error al montar '{}':\n{}").format(label, result.stderr))
+                messagebox.showerror(_("Error"), _("Error al montar '{}':\n{}").format(label, stderr))
                 return False
-        except subprocess.TimeoutExpired:
-            messagebox.showerror(_("Error"), _( "Timeout al montar la cuenta"))
-            return False
         except Exception as e:
             messagebox.showerror(_("Error"), _("Error inesperado: {}").format(str(e)))
             return False
@@ -254,10 +282,10 @@ class MountManager:
                     print(f"[DEBUG] Automontando cuenta '{label}' en {mount_point}...")
                     
                     mount_cmd = ["google-drive-ocamlfuse", "-label", label, mount_point]
-                    # Ejecutar montaje con timeout
-                    result = subprocess.run(mount_cmd, capture_output=True, text=True, timeout=30)
+                    # Ejecutar montaje con nuestra lógica robusta (timeout 30s para automontaje)
+                    retcode, stdout, stderr = self._run_safe_mount(mount_cmd, mount_point, timeout=30)
                     
-                    if result.returncode == 0:
+                    if retcode == 0:
                         self.mounted_accounts[label] = mount_point
                         # Notificar a la app principal para que guarde y refresque
                         if hasattr(self, 'main_app'):
@@ -271,7 +299,7 @@ class MountManager:
                                 GLib.idle_add(self.main_app.refresh_mounts)
                         print(f"[DEBUG] '{label}' montada con éxito.")
                     else:
-                        error_msg = result.stderr.strip()
+                        error_msg = stderr.strip()
                         # Lógica de detección de errores específicos
                         if "access_token" in error_msg or "invalid_grant" in error_msg:
                             print(_("No se monta '{}' porque el token OAuth no es válido o ha caducado.").format(label))

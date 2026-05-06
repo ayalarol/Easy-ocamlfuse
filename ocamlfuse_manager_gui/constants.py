@@ -1,6 +1,6 @@
 import os
 
-APP_VERSION = "1.0.2"
+APP_VERSION = "1.0.3"
 GITHUB_URL = "https://github.com/ayalarol/Easy-ocamlfuse"
 LICENSE_URL = f"{GITHUB_URL}/blob/main/LICENSE"
 
