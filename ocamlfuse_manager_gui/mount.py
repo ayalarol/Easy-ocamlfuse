@@ -63,9 +63,14 @@ class MountManager:
     def mount_account(self, label, mount_point):
         """Montar una cuenta específica con verificaciones de seguridad"""
         try:
+            # Normalizar el punto de montaje para evitar inconsistencias
+            mount_point = os.path.abspath(os.path.expanduser(mount_point))
+            
             # Si el directorio no existe, crearlo
             if not os.path.exists(mount_point):
                 os.makedirs(mount_point, exist_ok=True)
+                # En algunas distros como Fedora, asegurar permisos 755 ayuda a FUSE
+                os.chmod(mount_point, 0o755)
             
             # Verificar si ya está montado algo ahí
             if os.path.ismount(mount_point):
@@ -93,38 +98,64 @@ class MountManager:
             # Ejecutamos el montaje con nuestra lógica de verificación rápida
             retcode, stdout, stderr = self._run_safe_mount(mount_cmd, mount_point, timeout=45)
 
+            if retcode != 0:
+                # Si falla, analizamos el error para intentar soluciones comunes
+                error_msg = stderr.lower()
+                
+                # "invalid argument" (o errores similares en Fedora) 
+                # ocurre cuando el punto de montaje está en un estado inconsistente o no está vacío.
+                dirty_mount_errors = [
+                    "transport endpoint is not connected", 
+                    "device or resource busy", 
+                    "invalid argument", 
+                    "inválid", 
+                    "invalida"
+                ]
+                
+                if any(err in error_msg for err in dirty_mount_errors):
+                    # 1. Intentar un desmontaje forzado (lazy unmount) por si es un montaje zombie
+                    # Probamos con fusermount3 (común en Fedora) y luego fusermount
+                    for unmount_bin in ["fusermount3", "fusermount"]:
+                        try:
+                            subprocess.run([unmount_bin, "-uz", mount_point], capture_output=True)
+                        except FileNotFoundError:
+                            continue
+                    
+                    time.sleep(1)
+                    
+                    # 2. Reintentar el montaje normal
+                    retcode, stdout, stderr = self._run_safe_mount(mount_cmd, mount_point, timeout=30)
+                    
+                    # 3. Si sigue fallando con "invalid argument", intentar con la opción nonempty
+                    # Esto es necesario en Fedora si el directorio tiene rastros de FUSE
+                    if retcode != 0 and any(err in stderr.lower() for err in ["invalid argument", "inválid", "invalida"]):
+                        mount_cmd_nonempty = ["google-drive-ocamlfuse", "-label", label, "-o", "nonempty", mount_point]
+                        retcode, stdout, stderr = self._run_safe_mount(mount_cmd_nonempty, mount_point, timeout=30)
+
             if retcode == 0:
                 self.mounted_accounts[label] = mount_point
                 
                 # --- ACTUALIZAR ESTADO EN LA GUI ---
                 if hasattr(self, 'main_app'):
-                    if hasattr(self.main_app, 'mounted_accounts'):
-                        self.main_app.mounted_accounts[label] = mount_point
+                    app = self.main_app
+                    if hasattr(app, 'mounted_accounts'):
+                        app.mounted_accounts[label] = mount_point
                     
-                    if hasattr(self.main_app, 'accounts') and label in self.main_app.accounts:
-                        self.main_app.accounts[label]['mount_point'] = mount_point
+                    if hasattr(app, 'accounts') and label in app.accounts:
+                        app.accounts[label]['mount_point'] = mount_point
                     
-                    if hasattr(self.main_app, '_save_state'):
-                        self.main_app._save_state()
+                    if hasattr(app, '_save_state'):
+                        app._save_state()
                     
-                    # Forzar refresco de la UI si existe el método
-                    if hasattr(self.main_app, 'refresh_accounts_ui'):
-                        self.main_app.refresh_accounts_ui()
+                    # Forzar refresco de la UI
+                    if hasattr(app, 'refresh_mounts'):
+                        GLib.idle_add(app.refresh_mounts)
+                    elif hasattr(app, 'refresh_accounts_ui'):
+                        app.refresh_accounts_ui()
 
                 messagebox.showinfo(_("Éxito"), _("Cuenta '{}' montada en {}").format(label, mount_point))
                 return True
             else:
-                # Si falla porque el punto de montaje está "sucio" (transporte no conectado, etc)
-                error_msg = stderr.lower()
-                if "transport endpoint is not connected" in error_msg or "device or resource busy" in error_msg:
-                    # Intentar un desmontaje forzado y reintentar una vez
-                    subprocess.run(["fusermount", "-uz", mount_point], capture_output=True)
-                    time.sleep(1)
-                    retcode, stdout, stderr = self._run_safe_mount(mount_cmd, mount_point, timeout=30)
-                    if retcode == 0:
-                        self.mounted_accounts[label] = mount_point
-                        return True
-                
                 messagebox.showerror(_("Error"), _("Error al montar '{}':\n{}").format(label, stderr))
                 return False
         except Exception as e:
